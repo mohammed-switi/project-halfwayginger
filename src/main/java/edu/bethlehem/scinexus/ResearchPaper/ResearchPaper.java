@@ -1,11 +1,11 @@
 package edu.bethlehem.scinexus.ResearchPaper;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Data;
 
 import edu.bethlehem.scinexus.Organization.Organization;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 @Data
 @Entity
@@ -13,6 +13,8 @@ public class ResearchPaper {
     private @Id @GeneratedValue Long id;
     private String description;
 
+    @OneToOne
+    @JdbcTypeCode(SqlTypes.JSON)
     private Organization validatedBy;
     private String subject;
     private String language;

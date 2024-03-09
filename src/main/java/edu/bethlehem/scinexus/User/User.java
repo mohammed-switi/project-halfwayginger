@@ -1,21 +1,23 @@
 
 package edu.bethlehem.scinexus.User;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.*;
 
 import lombok.Data;
 
 import edu.bethlehem.scinexus.Media.Media;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
-// @Entity
-// @Table(name = "user")
-// @Data
+@Entity
+ @Table(name = "_user")
+ @Data
+
 public class User {
-    private @Id @GeneratedValue Long id;
+
+     @Id
+     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     private String name;
     private String username;
@@ -23,11 +25,14 @@ public class User {
     private String email;
 
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "media_id")
+    @JoinColumn(name = "profile_picture_id")
+    @JdbcTypeCode(SqlTypes.JSON)
+
     private Media profilePicture;
 
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "media_id")
+    @JoinColumn(name = "profile_conver_id")
+    @JdbcTypeCode(SqlTypes.JSON)
     private Media profileCover;
 
     private String bio;

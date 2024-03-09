@@ -1,13 +1,16 @@
 package edu.bethlehem.scinexus.Organization;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import edu.bethlehem.scinexus.ResearchPaper.ResearchPaper;
+import jakarta.persistence.*;
 import lombok.Data;
+
+import java.util.List;
 
 @Data
 @Entity
+@Table
 public class Organization {
+
     private @Id @GeneratedValue Long id;
     private String type;
     private Boolean verified;

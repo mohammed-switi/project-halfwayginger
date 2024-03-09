@@ -6,6 +6,8 @@ import jakarta.persistence.Id;
 import lombok.Data;
 
 import edu.bethlehem.scinexus.User.User;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 @Data
 @Entity
@@ -14,9 +16,11 @@ public class Post {
     private Long postId;
     private String content;
     private Visibility visibility;
+    @JdbcTypeCode(SqlTypes.JSON)
     private User publisher;
     private Integer interactionCount;
     private Integer opinionsCount;
+    @JdbcTypeCode(SqlTypes.JSON)
     private Post reShare;
 
     public Post(Long postId, String content, Visibility visibility, User publisher, Integer interactionCount,

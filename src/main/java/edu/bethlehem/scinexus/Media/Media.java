@@ -11,7 +11,7 @@ import lombok.Data;
 @Entity
 @Table(name = "media")
 public class Media {
-    @Column(name = "id")
+    @Column(name = "media_id")
     private @Id @GeneratedValue Long mediaId;
     private MediaType type;
     private String path;
