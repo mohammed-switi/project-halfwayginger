@@ -10,13 +10,13 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 @Entity
- @Table(name = "_user")
- @Data
+@Table(name = "_user")
+@Data
 
 public class User {
 
-     @Id
-     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String name;
@@ -31,7 +31,7 @@ public class User {
     private Media profilePicture;
 
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "profile_conver_id")
+    @JoinColumn(name = "profile_cover_id")
     @JdbcTypeCode(SqlTypes.JSON)
     private Media profileCover;
 
