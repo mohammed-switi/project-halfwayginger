@@ -83,6 +83,7 @@ public class PostController {
       post.setVisibility(newPost.getVisibility());
 
     // post.setPublisher(newPost.getPublisher());
+
     if (newPost.getInteractionCount() != null)
       post.setInteractionCount(newPost.getInteractionCount());
     if (newPost.getOpinionsCount() != null)

@@ -9,9 +9,6 @@ import org.springframework.http.*;
 import org.springframework.hateoas.*;
 import org.springframework.web.bind.annotation.*;
 
-import edu.bethlehem.scinexus.Organization.Organization;
-import edu.bethlehem.scinexus.Organization.OrganizationNotFoundException;
-
 @RestController
 public class OrganizationController {
 

@@ -56,9 +56,13 @@ public class ResearchPaperController {
         .map(researchpaper -> {
           researchpaper.setDescription(newResearchPaper.getDescription());
           researchpaper.setValidatedBy(newResearchPaper.getValidatedBy());
+          researchpaper.setDescription(newResearchPaper.getDescription());
           researchpaper.setSubject(newResearchPaper.getSubject());
+          researchpaper.setTitle(newResearchPaper.getTitle());
           researchpaper.setLanguage(newResearchPaper.getLanguage());
-          researchpaper.setNoOfPages(newResearchPaper.getNoOfPages());
+          researchpaper.setPublisher(newResearchPaper.getPublisher());
+          researchpaper.setVisibility(newResearchPaper.getVisibility());
+          researchpaper.setContributors(newResearchPaper.getContributors());
           EntityModel<ResearchPaper> entityModel = assembler.toModel(repository.save(researchpaper));
           return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
         })
@@ -79,12 +83,20 @@ public class ResearchPaperController {
       researchpaper.setDescription(newResearchPaper.getDescription());
     if (newResearchPaper.getValidatedBy() != null)
       researchpaper.setValidatedBy(newResearchPaper.getValidatedBy());
+    if (newResearchPaper.getDescription() != null)
+      researchpaper.setDescription(newResearchPaper.getDescription());
     if (newResearchPaper.getSubject() != null)
       researchpaper.setSubject(newResearchPaper.getSubject());
+    if (newResearchPaper.getTitle() != null)
+      researchpaper.setTitle(newResearchPaper.getTitle());
     if (newResearchPaper.getLanguage() != null)
       researchpaper.setLanguage(newResearchPaper.getLanguage());
-    if (newResearchPaper.getNoOfPages() != null)
-      researchpaper.setNoOfPages(newResearchPaper.getNoOfPages());
+    if (newResearchPaper.getPublisher() != null)
+      researchpaper.setPublisher(newResearchPaper.getPublisher());
+    if (newResearchPaper.getVisibility() != null)
+      researchpaper.setVisibility(newResearchPaper.getVisibility());
+    if (newResearchPaper.getContributors() != null)
+      researchpaper.setContributors(newResearchPaper.getContributors());
 
     EntityModel<ResearchPaper> entityModel = assembler.toModel(repository.save(researchpaper));
     return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);

@@ -9,9 +9,6 @@ import org.springframework.http.*;
 import org.springframework.hateoas.*;
 import org.springframework.web.bind.annotation.*;
 
-import edu.bethlehem.scinexus.Article.Article;
-import edu.bethlehem.scinexus.Article.ArticleNotFoundException;
-
 @RestController
 public class ArticleController {
 
@@ -54,6 +51,13 @@ public class ArticleController {
     return repository.findById(id)
         .map(article -> {
           article.setContent(newArticle.getContent());
+          article.setDescription(newArticle.getDescription());
+          article.setSubject(newArticle.getSubject());
+          article.setTitle(newArticle.getTitle());
+          article.setLanguage(newArticle.getLanguage());
+          article.setPublisher(newArticle.getPublisher());
+          article.setVisibility(newArticle.getVisibility());
+          article.setContributors(newArticle.getContributors());
           EntityModel<Article> entityModel = assembler.toModel(repository.save(article));
           return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
         })
@@ -72,6 +76,20 @@ public class ArticleController {
 
     if (newArticle.getContent() != null)
       article.setContent(newArticle.getContent());
+    if (newArticle.getDescription() != null)
+      article.setDescription(newArticle.getDescription());
+    if (newArticle.getSubject() != null)
+      article.setSubject(newArticle.getSubject());
+    if (newArticle.getTitle() != null)
+      article.setTitle(newArticle.getTitle());
+    if (newArticle.getLanguage() != null)
+      article.setLanguage(newArticle.getLanguage());
+    if (newArticle.getPublisher() != null)
+      article.setPublisher(newArticle.getPublisher());
+    if (newArticle.getVisibility() != null)
+      article.setVisibility(newArticle.getVisibility());
+    if (newArticle.getContributors() != null)
+      article.setContributors(newArticle.getContributors());
 
     EntityModel<Article> entityModel = assembler.toModel(repository.save(article));
     return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
