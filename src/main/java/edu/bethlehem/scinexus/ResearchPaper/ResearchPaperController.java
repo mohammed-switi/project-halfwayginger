@@ -9,6 +9,9 @@ import org.springframework.http.*;
 import org.springframework.hateoas.*;
 import org.springframework.web.bind.annotation.*;
 
+import edu.bethlehem.scinexus.ResearchPaper.ResearchPaper;
+import edu.bethlehem.scinexus.ResearchPaper.ResearchPaperNotFoundException;
+
 @RestController
 public class ResearchPaperController {
 
@@ -64,6 +67,27 @@ public class ResearchPaperController {
           EntityModel<ResearchPaper> entityModel = assembler.toModel(repository.save(newResearchPaper));
           return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
         });
+  }
+
+  @PatchMapping("/researchpapers/{id}")
+  public ResponseEntity<?> updateUserPartially(@PathVariable(value = "id") Long researchpaperId,
+      @RequestBody ResearchPaper newResearchPaper) {
+    ResearchPaper researchpaper = repository.findById(researchpaperId)
+        .orElseThrow(() -> new ResearchPaperNotFoundException(researchpaperId));
+
+    if (newResearchPaper.getDescription() != null)
+      researchpaper.setDescription(newResearchPaper.getDescription());
+    if (newResearchPaper.getValidatedBy() != null)
+      researchpaper.setValidatedBy(newResearchPaper.getValidatedBy());
+    if (newResearchPaper.getSubject() != null)
+      researchpaper.setSubject(newResearchPaper.getSubject());
+    if (newResearchPaper.getLanguage() != null)
+      researchpaper.setLanguage(newResearchPaper.getLanguage());
+    if (newResearchPaper.getNoOfPages() != null)
+      researchpaper.setNoOfPages(newResearchPaper.getNoOfPages());
+
+    EntityModel<ResearchPaper> entityModel = assembler.toModel(repository.save(researchpaper));
+    return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
   }
 
   @DeleteMapping("/researchpapers/{id}")

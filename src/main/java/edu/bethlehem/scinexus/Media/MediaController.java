@@ -9,6 +9,9 @@ import org.springframework.http.*;
 import org.springframework.hateoas.*;
 import org.springframework.web.bind.annotation.*;
 
+import edu.bethlehem.scinexus.Media.Media;
+import edu.bethlehem.scinexus.Media.MediaNotFoundException;
+
 @RestController
 public class MediaController {
 
@@ -61,6 +64,22 @@ public class MediaController {
           EntityModel<Media> entityModel = assembler.toModel(repository.save(newMedia));
           return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
         });
+  }
+
+  @PatchMapping("/medias/{id}")
+  public ResponseEntity<?> updateUserPartially(@PathVariable(value = "id") Long mediaId,
+      @RequestBody Media newMedia) {
+    Media media = repository.findById(mediaId)
+        .orElseThrow(() -> new MediaNotFoundException(mediaId));
+    if (newMedia.getMediaId() != null)
+      media.setMediaId(newMedia.getMediaId());
+    if (newMedia.getType() != null)
+      media.setType(newMedia.getType());
+    if (newMedia.getPath() != null)
+      media.setPath(newMedia.getPath());
+
+    EntityModel<Media> entityModel = assembler.toModel(repository.save(media));
+    return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
   }
 
   @DeleteMapping("/medias/{id}")

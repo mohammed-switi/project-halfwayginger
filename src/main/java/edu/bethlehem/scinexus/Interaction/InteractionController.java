@@ -9,6 +9,9 @@ import org.springframework.http.*;
 import org.springframework.hateoas.*;
 import org.springframework.web.bind.annotation.*;
 
+import edu.bethlehem.scinexus.Interaction.Interaction;
+import edu.bethlehem.scinexus.Interaction.InteractionNotFoundException;
+
 @RestController
 public class InteractionController {
 
@@ -61,6 +64,21 @@ public class InteractionController {
           EntityModel<Interaction> entityModel = assembler.toModel(repository.save(newInteraction));
           return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
         });
+  }
+
+  @PatchMapping("/interactions/{id}")
+  public ResponseEntity<?> updateUserPartially(@PathVariable(value = "id") Long interactionId,
+      @RequestBody Interaction newInteraction) {
+    Interaction interaction = repository.findById(interactionId)
+        .orElseThrow(() -> new InteractionNotFoundException(interactionId));
+
+    if (newInteraction.getInteractionId() != null)
+      interaction.setInteractionId(newInteraction.getInteractionId());
+    if (newInteraction.getType() != null)
+      interaction.setType(newInteraction.getType());
+
+    EntityModel<Interaction> entityModel = assembler.toModel(repository.save(interaction));
+    return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
   }
 
   @DeleteMapping("/interactions/{id}")

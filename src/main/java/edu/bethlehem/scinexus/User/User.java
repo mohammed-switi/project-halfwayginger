@@ -9,10 +9,13 @@ import edu.bethlehem.scinexus.Media.Media;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
-@Entity
-@Table(name = "_user")
-@Data
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
+// @Entity
+// @Table(name = "_user")
+
+@Data
+@MappedSuperclass
 public class User {
 
     @Id
@@ -21,13 +24,13 @@ public class User {
 
     private String name;
     private String username;
+    @JsonIgnore
     private String password;
     private String email;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "profile_picture_id")
     @JdbcTypeCode(SqlTypes.JSON)
-
     private Media profilePicture;
 
     @OneToOne(cascade = CascadeType.ALL)
@@ -41,10 +44,10 @@ public class User {
 
     private String userSettings;
 
-    public User(Long userId, String name, String username, String password, String email,
+    public User(String name, String username, String password, String email,
             Media profilePicture,
             Media profileCover, String bio, String phoneNumber, String fieldOfWork, String userSettings) {
-        this.id = userId;
+
         this.name = name;
         this.username = username;
         this.password = password;
@@ -55,6 +58,13 @@ public class User {
         this.phoneNumber = phoneNumber;
         this.fieldOfWork = fieldOfWork;
         this.userSettings = userSettings;
+    }
+
+    public User(String name, String username, String password, String email) {
+        this.name = name;
+        this.username = username;
+        this.password = password;
+        this.email = email;
     }
 
     public User() {

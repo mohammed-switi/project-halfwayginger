@@ -9,6 +9,9 @@ import org.springframework.http.*;
 import org.springframework.hateoas.*;
 import org.springframework.web.bind.annotation.*;
 
+import edu.bethlehem.scinexus.Article.Article;
+import edu.bethlehem.scinexus.Article.ArticleNotFoundException;
+
 @RestController
 public class ArticleController {
 
@@ -59,6 +62,19 @@ public class ArticleController {
           EntityModel<Article> entityModel = assembler.toModel(repository.save(newArticle));
           return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
         });
+  }
+
+  @PatchMapping("/articles/{id}")
+  public ResponseEntity<?> updateUserPartially(@PathVariable(value = "id") Long articleId,
+      @RequestBody Article newArticle) {
+    Article article = repository.findById(articleId)
+        .orElseThrow(() -> new ArticleNotFoundException(articleId));
+
+    if (newArticle.getContent() != null)
+      article.setContent(newArticle.getContent());
+
+    EntityModel<Article> entityModel = assembler.toModel(repository.save(article));
+    return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
   }
 
   @DeleteMapping("/articles/{id}")

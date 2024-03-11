@@ -9,6 +9,9 @@ import org.springframework.http.*;
 import org.springframework.hateoas.*;
 import org.springframework.web.bind.annotation.*;
 
+import edu.bethlehem.scinexus.Post.Post;
+import edu.bethlehem.scinexus.Post.PostNotFoundException;
+
 @RestController
 public class PostController {
 
@@ -65,6 +68,30 @@ public class PostController {
           EntityModel<Post> entityModel = assembler.toModel(repository.save(newPost));
           return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
         });
+  }
+
+  @PatchMapping("/posts/{id}")
+  public ResponseEntity<?> updateUserPartially(@PathVariable(value = "id") Long postId,
+      @RequestBody Post newPost) {
+    Post post = repository.findById(postId)
+        .orElseThrow(() -> new PostNotFoundException(postId));
+    if (newPost.getContent() != null)
+      post.setPostId(newPost.getPostId());
+    if (newPost.getContent() != null)
+      post.setContent(newPost.getContent());
+    if (newPost.getVisibility() != null)
+      post.setVisibility(newPost.getVisibility());
+
+    // post.setPublisher(newPost.getPublisher());
+    if (newPost.getInteractionCount() != null)
+      post.setInteractionCount(newPost.getInteractionCount());
+    if (newPost.getOpinionsCount() != null)
+      post.setOpinionsCount(newPost.getOpinionsCount());
+    if (newPost.getReShare() != null)
+      post.setReShare(newPost.getReShare());
+
+    EntityModel<Post> entityModel = assembler.toModel(repository.save(post));
+    return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
   }
 
   @DeleteMapping("/posts/{id}")

@@ -52,8 +52,20 @@ public class AcademicController {
         .map(academic -> {
           academic.setBadge(newAcademic.getBadge());
           academic.setEducation(newAcademic.getEducation());
-          academic.setOrganizationId(newAcademic.getOrganizationId());
+          academic.setOrganization(newAcademic.getOrganization());
           academic.setPosition(newAcademic.getPosition());
+          // User Properties
+          academic.setUsername(newAcademic.getUsername());
+          academic.setPassword(newAcademic.getPassword());
+          academic.setEmail(newAcademic.getEmail());
+          academic.setProfilePicture(newAcademic.getProfilePicture());
+          academic.setProfileCover(newAcademic.getProfileCover());
+          academic.setBio(newAcademic.getBio());
+          academic.setPhoneNumber(newAcademic.getPhoneNumber());
+          academic.setFieldOfWork(newAcademic.getFieldOfWork());
+          academic.setUserSettings(newAcademic.getUserSettings());
+          academic.setName(newAcademic.getName());
+
           EntityModel<Academic> entityModel = assembler.toModel(repository.save(academic));
           return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
         })
@@ -62,6 +74,46 @@ public class AcademicController {
           EntityModel<Academic> entityModel = assembler.toModel(repository.save(newAcademic));
           return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
         });
+  }
+
+  @PatchMapping("/academics/{id}")
+  public ResponseEntity<?> updateUserPartially(@PathVariable(value = "id") Long academicId,
+      @RequestBody Academic newAcademic) {
+    Academic academic = repository.findById(academicId)
+        .orElseThrow(() -> new AcademicNotFoundException(academicId));
+
+    if (newAcademic.getBadge() != null)
+      academic.setBadge(newAcademic.getBadge());
+    if (newAcademic.getEducation() != null)
+      academic.setEducation(newAcademic.getEducation());
+    if (newAcademic.getOrganization() != null)
+      academic.setOrganization(newAcademic.getOrganization());
+    if (newAcademic.getPosition() != null)
+      academic.setPosition(newAcademic.getPosition());
+    // User Properties
+    if (newAcademic.getUsername() != null)
+      academic.setUsername(newAcademic.getUsername());
+    if (newAcademic.getPassword() != null)
+      academic.setPassword(newAcademic.getPassword());
+    if (newAcademic.getEmail() != null)
+      academic.setEmail(newAcademic.getEmail());
+    if (newAcademic.getProfilePicture() != null)
+      academic.setProfilePicture(newAcademic.getProfilePicture());
+    if (newAcademic.getProfileCover() != null)
+      academic.setProfileCover(newAcademic.getProfileCover());
+    if (newAcademic.getBio() != null)
+      academic.setBio(newAcademic.getBio());
+    if (newAcademic.getPhoneNumber() != null)
+      academic.setPhoneNumber(newAcademic.getPhoneNumber());
+    if (newAcademic.getFieldOfWork() != null)
+      academic.setFieldOfWork(newAcademic.getFieldOfWork());
+    if (newAcademic.getUserSettings() != null)
+      academic.setUserSettings(newAcademic.getUserSettings());
+    if (newAcademic.getName() != null)
+      academic.setName(newAcademic.getName());
+
+    EntityModel<Academic> entityModel = assembler.toModel(repository.save(academic));
+    return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
   }
 
   @DeleteMapping("/academics/{id}")

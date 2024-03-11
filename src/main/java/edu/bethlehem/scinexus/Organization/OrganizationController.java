@@ -9,6 +9,9 @@ import org.springframework.http.*;
 import org.springframework.hateoas.*;
 import org.springframework.web.bind.annotation.*;
 
+import edu.bethlehem.scinexus.Organization.Organization;
+import edu.bethlehem.scinexus.Organization.OrganizationNotFoundException;
+
 @RestController
 public class OrganizationController {
 
@@ -53,6 +56,19 @@ public class OrganizationController {
         .map(organization -> {
           organization.setType(newOrganization.getType());
           organization.setVerified(newOrganization.getVerified());
+
+          // User Properties
+          organization.setUsername(newOrganization.getUsername());
+          organization.setPassword(newOrganization.getPassword());
+          organization.setEmail(newOrganization.getEmail());
+          organization.setProfilePicture(newOrganization.getProfilePicture());
+          organization.setProfileCover(newOrganization.getProfileCover());
+          organization.setBio(newOrganization.getBio());
+          organization.setPhoneNumber(newOrganization.getPhoneNumber());
+          organization.setFieldOfWork(newOrganization.getFieldOfWork());
+          organization.setUserSettings(newOrganization.getUserSettings());
+          organization.setName(newOrganization.getName());
+
           EntityModel<Organization> entityModel = assembler.toModel(repository.save(organization));
           return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
         })
@@ -61,6 +77,42 @@ public class OrganizationController {
           EntityModel<Organization> entityModel = assembler.toModel(repository.save(newOrganization));
           return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
         });
+  }
+
+  @PatchMapping("/organizations/{id}")
+  public ResponseEntity<?> updateUserPartially(@PathVariable(value = "id") Long organizationId,
+      @RequestBody Organization newOrganization) {
+    Organization organization = repository.findById(organizationId)
+        .orElseThrow(() -> new OrganizationNotFoundException(organizationId));
+    if (newOrganization.getType() != null)
+      organization.setType(newOrganization.getType());
+    if (newOrganization.getVerified() != null)
+      organization.setVerified(newOrganization.getVerified());
+
+    // User Properties
+    if (newOrganization.getUsername() != null)
+      organization.setUsername(newOrganization.getUsername());
+    if (newOrganization.getPassword() != null)
+      organization.setPassword(newOrganization.getPassword());
+    if (newOrganization.getEmail() != null)
+      organization.setEmail(newOrganization.getEmail());
+    if (newOrganization.getProfilePicture() != null)
+      organization.setProfilePicture(newOrganization.getProfilePicture());
+    if (newOrganization.getProfileCover() != null)
+      organization.setProfileCover(newOrganization.getProfileCover());
+    if (newOrganization.getBio() != null)
+      organization.setBio(newOrganization.getBio());
+    if (newOrganization.getPhoneNumber() != null)
+      organization.setPhoneNumber(newOrganization.getPhoneNumber());
+    if (newOrganization.getFieldOfWork() != null)
+      organization.setFieldOfWork(newOrganization.getFieldOfWork());
+    if (newOrganization.getUserSettings() != null)
+      organization.setUserSettings(newOrganization.getUserSettings());
+    if (newOrganization.getName() != null)
+      organization.setName(newOrganization.getName());
+
+    EntityModel<Organization> entityModel = assembler.toModel(repository.save(organization));
+    return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
   }
 
   @DeleteMapping("/organizations/{id}")

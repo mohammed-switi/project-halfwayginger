@@ -9,6 +9,9 @@ import org.springframework.http.*;
 import org.springframework.hateoas.*;
 import org.springframework.web.bind.annotation.*;
 
+import edu.bethlehem.scinexus.Opinion.Opinion;
+import edu.bethlehem.scinexus.Opinion.OpinionNotFoundException;
+
 @RestController
 public class OpinionController {
 
@@ -60,6 +63,20 @@ public class OpinionController {
           EntityModel<Opinion> entityModel = assembler.toModel(repository.save(newOpinion));
           return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
         });
+  }
+
+  @PatchMapping("/opinions/{id}")
+  public ResponseEntity<?> updateUserPartially(@PathVariable(value = "id") Long opinionId,
+      @RequestBody Opinion newOpinion) {
+    Opinion opinion = repository.findById(opinionId)
+        .orElseThrow(() -> new OpinionNotFoundException(opinionId));
+    if (newOpinion.getContent() != null)
+      opinion.setOpinionId(newOpinion.getOpinionId());
+    if (newOpinion.getContent() != null)
+      opinion.setContent(newOpinion.getContent());
+
+    EntityModel<Opinion> entityModel = assembler.toModel(repository.save(opinion));
+    return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
   }
 
   @DeleteMapping("/opinions/{id}")

@@ -9,6 +9,9 @@ import org.springframework.http.*;
 import org.springframework.hateoas.*;
 import org.springframework.web.bind.annotation.*;
 
+import edu.bethlehem.scinexus.Notification.Notification;
+import edu.bethlehem.scinexus.Notification.NotificationNotFoundException;
+
 @RestController
 public class NotificationController {
 
@@ -62,6 +65,22 @@ public class NotificationController {
           EntityModel<Notification> entityModel = assembler.toModel(repository.save(newNotification));
           return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
         });
+  }
+
+  @PatchMapping("/notifications/{id}")
+  public ResponseEntity<?> updateUserPartially(@PathVariable(value = "id") Long notificationId,
+      @RequestBody Notification newNotification) {
+    Notification notification = repository.findById(notificationId)
+        .orElseThrow(() -> new NotificationNotFoundException(notificationId));
+    if (newNotification.getContent() != null)
+      notification.setNotificationId(newNotification.getNotificationId());
+    if (newNotification.getContent() != null)
+      notification.setContent(newNotification.getContent());
+    if (newNotification.getStatus() != null)
+      notification.setStatus(newNotification.getStatus());
+
+    EntityModel<Notification> entityModel = assembler.toModel(repository.save(notification));
+    return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
   }
 
   @DeleteMapping("/notifications/{id}")
