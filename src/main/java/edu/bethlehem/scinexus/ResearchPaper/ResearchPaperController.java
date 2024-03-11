@@ -9,9 +9,6 @@ import org.springframework.http.*;
 import org.springframework.hateoas.*;
 import org.springframework.web.bind.annotation.*;
 
-import edu.bethlehem.scinexus.ResearchPaper.ResearchPaper;
-import edu.bethlehem.scinexus.ResearchPaper.ResearchPaperNotFoundException;
-
 @RestController
 public class ResearchPaperController {
 

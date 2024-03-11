@@ -9,9 +9,6 @@ import org.springframework.http.*;
 import org.springframework.hateoas.*;
 import org.springframework.web.bind.annotation.*;
 
-import edu.bethlehem.scinexus.Notification.Notification;
-import edu.bethlehem.scinexus.Notification.NotificationNotFoundException;
-
 @RestController
 public class NotificationController {
 

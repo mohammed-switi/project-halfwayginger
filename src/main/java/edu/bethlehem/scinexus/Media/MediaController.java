@@ -9,9 +9,6 @@ import org.springframework.http.*;
 import org.springframework.hateoas.*;
 import org.springframework.web.bind.annotation.*;
 
-import edu.bethlehem.scinexus.Media.Media;
-import edu.bethlehem.scinexus.Media.MediaNotFoundException;
-
 @RestController
 public class MediaController {
 

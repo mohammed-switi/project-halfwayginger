@@ -9,9 +9,6 @@ import org.springframework.http.*;
 import org.springframework.hateoas.*;
 import org.springframework.web.bind.annotation.*;
 
-import edu.bethlehem.scinexus.Opinion.Opinion;
-import edu.bethlehem.scinexus.Opinion.OpinionNotFoundException;
-
 @RestController
 public class OpinionController {
 

@@ -9,9 +9,6 @@ import org.springframework.http.*;
 import org.springframework.hateoas.*;
 import org.springframework.web.bind.annotation.*;
 
-import edu.bethlehem.scinexus.Post.Post;
-import edu.bethlehem.scinexus.Post.PostNotFoundException;
-
 @RestController
 public class PostController {
 
