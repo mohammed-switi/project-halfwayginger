@@ -50,7 +50,6 @@ public class PostController {
 
     return repository.findById(id)
         .map(post -> {
-          post.setPostId(newPost.getPostId());
           post.setContent(newPost.getContent());
           post.setVisibility(newPost.getVisibility());
           // post.setPublisher(newPost.getPublisher());
@@ -73,9 +72,8 @@ public class PostController {
     Post post = repository.findById(postId)
         .orElseThrow(() -> new PostNotFoundException(postId));
     if (newPost.getContent() != null)
-      post.setPostId(newPost.getPostId());
-    if (newPost.getContent() != null)
-      post.setContent(newPost.getContent());
+      if (newPost.getContent() != null)
+        post.setContent(newPost.getContent());
     if (newPost.getVisibility() != null)
       post.setVisibility(newPost.getVisibility());
 

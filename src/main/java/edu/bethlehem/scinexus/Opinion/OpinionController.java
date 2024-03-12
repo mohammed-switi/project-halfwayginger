@@ -50,7 +50,7 @@ public class OpinionController {
 
     return repository.findById(id)
         .map(opinion -> {
-          opinion.setOpinionId(newOpinion.getOpinionId());
+
           opinion.setContent(newOpinion.getContent());
           EntityModel<Opinion> entityModel = assembler.toModel(repository.save(opinion));
           return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
@@ -67,8 +67,7 @@ public class OpinionController {
       @RequestBody Opinion newOpinion) {
     Opinion opinion = repository.findById(opinionId)
         .orElseThrow(() -> new OpinionNotFoundException(opinionId));
-    if (newOpinion.getContent() != null)
-      opinion.setOpinionId(newOpinion.getOpinionId());
+    ;
     if (newOpinion.getContent() != null)
       opinion.setContent(newOpinion.getContent());
 

@@ -4,13 +4,16 @@ package edu.bethlehem.scinexus.User;
 import jakarta.persistence.*;
 
 import lombok.Data;
-
+import edu.bethlehem.scinexus.Journal.Journal;
 import edu.bethlehem.scinexus.Media.Media;
+import edu.bethlehem.scinexus.Post.Post;
+import edu.bethlehem.scinexus.ResearchPaper.ResearchPaper;
+
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
+import java.util.List;
 // @Entity
 // @Table(name = "_user")
 
