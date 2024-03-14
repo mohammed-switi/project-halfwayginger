@@ -12,7 +12,7 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import lombok.Data;
-
+import lombok.EqualsAndHashCode;
 import edu.bethlehem.scinexus.User.User;
 
 import java.util.List;
@@ -22,6 +22,7 @@ import org.hibernate.type.SqlTypes;
 
 @Data
 @Entity
+@EqualsAndHashCode(callSuper = false)
 public class Academic extends User {
     private @Id @GeneratedValue Long id;
     private String badge;

@@ -9,10 +9,11 @@ import edu.bethlehem.scinexus.Post.Post;
 import edu.bethlehem.scinexus.User.User;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
 @Entity
-@Table
+@EqualsAndHashCode(callSuper = false)
 public class Organization extends User {
 
     private @Id @GeneratedValue Long id;

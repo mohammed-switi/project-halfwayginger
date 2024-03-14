@@ -1,8 +1,8 @@
 package edu.bethlehem.scinexus.Notification;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import edu.bethlehem.scinexus.Academic.Academic;
+import edu.bethlehem.scinexus.Organization.Organization;
+import jakarta.persistence.*;
 import lombok.Data;
 
 @Data
@@ -12,6 +12,14 @@ public class Notification {
     private Long notificationId;
     private String content;
     private Status status;
+
+    @ManyToOne
+    @JoinColumn(name = "notificationsAcademic")
+    private Academic academic;
+
+    @ManyToOne
+    @JoinColumn(name = "notificationsOrganization")
+    private Organization organization;
 
     public Notification(Long notificationId, String content, Status status) {
         this.notificationId = notificationId;
