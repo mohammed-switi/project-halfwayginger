@@ -1,5 +1,6 @@
 package edu.bethlehem.scinexus.Journal;
 
+import edu.bethlehem.scinexus.Post.Visibility;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -26,7 +27,8 @@ public class Journal {
     @JdbcTypeCode(SqlTypes.JSON)
     private Organization validatedBy;
 
-    private String visibility;
+    @Enumerated(EnumType.STRING)
+    private Visibility visibility;
 
     @JdbcTypeCode(SqlTypes.JSON)
     private User publisher;
@@ -35,7 +37,7 @@ public class Journal {
     private List<User> contributors;
 
     public Journal(String name, String description, String subject, String title, String language, User publisher,
-            Integer noOfPages, Organization validatedBy, String visibility, List<User> contributors) {
+            Integer noOfPages, Organization validatedBy, Visibility visibility, List<User> contributors) {
         this.name = name;
         this.description = description;
         this.subject = subject;
@@ -50,7 +52,7 @@ public class Journal {
     }
 
     public Journal(String name, String description, String subject, String title, String language, User publisher,
-            Integer noOfPages, String visibility) {
+            Integer noOfPages, Visibility visibility) {
         this.name = name;
         this.description = description;
         this.subject = subject;

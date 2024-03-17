@@ -1,5 +1,6 @@
 package edu.bethlehem.scinexus.ResearchPaper;
 
+import edu.bethlehem.scinexus.Post.Visibility;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -60,8 +61,8 @@ public class ResearchPaper extends Journal {
     }
 
     public ResearchPaper(String name, String description, String subject, String title, String language, User publisher,
-            Integer noOfPages, String visibility, Organization validatedBy) {
-        super(name, description, subject, title, language, publisher, noOfPages, visibility);
+            Integer noOfPages, Visibility visibility, Organization validatedBy) {
+        super(name, description, subject, title, language, publisher, noOfPages,  visibility);
         this.description = description;
         this.validatedBy = validatedBy;
 

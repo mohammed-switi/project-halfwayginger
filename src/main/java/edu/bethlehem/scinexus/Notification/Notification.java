@@ -11,6 +11,7 @@ public class Notification {
     private @Id @GeneratedValue Long id;
     private Long notificationId;
     private String content;
+    @Enumerated(EnumType.STRING)
     private Status status;
 
     @ManyToOne

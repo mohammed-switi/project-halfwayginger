@@ -1,5 +1,6 @@
 package edu.bethlehem.scinexus.User;
 
+import com.fasterxml.jackson.databind.util.JSONPObject;
 import jakarta.persistence.*;
 
 import lombok.Data;
@@ -16,7 +17,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Data
 @MappedSuperclass
-public class User {
+public abstract class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -42,11 +43,13 @@ public class User {
     private String phoneNumber;
     private String fieldOfWork;
 
-    private String userSettings;
+    @JdbcTypeCode(SqlTypes.JSON)
+
+    private JSONPObject userSettings;
 
     public User(String name, String username, String password, String email,
             Media profilePicture,
-            Media profileCover, String bio, String phoneNumber, String fieldOfWork, String userSettings) {
+            Media profileCover, String bio, String phoneNumber, String fieldOfWork, JSONPObject userSettings) {
 
         this.name = name;
         this.username = username;

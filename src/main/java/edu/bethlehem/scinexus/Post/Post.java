@@ -18,6 +18,7 @@ import org.hibernate.type.SqlTypes;
 public class Post {
     private @Id @GeneratedValue Long id;
     private String content;
+    @Enumerated(EnumType.STRING)
     private Visibility visibility;
 
     @ManyToOne(fetch = FetchType.LAZY)
