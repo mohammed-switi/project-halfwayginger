@@ -44,6 +44,8 @@ public class User {
 
     private String userSettings;
 
+    
+
     public User(String name, String username, String password, String email,
             Media profilePicture,
             Media profileCover, String bio, String phoneNumber, String fieldOfWork, String userSettings) {
