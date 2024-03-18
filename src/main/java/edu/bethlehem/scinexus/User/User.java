@@ -30,6 +30,7 @@ import java.util.List;
 @Entity
 
 //@MappedSuperclass
+@Inheritance(strategy = InheritanceType.JOINED)
 public  class User implements UserDetails {
 
     @Id

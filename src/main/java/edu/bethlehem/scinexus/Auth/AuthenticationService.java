@@ -1,6 +1,10 @@
 package edu.bethlehem.scinexus.Auth;
 
+import edu.bethlehem.scinexus.Academic.Academic;
+import edu.bethlehem.scinexus.Academic.AcademicRepository;
 import edu.bethlehem.scinexus.Config.JwtService;
+import edu.bethlehem.scinexus.Organization.Organization;
+import edu.bethlehem.scinexus.Organization.OrganizationRepository;
 import edu.bethlehem.scinexus.User.Role;
 import edu.bethlehem.scinexus.User.User;
 import edu.bethlehem.scinexus.User.UserNotFoundException;
@@ -16,30 +20,40 @@ import org.springframework.stereotype.Service;
 public class AuthenticationService {
 
     private final UserRepository userRepository;
+    private final AcademicRepository academicRepository;
+    private final OrganizationRepository organizationRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService service;
 
     private final AuthenticationManager authenticationManager;
 
     public AuthenticationResponse register(RegisterRequest request) {
-    var user = User.builder()
-            .name(request.getName())
-            .username(request.getUsername())
-            .email(request.getEmail())
-            .password(passwordEncoder.encode(request.getPassword()))
-            .role(Role.ACADEMIC)
-            .build();
+            User user = null;
 
-            userRepository.save(user);
-            var j2tToken = service.generateToken(user);
+        System.out.println(request.getRole());
+//
+//            userRepository.save(user);
+//            userRepository.save(user);
+            if(request.getRole() == Role.ACADEMIC){
+               user = new Academic(request.getName(), request.getUsername(),passwordEncoder.encode(request.getPassword()), request.getEmail());
+                user.setRole(Role.ACADEMIC);
+                academicRepository.save((Academic) user);
+            }
+            else {
+            user = new Organization(request.getName(), request.getUsername(),passwordEncoder.encode(request.getPassword()), request.getEmail());
+            user.setRole(Role.ORGANIZATION);
+            organizationRepository.save((Organization) user);
+             }
+
+        var jwtToken = service.generateToken(user);
             return AuthenticationResponse.builder()
-                    .token(j2tToken)
+                    .token(jwtToken)
                     .build();
 
     }
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
-        System.out.println(request.getEmail() +"\t" + request.getPassword());
+
     authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(
                     request.getEmail(),

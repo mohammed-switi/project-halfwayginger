@@ -4,6 +4,7 @@ import edu.bethlehem.scinexus.Organization.Organization;
 import edu.bethlehem.scinexus.Post.Post;
 import edu.bethlehem.scinexus.ResearchPaper.ResearchPaper;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import edu.bethlehem.scinexus.User.User;
@@ -16,6 +17,7 @@ import org.hibernate.type.SqlTypes;
 @Data
 @Entity
 @EqualsAndHashCode(callSuper = false)
+
 public class Academic extends User {
     private @Id @GeneratedValue Long id;
     private String badge;
