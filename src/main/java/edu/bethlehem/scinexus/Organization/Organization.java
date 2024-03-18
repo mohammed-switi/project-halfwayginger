@@ -24,10 +24,9 @@ public class Organization extends User {
     @JdbcTypeCode(SqlTypes.JSON)
     private List<Post> postsOrganization;
 
-    public Organization(String name, String username, String password, String email, String type, Boolean verified) {
+    public Organization(String name, String username, String password, String email, String type) {
         super(name, username, password, email);
         this.type = type;
-        this.verified = verified;
     }
 
     public Organization() {

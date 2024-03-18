@@ -34,8 +34,7 @@ public class Media {
     @JdbcTypeCode(SqlTypes.JSON)
     private ResearchPaper ownerResearchPaper;
 
-    public Media(Long mediaId, MediaType type, String path) {
-        this.mediaId = mediaId;
+    public Media(MediaType type, String path) {
         this.type = type;
         this.path = path;
     }

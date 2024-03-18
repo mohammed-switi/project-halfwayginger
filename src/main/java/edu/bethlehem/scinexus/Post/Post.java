@@ -51,16 +51,9 @@ public class Post {
     @JdbcTypeCode(SqlTypes.JSON)
     private List<Interaction> interactions;
 
-    public Post(String content, Visibility visibility, Academic publisherAcademic,
-            Integer interactionCount,
-            Integer opinionsCount, Post reShare) {
-
+    public Post(String content, Academic publisherAcademic) {
         this.content = content;
-        this.visibility = visibility;
         this.publisherAcademic = publisherAcademic;
-        this.interactionCount = interactionCount;
-        this.opinionsCount = opinionsCount;
-        this.reShare = reShare;
     }
 
     public Post() {

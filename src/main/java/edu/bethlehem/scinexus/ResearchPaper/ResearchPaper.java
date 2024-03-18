@@ -21,7 +21,6 @@ import org.hibernate.type.SqlTypes;
 @EqualsAndHashCode(callSuper = false)
 public class ResearchPaper extends Journal {
     private @Id @GeneratedValue Long id;
-    private String description;
 
     @OneToOne
     @JdbcTypeCode(SqlTypes.JSON)
@@ -37,11 +36,6 @@ public class ResearchPaper extends Journal {
     @JdbcTypeCode(SqlTypes.JSON)
     private List<Opinion> opinions;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "researchPaperPublisherAcademic")
-    @JdbcTypeCode(SqlTypes.JSON)
-    private Organization publisherAcademic;
-
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "ownerResearchPaper")
     @JdbcTypeCode(SqlTypes.JSON)
@@ -52,18 +46,15 @@ public class ResearchPaper extends Journal {
     @JdbcTypeCode(SqlTypes.JSON)
     private List<Interaction> interactions;
 
-    public ResearchPaper(String description, Organization validatedBy, String subject, String language,
+    public ResearchPaper(Organization validatedBy, String subject, String language,
             Integer noOfPages) {
-        this.description = description;
+
         this.validatedBy = validatedBy;
 
     }
 
-    public ResearchPaper(String name, String description, String subject, String title, String language, User publisher,
-            Integer noOfPages, String visibility, Organization validatedBy) {
-        super(name, description, subject, title, language, publisher, noOfPages, visibility);
-        this.description = description;
-        this.validatedBy = validatedBy;
+    public ResearchPaper(String title, String description, String subject, Academic publisherAcademic) {
+        super(title, description, subject, publisherAcademic);
 
     }
 

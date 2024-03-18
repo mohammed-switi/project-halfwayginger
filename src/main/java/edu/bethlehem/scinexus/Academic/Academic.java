@@ -1,5 +1,6 @@
 package edu.bethlehem.scinexus.Academic;
 
+import edu.bethlehem.scinexus.Article.Article;
 import edu.bethlehem.scinexus.Organization.Organization;
 import edu.bethlehem.scinexus.Post.Post;
 import edu.bethlehem.scinexus.ResearchPaper.ResearchPaper;
@@ -39,13 +40,13 @@ public class Academic extends User {
     @JdbcTypeCode(SqlTypes.JSON)
     private List<Post> postsAcademic;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "publisherAcademic")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "academicPublisher")
     @JdbcTypeCode(SqlTypes.JSON)
-    private List<Post> researchPaperPublisherAcademic;
+    private List<ResearchPaper> researchPaperPublisherAcademic;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "publisherAcademic")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "academicPublisher")
     @JdbcTypeCode(SqlTypes.JSON)
-    private List<Post> articlePublisherAcademic;
+    private List<Article> articlePublisherAcademic;
 
     @ManyToMany(mappedBy = "requestsForAccess")
     List<ResearchPaper> requestsResearchPapers;
