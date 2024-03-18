@@ -24,7 +24,7 @@ public class OpinionController {
   EntityModel<Opinion> one(@PathVariable Long opinionId) {
 
     Opinion opinion = repository.findById(opinionId)
-        .orElseThrow(() -> new OpinionNotFoundException(opinionId));
+        .orElseThrow(() -> new OpinionNotFoundException(opinionId,HttpStatus.NOT_FOUND));
 
     return assembler.toModel(opinion);
   }
@@ -66,7 +66,7 @@ public class OpinionController {
   public ResponseEntity<?> updateUserPartially(@PathVariable(value = "id") Long opinionId,
       @RequestBody Opinion newOpinion) {
     Opinion opinion = repository.findById(opinionId)
-        .orElseThrow(() -> new OpinionNotFoundException(opinionId));
+        .orElseThrow(() -> new OpinionNotFoundException(opinionId,HttpStatus.NOT_FOUND));
     ;
     if (newOpinion.getContent() != null)
       opinion.setContent(newOpinion.getContent());
@@ -78,7 +78,7 @@ public class OpinionController {
   @DeleteMapping("/opinions/{id}")
   ResponseEntity<?> deleteOpinion(@PathVariable Long id) {
 
-    Opinion opinion = repository.findById(id).orElseThrow(() -> new OpinionNotFoundException(id));
+    Opinion opinion = repository.findById(id).orElseThrow(() -> new OpinionNotFoundException(id,HttpStatus.NOT_FOUND));
 
     repository.delete(opinion);
 

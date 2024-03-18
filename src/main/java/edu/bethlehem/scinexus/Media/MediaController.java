@@ -24,7 +24,7 @@ public class MediaController {
   EntityModel<Media> one(@PathVariable Long mediaId) {
 
     Media media = repository.findById(mediaId)
-        .orElseThrow(() -> new MediaNotFoundException(mediaId));
+        .orElseThrow(() -> new MediaNotFoundException(mediaId,HttpStatus.NOT_FOUND));
 
     return assembler.toModel(media);
   }
@@ -67,7 +67,7 @@ public class MediaController {
   public ResponseEntity<?> updateUserPartially(@PathVariable(value = "id") Long mediaId,
       @RequestBody Media newMedia) {
     Media media = repository.findById(mediaId)
-        .orElseThrow(() -> new MediaNotFoundException(mediaId));
+        .orElseThrow(() -> new MediaNotFoundException(mediaId,HttpStatus.NOT_FOUND));
     if (newMedia.getMediaId() != null)
       media.setMediaId(newMedia.getMediaId());
     if (newMedia.getType() != null)
@@ -82,7 +82,7 @@ public class MediaController {
   @DeleteMapping("/medias/{id}")
   ResponseEntity<?> deleteMedia(@PathVariable Long id) {
 
-    Media media = repository.findById(id).orElseThrow(() -> new MediaNotFoundException(id));
+    Media media = repository.findById(id).orElseThrow(() -> new MediaNotFoundException(id,HttpStatus.NOT_FOUND));
 
     repository.delete(media);
 

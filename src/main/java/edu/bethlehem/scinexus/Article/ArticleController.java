@@ -10,6 +10,7 @@ import org.springframework.hateoas.*;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@RequestMapping("/articles")
 public class ArticleController {
 
   private final ArticleRepository repository;
@@ -20,16 +21,16 @@ public class ArticleController {
     this.assembler = assembler;
   }
 
-  @GetMapping("/articles/{articleId}")
+  @GetMapping("/{articleId}")
   EntityModel<Article> one(@PathVariable Long articleId) {
 
     Article article = repository.findById(articleId)
-        .orElseThrow(() -> new ArticleNotFoundException(articleId));
+        .orElseThrow(() -> new ArticleNotFoundException(articleId,HttpStatus.NOT_FOUND));
 
     return assembler.toModel(article);
   }
 
-  @GetMapping("/articles")
+  @GetMapping()
   CollectionModel<EntityModel<Article>> all() {
     List<EntityModel<Article>> articles = repository.findAll().stream().map(article -> assembler.toModel(article))
         .collect(Collectors.toList());
@@ -37,7 +38,7 @@ public class ArticleController {
     return CollectionModel.of(articles, linkTo(methodOn(ArticleController.class).all()).withSelfRel());
   }
 
-  @PostMapping("/articles")
+  @PostMapping()
   ResponseEntity<?> newArticle(@RequestBody Article newArticle) {
 
     EntityModel<Article> entityModel = assembler.toModel(repository.save(newArticle));
@@ -45,7 +46,7 @@ public class ArticleController {
     return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
   }
 
-  @PutMapping("/articles/{id}")
+  @PutMapping("/{id}")
   ResponseEntity<?> editArticle(@RequestBody Article newArticle, @PathVariable Long id) {
 
     return repository.findById(id)
@@ -68,11 +69,11 @@ public class ArticleController {
         });
   }
 
-  @PatchMapping("/articles/{id}")
+  @PatchMapping("/{id}")
   public ResponseEntity<?> updateUserPartially(@PathVariable(value = "id") Long articleId,
       @RequestBody Article newArticle) {
     Article article = repository.findById(articleId)
-        .orElseThrow(() -> new ArticleNotFoundException(articleId));
+        .orElseThrow(() -> new ArticleNotFoundException(articleId,HttpStatus.NOT_FOUND));
 
     if (newArticle.getContent() != null)
       article.setContent(newArticle.getContent());
@@ -95,10 +96,10 @@ public class ArticleController {
     return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
   }
 
-  @DeleteMapping("/articles/{id}")
+  @DeleteMapping("/{id}")
   ResponseEntity<?> deleteArticle(@PathVariable Long id) {
 
-    Article article = repository.findById(id).orElseThrow(() -> new ArticleNotFoundException(id));
+    Article article = repository.findById(id).orElseThrow(() -> new ArticleNotFoundException(id,HttpStatus.NOT_FOUND));
 
     repository.delete(article);
 

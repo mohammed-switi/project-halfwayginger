@@ -13,5 +13,6 @@ public class GeneralErrorResponse {
 
     int status;
     String message;
+   // Throwable throwable;
     Date timestamp;
 }

@@ -1,8 +1,12 @@
 package edu.bethlehem.scinexus.Notification;
 
-public class NotificationNotFoundException extends RuntimeException {
+import edu.bethlehem.scinexus.Error.GeneralException;
+import org.springframework.http.HttpStatus;
 
-  public NotificationNotFoundException(Long id) {
-    super("Could not find Notification" + id);
+public class NotificationNotFoundException extends GeneralException {
+
+
+  public NotificationNotFoundException(long id, HttpStatus httpStatus) {
+    super("Notification with Id : " + id + ", is Not Found", httpStatus);
   }
 }

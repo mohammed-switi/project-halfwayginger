@@ -38,9 +38,11 @@ public  class User implements UserDetails {
     private Long id;
 
     private String name;
+    @Column(unique = true)
     private String username;
     //@JsonIgnore
     private String password;
+    @Column(unique = true)
     private String email;
 
     @OneToOne(cascade = CascadeType.ALL)

@@ -24,7 +24,7 @@ public class NotificationController {
   EntityModel<Notification> one(@PathVariable Long notificationId) {
 
     Notification notification = repository.findById(notificationId)
-        .orElseThrow(() -> new NotificationNotFoundException(notificationId));
+        .orElseThrow(() -> new NotificationNotFoundException(notificationId,HttpStatus.NOT_FOUND));
 
     return assembler.toModel(notification);
   }
@@ -68,7 +68,7 @@ public class NotificationController {
   public ResponseEntity<?> updateUserPartially(@PathVariable(value = "id") Long notificationId,
       @RequestBody Notification newNotification) {
     Notification notification = repository.findById(notificationId)
-        .orElseThrow(() -> new NotificationNotFoundException(notificationId));
+        .orElseThrow(() -> new NotificationNotFoundException(notificationId,HttpStatus.NOT_FOUND));
     if (newNotification.getContent() != null)
       notification.setNotificationId(newNotification.getNotificationId());
     if (newNotification.getContent() != null)
@@ -83,7 +83,7 @@ public class NotificationController {
   @DeleteMapping("/notifications/{id}")
   ResponseEntity<?> deleteNotification(@PathVariable Long id) {
 
-    Notification notification = repository.findById(id).orElseThrow(() -> new NotificationNotFoundException(id));
+    Notification notification = repository.findById(id).orElseThrow(() -> new NotificationNotFoundException(id,HttpStatus.NOT_FOUND));
 
     repository.delete(notification);
 

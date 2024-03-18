@@ -1,8 +1,12 @@
 package edu.bethlehem.scinexus.Post;
 
-public class PostNotFoundException extends RuntimeException {
+import edu.bethlehem.scinexus.Error.GeneralException;
+import org.springframework.http.HttpStatus;
 
-  public PostNotFoundException(Long id) {
-    super("Could not find Post" + id);
+
+public class PostNotFoundException extends GeneralException {
+
+  public PostNotFoundException(long id, HttpStatus httpStatus) {
+    super("Post With Id : " + id + ", is Not Found ", httpStatus);
   }
 }

@@ -22,7 +22,7 @@ public class AcademicController {
   }
 
   @GetMapping("/{academicId}")
-  EntityModel<Academic> one(@PathVariable Long academicId) {
+  EntityModel<Academic> one(@PathVariable Long academicId) throws AcademicNotFoundException {
 
     Academic academic = repository.findById(academicId)
         .orElseThrow(() -> new AcademicNotFoundException(academicId,HttpStatus.NOT_FOUND));
@@ -79,7 +79,7 @@ public class AcademicController {
 
   @PatchMapping("/{id}")
   public ResponseEntity<?> updateUserPartially(@PathVariable(value = "id") Long academicId,
-      @RequestBody Academic newAcademic) {
+      @RequestBody Academic newAcademic) throws AcademicNotFoundException {
     Academic academic = repository.findById(academicId)
         .orElseThrow(() -> new AcademicNotFoundException(academicId,HttpStatus.NOT_FOUND));
 
@@ -118,7 +118,7 @@ public class AcademicController {
   }
 
   @DeleteMapping("/{id}")
-  ResponseEntity<?> deleteAcademic(@PathVariable Long id) {
+  ResponseEntity<?> deleteAcademic(@PathVariable Long id) throws AcademicNotFoundException {
 
     Academic academic = repository.findById(id).orElseThrow(() -> new AcademicNotFoundException(id,HttpStatus.NOT_FOUND));
 

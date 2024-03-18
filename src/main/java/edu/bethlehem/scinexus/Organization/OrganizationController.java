@@ -24,7 +24,7 @@ public class OrganizationController {
   EntityModel<Organization> one(@PathVariable Long organizationId) {
 
     Organization organization = repository.findById(organizationId)
-        .orElseThrow(() -> new OrganizationNotFoundException(organizationId));
+        .orElseThrow(() -> new OrganizationNotFoundException(organizationId,HttpStatus.NOT_FOUND));
 
     return assembler.toModel(organization);
   }
@@ -80,7 +80,7 @@ public class OrganizationController {
   public ResponseEntity<?> updateUserPartially(@PathVariable(value = "id") Long organizationId,
       @RequestBody Organization newOrganization) {
     Organization organization = repository.findById(organizationId)
-        .orElseThrow(() -> new OrganizationNotFoundException(organizationId));
+        .orElseThrow(() -> new OrganizationNotFoundException(organizationId,HttpStatus.NOT_FOUND));
     if (newOrganization.getType() != null)
       organization.setType(newOrganization.getType());
     if (newOrganization.getVerified() != null)
@@ -115,7 +115,7 @@ public class OrganizationController {
   @DeleteMapping("/organizations/{id}")
   ResponseEntity<?> deleteOrganization(@PathVariable Long id) {
 
-    Organization organization = repository.findById(id).orElseThrow(() -> new OrganizationNotFoundException(id));
+    Organization organization = repository.findById(id).orElseThrow(() -> new OrganizationNotFoundException(id,HttpStatus.NOT_FOUND));
 
     repository.delete(organization);
 

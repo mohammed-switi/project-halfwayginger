@@ -6,13 +6,13 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-@ControllerAdvice
-public class OpinionNotFoundAdvice {
-
-  @ResponseBody
-  @ExceptionHandler(OpinionNotFoundException.class)
-  @ResponseStatus(HttpStatus.NOT_FOUND)
-  String opinionNotFoundHandler(OpinionNotFoundException ex) {
-    return ex.getMessage();
-  }
-}
+//@ControllerAdvice
+//public class OpinionNotFoundAdvice {
+//
+//  @ResponseBody
+//  @ExceptionHandler(OpinionNotFoundException.class)
+//  @ResponseStatus(HttpStatus.NOT_FOUND)
+//  String opinionNotFoundHandler(OpinionNotFoundException ex) {
+//    return ex.getMessage();
+//  }
+//}

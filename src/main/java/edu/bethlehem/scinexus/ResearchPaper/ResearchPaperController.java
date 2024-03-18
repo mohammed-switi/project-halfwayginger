@@ -24,7 +24,7 @@ public class ResearchPaperController {
   EntityModel<ResearchPaper> one(@PathVariable Long researchpaperId) {
 
     ResearchPaper researchpaper = repository.findById(researchpaperId)
-        .orElseThrow(() -> new ResearchPaperNotFoundException(researchpaperId));
+        .orElseThrow(() -> new ResearchPaperNotFoundException(researchpaperId,HttpStatus.NOT_FOUND));
 
     return assembler.toModel(researchpaper);
   }
@@ -74,7 +74,7 @@ public class ResearchPaperController {
   public ResponseEntity<?> updateUserPartially(@PathVariable(value = "id") Long researchpaperId,
       @RequestBody ResearchPaper newResearchPaper) {
     ResearchPaper researchpaper = repository.findById(researchpaperId)
-        .orElseThrow(() -> new ResearchPaperNotFoundException(researchpaperId));
+        .orElseThrow(() -> new ResearchPaperNotFoundException(researchpaperId,HttpStatus.NOT_FOUND));
 
     if (newResearchPaper.getDescription() != null)
       researchpaper.setDescription(newResearchPaper.getDescription());
@@ -102,7 +102,7 @@ public class ResearchPaperController {
   @DeleteMapping("/researchpapers/{id}")
   ResponseEntity<?> deleteResearchPaper(@PathVariable Long id) {
 
-    ResearchPaper researchpaper = repository.findById(id).orElseThrow(() -> new ResearchPaperNotFoundException(id));
+    ResearchPaper researchpaper = repository.findById(id).orElseThrow(() -> new ResearchPaperNotFoundException(id,HttpStatus.NOT_FOUND));
 
     repository.delete(researchpaper);
 

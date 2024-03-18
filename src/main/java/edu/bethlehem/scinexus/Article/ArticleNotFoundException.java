@@ -1,8 +1,12 @@
 package edu.bethlehem.scinexus.Article;
 
-public class ArticleNotFoundException extends RuntimeException {
+import edu.bethlehem.scinexus.Error.GeneralException;
+import org.springframework.http.HttpStatus;
 
-  public ArticleNotFoundException(Long id) {
-    super("Could not find Article" + id);
+public class ArticleNotFoundException extends GeneralException {
+
+
+  public ArticleNotFoundException(Long id, HttpStatus httpStatus) {
+    super("Article With Id : " + id + ", is Not Found", httpStatus);
   }
 }

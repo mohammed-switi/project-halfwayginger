@@ -1,8 +1,11 @@
 package edu.bethlehem.scinexus.ResearchPaper;
 
-public class ResearchPaperNotFoundException extends RuntimeException {
+import edu.bethlehem.scinexus.Error.GeneralException;
+import org.springframework.http.HttpStatus;
 
-  public ResearchPaperNotFoundException(Long id) {
-    super("Could not find ResearchPaper" + id);
+public class ResearchPaperNotFoundException extends GeneralException {
+
+  public ResearchPaperNotFoundException(long id , HttpStatus httpStatus) {
+    super("Research Paper With Id : " + id + ", is Not Found", httpStatus);
   }
 }
