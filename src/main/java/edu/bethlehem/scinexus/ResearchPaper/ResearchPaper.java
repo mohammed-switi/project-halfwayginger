@@ -4,6 +4,7 @@ import edu.bethlehem.scinexus.Post.Visibility;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import edu.bethlehem.scinexus.Academic.Academic;
 import edu.bethlehem.scinexus.Interaction.Interaction;
 import edu.bethlehem.scinexus.Journal.Journal;
@@ -19,11 +20,13 @@ import org.hibernate.type.SqlTypes;
 
 @Data
 @Entity
+@NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 public class ResearchPaper extends Journal {
     private @Id @GeneratedValue Long id;
 
     @OneToOne
+    @JoinColumn(name = "validatedBy")
     @JdbcTypeCode(SqlTypes.JSON)
     private Organization validatedBy;
 
@@ -47,18 +50,9 @@ public class ResearchPaper extends Journal {
     @JdbcTypeCode(SqlTypes.JSON)
     private List<Interaction> interactions;
 
-    public ResearchPaper(Organization validatedBy, String subject, String language,
-            Integer noOfPages) {
-
-        this.validatedBy = validatedBy;
+    public ResearchPaper(String title, String description, String subject, User publisher) {
+        super(title, description, subject, publisher);
 
     }
 
-    public ResearchPaper(String title, String description, String subject, Academic publisherAcademic) {
-        super(title, description, subject, publisherAcademic);
-
-    }
-
-    public ResearchPaper() {
-    }
 }

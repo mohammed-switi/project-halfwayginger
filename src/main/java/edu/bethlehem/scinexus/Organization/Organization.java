@@ -20,14 +20,11 @@ public class Organization extends User {
     private String type;
     private Boolean verified;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "publisherOrganization")
-    @JdbcTypeCode(SqlTypes.JSON)
-    private List<Post> postsOrganization;
-
     public Organization(String name, String username, String password, String email, String type) {
         super(name, username, password, email);
         this.type = type;
     }
+
     public Organization(String name, String username, String password, String email) {
         super(name, username, password, email);
     }

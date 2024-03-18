@@ -57,7 +57,7 @@ public class ResearchPaperController {
           researchpaper.setSubject(newResearchPaper.getSubject());
           researchpaper.setTitle(newResearchPaper.getTitle());
           researchpaper.setLanguage(newResearchPaper.getLanguage());
-          researchpaper.setAcademicPublisher(newResearchPaper.getAcademicPublisher());
+          researchpaper.setPublisher(newResearchPaper.getPublisher());
           researchpaper.setVisibility(newResearchPaper.getVisibility());
           researchpaper.setContributors(newResearchPaper.getContributors());
           EntityModel<ResearchPaper> entityModel = assembler.toModel(repository.save(researchpaper));
@@ -88,8 +88,8 @@ public class ResearchPaperController {
       researchpaper.setTitle(newResearchPaper.getTitle());
     if (newResearchPaper.getLanguage() != null)
       researchpaper.setLanguage(newResearchPaper.getLanguage());
-    if (newResearchPaper.getAcademicPublisher() != null)
-      researchpaper.setAcademicPublisher(newResearchPaper.getAcademicPublisher());
+    if (newResearchPaper.getPublisher() != null)
+      researchpaper.setPublisher(newResearchPaper.getPublisher());
     if (newResearchPaper.getVisibility() != null)
       researchpaper.setVisibility(newResearchPaper.getVisibility());
     if (newResearchPaper.getContributors() != null)

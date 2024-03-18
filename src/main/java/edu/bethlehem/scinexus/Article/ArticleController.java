@@ -55,7 +55,7 @@ public class ArticleController {
           article.setSubject(newArticle.getSubject());
           article.setTitle(newArticle.getTitle());
           article.setLanguage(newArticle.getLanguage());
-          article.setAcademicPublisher(newArticle.getAcademicPublisher());
+          article.setPublisher(newArticle.getPublisher());
           article.setVisibility(newArticle.getVisibility());
           article.setContributors(newArticle.getContributors());
           EntityModel<Article> entityModel = assembler.toModel(repository.save(article));
@@ -84,8 +84,8 @@ public class ArticleController {
       article.setTitle(newArticle.getTitle());
     if (newArticle.getLanguage() != null)
       article.setLanguage(newArticle.getLanguage());
-    if (newArticle.getAcademicPublisher() != null)
-      article.setAcademicPublisher(newArticle.getAcademicPublisher());
+    if (newArticle.getPublisher() != null)
+      article.setPublisher(newArticle.getPublisher());
     if (newArticle.getVisibility() != null)
       article.setVisibility(newArticle.getVisibility());
     if (newArticle.getContributors() != null)

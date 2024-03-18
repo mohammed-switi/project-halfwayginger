@@ -29,9 +29,9 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 
-//@MappedSuperclass
+// @MappedSuperclass
 @Inheritance(strategy = InheritanceType.JOINED)
-public  class User implements UserDetails {
+public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -39,7 +39,7 @@ public  class User implements UserDetails {
 
     private String name;
     private String username;
-    //@JsonIgnore
+    // @JsonIgnore
     private String password;
     private String email;
 
@@ -63,24 +63,6 @@ public  class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    
-
-    public User(String name, String username, String password, String email,
-            Media profilePicture,
-            Media profileCover, String bio, String phoneNumber, String fieldOfWork, JSONPObject userSettings) {
-
-        this.name = name;
-        this.username = username;
-        this.password = password;
-        this.email = email;
-        this.profilePicture = profilePicture;
-        this.profileCover = profileCover;
-        this.bio = bio;
-        this.phoneNumber = phoneNumber;
-        this.fieldOfWork = fieldOfWork;
-        this.userSettings = userSettings;
-    }
-
     public User(String name, String username, String password, String email) {
         this.name = name;
         this.username = username;
@@ -88,16 +70,16 @@ public  class User implements UserDetails {
         this.email = email;
     }
 
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role.name()));
     }
 
     @Override
-    public String getUsername(){
+    public String getUsername() {
         return email;
     }
+
     @Override
     public boolean isAccountNonExpired() {
         return true;

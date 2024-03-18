@@ -33,18 +33,6 @@ public class Academic extends User {
     @Enumerated(EnumType.STRING)
     private Position position;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "publisherAcademic")
-    @JdbcTypeCode(SqlTypes.JSON)
-    private List<Post> postsAcademic;
-
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "academicPublisher")
-    @JdbcTypeCode(SqlTypes.JSON)
-    private List<ResearchPaper> researchPaperPublisherAcademic;
-
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "academicPublisher")
-    @JdbcTypeCode(SqlTypes.JSON)
-    private List<Article> articlePublisherAcademic;
-
     @ManyToMany(mappedBy = "requestsForAccess")
     List<ResearchPaper> requestsResearchPapers;
 
