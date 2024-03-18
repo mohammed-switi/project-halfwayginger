@@ -2,6 +2,7 @@ package edu.bethlehem.scinexus.Article;
 
 import java.util.List;
 
+import edu.bethlehem.scinexus.Post.Visibility;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
@@ -38,8 +39,14 @@ public class Article extends Journal {
     @JdbcTypeCode(SqlTypes.JSON)
     private List<Interaction> interactions;
 
+<<<<<<< HEAD
     public Article(String title, String description, String subject, Academic publisherAcademic, String content) {
         super(title, description, subject, publisherAcademic);
+=======
+    public Article(String name, String description, String subject, String title, String language, User publisher,
+                   Integer noOfPages, Visibility visibility, Organization validatedBy, String content) {
+        super(name, description, subject, title, language, publisher, noOfPages, visibility);
+>>>>>>> security
         this.content = content;
     }
 

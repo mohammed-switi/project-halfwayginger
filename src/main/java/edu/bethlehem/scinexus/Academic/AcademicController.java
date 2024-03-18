@@ -10,6 +10,7 @@ import org.springframework.hateoas.*;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@RequestMapping("/academics")
 public class AcademicController {
 
   private final AcademicRepository repository;
@@ -20,16 +21,16 @@ public class AcademicController {
     this.assembler = assembler;
   }
 
-  @GetMapping("/academics/{academicId}")
+  @GetMapping("/{academicId}")
   EntityModel<Academic> one(@PathVariable Long academicId) {
 
     Academic academic = repository.findById(academicId)
-        .orElseThrow(() -> new AcademicNotFoundException(academicId));
+        .orElseThrow(() -> new AcademicNotFoundException(academicId,HttpStatus.NOT_FOUND));
 
     return assembler.toModel(academic);
   }
 
-  @GetMapping("/academics")
+  @GetMapping()
   CollectionModel<EntityModel<Academic>> all() {
     List<EntityModel<Academic>> academics = repository.findAll().stream().map(academic -> assembler.toModel(academic))
         .collect(Collectors.toList());
@@ -37,7 +38,7 @@ public class AcademicController {
     return CollectionModel.of(academics, linkTo(methodOn(AcademicController.class).all()).withSelfRel());
   }
 
-  @PostMapping("/academics")
+  @PostMapping()
   ResponseEntity<?> newAcademic(@RequestBody Academic newAcademic) {
 
     EntityModel<Academic> entityModel = assembler.toModel(repository.save(newAcademic));
@@ -45,7 +46,7 @@ public class AcademicController {
     return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
   }
 
-  @PutMapping("/academics/{id}")
+  @PutMapping("/{id}")
   ResponseEntity<?> editAcademic(@RequestBody Academic newAcademic, @PathVariable Long id) {
 
     return repository.findById(id)
@@ -76,11 +77,11 @@ public class AcademicController {
         });
   }
 
-  @PatchMapping("/academics/{id}")
+  @PatchMapping("/{id}")
   public ResponseEntity<?> updateUserPartially(@PathVariable(value = "id") Long academicId,
       @RequestBody Academic newAcademic) {
     Academic academic = repository.findById(academicId)
-        .orElseThrow(() -> new AcademicNotFoundException(academicId));
+        .orElseThrow(() -> new AcademicNotFoundException(academicId,HttpStatus.NOT_FOUND));
 
     if (newAcademic.getBadge() != null)
       academic.setBadge(newAcademic.getBadge());
@@ -116,10 +117,10 @@ public class AcademicController {
     return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
   }
 
-  @DeleteMapping("/academics/{id}")
+  @DeleteMapping("/{id}")
   ResponseEntity<?> deleteAcademic(@PathVariable Long id) {
 
-    Academic academic = repository.findById(id).orElseThrow(() -> new AcademicNotFoundException(id));
+    Academic academic = repository.findById(id).orElseThrow(() -> new AcademicNotFoundException(id,HttpStatus.NOT_FOUND));
 
     repository.delete(academic);
 

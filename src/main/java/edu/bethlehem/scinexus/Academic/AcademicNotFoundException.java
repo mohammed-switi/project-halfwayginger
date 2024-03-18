@@ -1,8 +1,20 @@
 package edu.bethlehem.scinexus.Academic;
 
+import lombok.Getter;
+import org.springframework.http.HttpStatus;
+
 public class AcademicNotFoundException extends RuntimeException {
 
-  public AcademicNotFoundException(Long id) {
-    super("Could not find Academic" + id);
+
+  private HttpStatus httpStatus;
+  public AcademicNotFoundException(Long id, HttpStatus httpStatus)
+  {    super("Could not find Academic with Id: " + id);
+
+    this.httpStatus=httpStatus;
+  }
+
+
+  public HttpStatus getHttpStatus(){
+    return httpStatus;
   }
 }

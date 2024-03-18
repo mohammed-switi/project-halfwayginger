@@ -1,5 +1,6 @@
 package edu.bethlehem.scinexus.ResearchPaper;
 
+import edu.bethlehem.scinexus.Post.Visibility;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

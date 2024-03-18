@@ -16,6 +16,8 @@ import lombok.Data;
 public class Media {
     @Column()
     private @Id @GeneratedValue Long mediaId;
+
+    @Enumerated(EnumType.STRING)
     private MediaType type;
     private String path;
 

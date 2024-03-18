@@ -6,12 +6,17 @@ import edu.bethlehem.scinexus.Post.Post;
 import edu.bethlehem.scinexus.ResearchPaper.ResearchPaper;
 import jakarta.persistence.*;
 import lombok.Data;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 @Data
 @Entity
 public class Interaction {
     private @Id @GeneratedValue Long id;
     private Long interactionId;
+
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Enumerated(EnumType.STRING)
     private InteractionType type;
 
     @ManyToOne

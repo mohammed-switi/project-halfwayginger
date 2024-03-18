@@ -28,6 +28,9 @@ public class Organization extends User {
         super(name, username, password, email);
         this.type = type;
     }
+    public Organization(String name, String username, String password, String email) {
+        super(name, username, password, email);
+    }
 
     public Organization() {
     }
