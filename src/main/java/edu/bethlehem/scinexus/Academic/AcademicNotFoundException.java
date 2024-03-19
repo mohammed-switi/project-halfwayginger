@@ -6,10 +6,8 @@ import org.springframework.http.HttpStatus;
 
 public class AcademicNotFoundException extends GeneralException {
 
-
   public AcademicNotFoundException(Long id, HttpStatus httpStatus) {
-    super("Academic With Id : " + id +", is Not Found", httpStatus);
+    super("Academic With Id : " + id + ", is Not Found", httpStatus);
   }
-
 
 }

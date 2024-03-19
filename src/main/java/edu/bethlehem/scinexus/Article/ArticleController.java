@@ -55,7 +55,7 @@ public class ArticleController {
           article.setDescription(newArticle.getDescription());
           article.setSubject(newArticle.getSubject());
           article.setTitle(newArticle.getTitle());
-          article.setLanguage(newArticle.getLanguage());
+
           article.setPublisher(newArticle.getPublisher());
           article.setVisibility(newArticle.getVisibility());
           article.setContributors(newArticle.getContributors());
@@ -83,8 +83,7 @@ public class ArticleController {
       article.setSubject(newArticle.getSubject());
     if (newArticle.getTitle() != null)
       article.setTitle(newArticle.getTitle());
-    if (newArticle.getLanguage() != null)
-      article.setLanguage(newArticle.getLanguage());
+
     if (newArticle.getPublisher() != null)
       article.setPublisher(newArticle.getPublisher());
     if (newArticle.getVisibility() != null)

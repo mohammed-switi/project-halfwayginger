@@ -52,9 +52,8 @@ public class PostController {
         .map(post -> {
           post.setContent(newPost.getContent());
           post.setVisibility(newPost.getVisibility());
-          // post.setPublisher(newPost.getPublisher());
           post.setInteractionCount(newPost.getInteractionCount());
-          post.setOpinionsCount(newPost.getOpinionsCount());
+          post.setOpinionCount(newPost.getOpinionCount());
           post.setReShare(newPost.getReShare());
           EntityModel<Post> entityModel = assembler.toModel(repository.save(post));
           return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
@@ -80,8 +79,8 @@ public class PostController {
 
     if (newPost.getInteractionCount() != null)
       post.setInteractionCount(newPost.getInteractionCount());
-    if (newPost.getOpinionsCount() != null)
-      post.setOpinionsCount(newPost.getOpinionsCount());
+    if (newPost.getOpinionCount() != null)
+      post.setOpinionCount(newPost.getOpinionCount());
     if (newPost.getReShare() != null)
       post.setReShare(newPost.getReShare());
 

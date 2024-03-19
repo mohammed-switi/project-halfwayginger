@@ -1,5 +1,6 @@
 package edu.bethlehem.scinexus.Journal;
 
+import edu.bethlehem.scinexus.Post.Post;
 import edu.bethlehem.scinexus.Post.Visibility;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -12,7 +13,9 @@ import java.util.List;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
-import edu.bethlehem.scinexus.Academic.Academic;
+import edu.bethlehem.scinexus.Interaction.Interaction;
+import edu.bethlehem.scinexus.Media.Media;
+import edu.bethlehem.scinexus.Opinion.Opinion;
 import edu.bethlehem.scinexus.Organization.Organization;
 import edu.bethlehem.scinexus.User.User;
 
@@ -28,13 +31,10 @@ public class Journal {
     private @Id Long id;
 
     private String description;
-    private String subject;
-    private String title;
-    private String language;
-    private Integer noOfPages;
 
-    @JdbcTypeCode(SqlTypes.JSON)
-    private Organization validatedBy;
+    private Integer interactionCount;
+    private Integer opinionCount;
+    private String content;
 
     @Enumerated(EnumType.STRING)
     private Visibility visibility;
@@ -44,15 +44,33 @@ public class Journal {
     @JdbcTypeCode(SqlTypes.JSON)
     private User publisher;
 
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "journal")
+    @JdbcTypeCode(SqlTypes.JSON)
+    private List<Interaction> interactions;
+
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "journal")
+    @JdbcTypeCode(SqlTypes.JSON)
+    private List<Opinion> opinions;
+
+    @OneToMany(fetch = FetchType.LAZY)
+    @JdbcTypeCode(SqlTypes.JSON)
+    @JoinColumn(name = "journal")
+    private List<Media> medias;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "reShare")
+    @JdbcTypeCode(SqlTypes.JSON)
+    private Journal reShare;
+
+    @ManyToMany(mappedBy = "contributs")
     @JdbcTypeCode(SqlTypes.JSON)
     private List<User> contributors;
 
-    public Journal(String title, String description, String subject, User publisher) {
-
-        this.description = description;
-        this.subject = subject;
-        this.title = title;
-
+    public Journal(String content, User publisher) {
+        this.publisher = publisher;
+        this.content = content;
     }
 
 }
