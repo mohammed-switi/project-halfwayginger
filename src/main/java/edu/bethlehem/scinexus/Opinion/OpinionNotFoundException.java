@@ -1,8 +1,11 @@
 package edu.bethlehem.scinexus.Opinion;
 
-public class OpinionNotFoundException extends RuntimeException {
+import edu.bethlehem.scinexus.Error.GeneralException;
+import org.springframework.http.HttpStatus;
 
-  public OpinionNotFoundException(Long id) {
-    super("Could not find Opinion" + id);
+public class OpinionNotFoundException extends GeneralException {
+
+  public OpinionNotFoundException(long id, HttpStatus httpStatus) {
+    super("Opinion With Id : "+ id + ", is Not Found ", httpStatus);
   }
 }

@@ -1,8 +1,11 @@
 package edu.bethlehem.scinexus.Media;
 
-public class MediaNotFoundException extends RuntimeException {
+import edu.bethlehem.scinexus.Error.GeneralException;
+import org.springframework.http.HttpStatus;
 
-  public MediaNotFoundException(Long id) {
-    super("Could not find Media" + id);
+public class MediaNotFoundException extends GeneralException {
+
+  public MediaNotFoundException(long id, HttpStatus httpStatus) {
+    super("Media With Id : "+ id + ", is Not Found", httpStatus);
   }
 }

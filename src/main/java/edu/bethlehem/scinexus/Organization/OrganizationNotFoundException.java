@@ -1,8 +1,12 @@
 package edu.bethlehem.scinexus.Organization;
 
-public class OrganizationNotFoundException extends RuntimeException {
+import edu.bethlehem.scinexus.Error.GeneralException;
+import org.springframework.http.HttpStatus;
 
-  public OrganizationNotFoundException(Long id) {
-    super("Could not find Organization" + id);
+public class OrganizationNotFoundException extends GeneralException {
+
+
+  public OrganizationNotFoundException(long id, HttpStatus httpStatus) {
+    super("Organization With Id : " + id + ", Is Not Found", httpStatus);
   }
 }

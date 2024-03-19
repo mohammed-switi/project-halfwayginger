@@ -10,6 +10,8 @@ import edu.bethlehem.scinexus.User.User;
 import edu.bethlehem.scinexus.User.UserNotFoundException;
 import edu.bethlehem.scinexus.User.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -30,10 +32,6 @@ public class AuthenticationService {
     public AuthenticationResponse register(RegisterRequest request) {
             User user = null;
 
-        System.out.println(request.getRole());
-//
-//            userRepository.save(user);
-//            userRepository.save(user);
             if(request.getRole() == Role.ACADEMIC){
                user = new Academic(request.getName(), request.getUsername(),passwordEncoder.encode(request.getPassword()), request.getEmail());
                 user.setRole(Role.ACADEMIC);
@@ -44,6 +42,7 @@ public class AuthenticationService {
             user.setRole(Role.ORGANIZATION);
             organizationRepository.save((Organization) user);
              }
+
 
         var jwtToken = service.generateToken(user);
             return AuthenticationResponse.builder()
@@ -61,7 +60,7 @@ public class AuthenticationService {
             )
     );
     var user = userRepository.findByEmail(request.getEmail())
-            .orElseThrow(() -> new UserNotFoundException("User Not Found Exception"));
+            .orElseThrow(() -> new UserNotFoundException("User Not Found Exception", HttpStatus.NOT_FOUND));
         var jwtToken = service.generateToken(user);
         return AuthenticationResponse.builder()
                 .token(jwtToken)

@@ -24,7 +24,7 @@ public class InteractionController {
   EntityModel<Interaction> one(@PathVariable Long interactionId) {
 
     Interaction interaction = repository.findById(interactionId)
-        .orElseThrow(() -> new InteractionNotFoundException(interactionId));
+        .orElseThrow(() -> new InteractionNotFoundException(interactionId,HttpStatus.NOT_FOUND));
 
     return assembler.toModel(interaction);
   }
@@ -67,7 +67,7 @@ public class InteractionController {
   public ResponseEntity<?> updateUserPartially(@PathVariable(value = "id") Long interactionId,
       @RequestBody Interaction newInteraction) {
     Interaction interaction = repository.findById(interactionId)
-        .orElseThrow(() -> new InteractionNotFoundException(interactionId));
+        .orElseThrow(() -> new InteractionNotFoundException(interactionId,HttpStatus.NOT_FOUND));
 
     if (newInteraction.getInteractionId() != null)
       interaction.setInteractionId(newInteraction.getInteractionId());
@@ -81,7 +81,7 @@ public class InteractionController {
   @DeleteMapping("/interactions/{id}")
   ResponseEntity<?> deleteInteraction(@PathVariable Long id) {
 
-    Interaction interaction = repository.findById(id).orElseThrow(() -> new InteractionNotFoundException(id));
+    Interaction interaction = repository.findById(id).orElseThrow(() -> new InteractionNotFoundException(id,HttpStatus.NOT_FOUND));
 
     repository.delete(interaction);
 

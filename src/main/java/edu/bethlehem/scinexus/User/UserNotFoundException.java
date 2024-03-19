@@ -1,11 +1,12 @@
 package edu.bethlehem.scinexus.User;
 
-public class UserNotFoundException extends RuntimeException {
+import edu.bethlehem.scinexus.Error.GeneralException;
+import org.springframework.http.HttpStatus;
 
-  public UserNotFoundException(Long id) {
-    super("Could not find User" + id);
+public class UserNotFoundException extends GeneralException {
+
+  public UserNotFoundException(String message, HttpStatus httpStatus){
+    super(message,httpStatus);
   }
-  public UserNotFoundException(String message){
-    super(message);
-  }
+
 }

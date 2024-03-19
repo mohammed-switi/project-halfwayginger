@@ -1,8 +1,11 @@
 package edu.bethlehem.scinexus.Interaction;
 
-public class InteractionNotFoundException extends RuntimeException {
+import edu.bethlehem.scinexus.Error.GeneralException;
+import org.springframework.http.HttpStatus;
 
-  public InteractionNotFoundException(Long id) {
-    super("Could not find Interaction" + id);
+public class InteractionNotFoundException extends GeneralException {
+
+  public InteractionNotFoundException(long id, HttpStatus httpStatus) {
+    super("Interaction With Id : " + id + ", is Not Found ", httpStatus);
   }
 }

@@ -24,7 +24,7 @@ public class PostController {
   EntityModel<Post> one(@PathVariable Long postId) {
 
     Post post = repository.findById(postId)
-        .orElseThrow(() -> new PostNotFoundException(postId));
+        .orElseThrow(() -> new PostNotFoundException(postId,HttpStatus.NOT_FOUND));
 
     return assembler.toModel(post);
   }
@@ -70,9 +70,8 @@ public class PostController {
   public ResponseEntity<?> updateUserPartially(@PathVariable(value = "id") Long postId,
       @RequestBody Post newPost) {
     Post post = repository.findById(postId)
-        .orElseThrow(() -> new PostNotFoundException(postId));
+        .orElseThrow(() -> new PostNotFoundException(postId,HttpStatus.NOT_FOUND));
     if (newPost.getContent() != null)
-      if (newPost.getContent() != null)
         post.setContent(newPost.getContent());
     if (newPost.getVisibility() != null)
       post.setVisibility(newPost.getVisibility());
@@ -93,7 +92,7 @@ public class PostController {
   @DeleteMapping("/posts/{id}")
   ResponseEntity<?> deletePost(@PathVariable Long id) {
 
-    Post post = repository.findById(id).orElseThrow(() -> new PostNotFoundException(id));
+    Post post = repository.findById(id).orElseThrow(() -> new PostNotFoundException(id,HttpStatus.NOT_FOUND));
 
     repository.delete(post);
 
