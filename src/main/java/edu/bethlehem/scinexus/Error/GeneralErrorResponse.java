@@ -1,11 +1,9 @@
 package edu.bethlehem.scinexus.Error;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.Getter;
 
 import java.util.Date;
-
 
 @Getter
 @AllArgsConstructor

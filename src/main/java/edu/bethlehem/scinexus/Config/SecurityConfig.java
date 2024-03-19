@@ -1,7 +1,5 @@
 package edu.bethlehem.scinexus.Config;
 
-
-import jakarta.servlet.Filter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,17 +23,14 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
                 .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(HttpRequestAuthorizer ->
-                        HttpRequestAuthorizer.requestMatchers("/api/v1/auth/**")
+                .authorizeHttpRequests(HttpRequestAuthorizer -> HttpRequestAuthorizer.requestMatchers("/api/v1/auth/**")
                         .permitAll()
                         .anyRequest()
-                        .authenticated()
-                )
-                .sessionManagement(sessionConfigurer -> sessionConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                        .authenticated())
+                .sessionManagement(
+                        sessionConfigurer -> sessionConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
-                
-
 
         return httpSecurity.build();
     }

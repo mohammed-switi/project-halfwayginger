@@ -1,11 +1,8 @@
 package edu.bethlehem.scinexus.Academic;
 
-import edu.bethlehem.scinexus.Article.Article;
 import edu.bethlehem.scinexus.Organization.Organization;
-import edu.bethlehem.scinexus.Post.Post;
 import edu.bethlehem.scinexus.ResearchPaper.ResearchPaper;
 import jakarta.persistence.*;
-import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import edu.bethlehem.scinexus.User.User;

@@ -1,6 +1,5 @@
 package edu.bethlehem.scinexus.ResearchPaper;
 
-import edu.bethlehem.scinexus.Post.Visibility;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -24,34 +23,24 @@ import org.hibernate.type.SqlTypes;
 @EqualsAndHashCode(callSuper = false)
 public class ResearchPaper extends Journal {
     private @Id @GeneratedValue Long id;
-
-    @OneToOne
-    @JoinColumn(name = "validatedBy")
-    @JdbcTypeCode(SqlTypes.JSON)
-    private Organization validatedBy;
+    private String language;
+    private String title;
+    private String subject;
+    private Integer noOfPages;
 
     @ManyToMany
     @JoinTable(name = "research_paper_access_request_academics", joinColumns = @JoinColumn(name = "requestsForAccess"), inverseJoinColumns = @JoinColumn(name = "requestsResearchPapers"))
     @JdbcTypeCode(SqlTypes.JSON)
     private List<Academic> requestsForAccess;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "research_paper")
-    @JdbcTypeCode(SqlTypes.JSON)
-    private List<Opinion> opinions;
-
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "ownerResearchPaper")
-    @JdbcTypeCode(SqlTypes.JSON)
-    private List<Media> media;
-
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "researchPaperInteractions")
-    @JdbcTypeCode(SqlTypes.JSON)
-    private List<Interaction> interactions;
+    @ManyToMany
+    @JoinTable(name = "research_paper_validated_by_organization", joinColumns = @JoinColumn(name = "validated"), inverseJoinColumns = @JoinColumn(name = "validated_research_papers"))
+    private List<Organization> validatedBy;
 
     public ResearchPaper(String title, String description, String subject, User publisher) {
-        super(title, description, subject, publisher);
+        super(description, publisher);
+        this.title = title;
+        this.subject = subject;
 
     }
 
