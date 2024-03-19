@@ -1,5 +1,6 @@
 package edu.bethlehem.scinexus.Auth;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +23,7 @@ public class AuthenticationController {
     @PostMapping("/register")
     public ResponseEntity<AuthenticationResponse> register(
 
-            @RequestBody RegisterRequest request
+           @Valid  @RequestBody RegisterRequest request
     ){
         AuthenticationResponse response = null;
         try {

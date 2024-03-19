@@ -5,57 +5,49 @@ import edu.bethlehem.scinexus.User.UserNotFoundException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.SignatureException;
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.WebRequest;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @ControllerAdvice
 public class RestExceptionHandler {
 
 
-//    @ExceptionHandler(AcademicNotFoundException.class)
-//    ResponseEntity<GeneralErrorResponse> academicNotFoundHandler(AcademicNotFoundException ex) {
-//        GeneralErrorResponse errorResponse = new GeneralErrorResponse(
-//                ex.getHttpStatus().value(),
-//                ex.getMessage(),
-//                new Date(System.currentTimeMillis())
-//        );
-//
-//        return new ResponseEntity<>(errorResponse,ex.getHttpStatus());
-//
-//    }
 
     @ExceptionHandler(GeneralException.class)
     ResponseEntity<GeneralErrorResponse> restExceptionHandler(GeneralException ex) {
-        GeneralErrorResponse errorResponse = new GeneralErrorResponse(
-                ex.getHttpStatus().value(),
-                ex.getMessage(),
-      //          ex,
-                new Date(System.currentTimeMillis())
-        );
+
+        GeneralErrorResponse errorResponse= GeneralErrorResponse
+                                                .builder()
+                                                .status(ex.getHttpStatus().value())
+                                                .message(ex.getMessage())
+                                                .timestamp(new Date(System.currentTimeMillis()))
+                                                .build();
 
         return new ResponseEntity<>(errorResponse,ex.getHttpStatus());
 
     }
     @ExceptionHandler(UserNotFoundException.class)
     public final ResponseEntity<Object> handleUserNotFoundException(UserNotFoundException ex) {
-            GeneralErrorResponse errorResponse = new GeneralErrorResponse(
-                    ex.getHttpStatus().value(),
-                    ex.getMessage(),
-    //                ex,
-                    new Date(System.currentTimeMillis())
-            );
+            GeneralErrorResponse errorResponse = GeneralErrorResponse
+                                                .builder()
+                                                .status(ex.getHttpStatus().value())
+                                                .message(ex.getMessage())
+                                                .timestamp(new Date(System.currentTimeMillis()))
+                                                .build();
             return new ResponseEntity<>(errorResponse,ex.getHttpStatus());
 
         }
-//    @ExceptionHandler(UserNotFoundException.class)
-//    public ResponseEntity<String> handleUserNotFoundException(UserNotFoundException ex) {
-//        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
-//    }
 
 
 
@@ -69,6 +61,30 @@ public class RestExceptionHandler {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Internal Server Error: " + cause.getMessage());
         }
+    }
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<GeneralErrorResponse> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        Map<String, String> errors = new HashMap<>();
+
+                ex
+                .getBindingResult()
+                .getAllErrors()
+                .forEach((error) -> {
+                                        String fieldName = ((FieldError) error).getField();
+                                        String errorMessage = error.getDefaultMessage();
+                                        errors.put(fieldName, errorMessage);
+                                     }
+                         );
+                GeneralErrorResponse errorResponse=GeneralErrorResponse
+                        .builder()
+                        .message("Vaildation Constraint Violation")
+                        .status(HttpStatus.BAD_REQUEST.value())
+                        .timestamp(new Date(System.currentTimeMillis()))
+                        .validationError(errors)
+                        .build();
+
+        return new ResponseEntity<>(errorResponse,HttpStatus.BAD_REQUEST);
     }
 
 
