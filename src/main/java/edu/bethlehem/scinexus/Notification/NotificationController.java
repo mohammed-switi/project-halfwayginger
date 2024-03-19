@@ -51,7 +51,7 @@ public class NotificationController {
 
     return repository.findById(id)
         .map(notification -> {
-          notification.setNotificationId(newNotification.getNotificationId());
+
           notification.setContent(newNotification.getContent());
           notification.setStatus(newNotification.getStatus());
           EntityModel<Notification> entityModel = assembler.toModel(repository.save(notification));
@@ -69,8 +69,6 @@ public class NotificationController {
       @RequestBody Notification newNotification) {
     Notification notification = repository.findById(notificationId)
         .orElseThrow(() -> new NotificationNotFoundException(notificationId,HttpStatus.NOT_FOUND));
-    if (newNotification.getContent() != null)
-      notification.setNotificationId(newNotification.getNotificationId());
     if (newNotification.getContent() != null)
       notification.setContent(newNotification.getContent());
     if (newNotification.getStatus() != null)

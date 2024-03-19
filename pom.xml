@@ -18,6 +18,13 @@
 		<java.version>21</java.version>
 	</properties>
 	<dependencies>
+		<!-- https://mvnrepository.com/artifact/org.ajbrown/name-machine -->
+		<dependency>
+			<groupId>org.ajbrown</groupId>
+			<artifactId>name-machine</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+
 		<dependency>
 			<groupId>com.github.java-json-tools</groupId>
 			<artifactId>json-patch</artifactId>

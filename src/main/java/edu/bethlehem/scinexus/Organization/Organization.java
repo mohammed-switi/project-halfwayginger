@@ -2,10 +2,7 @@ package edu.bethlehem.scinexus.Organization;
 
 import java.util.List;
 
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
-
-import edu.bethlehem.scinexus.Post.Post;
+import edu.bethlehem.scinexus.ResearchPaper.ResearchPaper;
 import edu.bethlehem.scinexus.User.User;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -20,15 +17,14 @@ public class Organization extends User {
     private String type;
     private Boolean verified;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "publisherOrganization")
-    @JdbcTypeCode(SqlTypes.JSON)
-    private List<Post> postsOrganization;
+    @ManyToMany(mappedBy = "validatedBy")
+    List<ResearchPaper> validateds;
 
-    public Organization(String name, String username, String password, String email, String type, Boolean verified) {
+    public Organization(String name, String username, String password, String email, String type) {
         super(name, username, password, email);
         this.type = type;
-        this.verified = verified;
     }
+
     public Organization(String name, String username, String password, String email) {
         super(name, username, password, email);
     }

@@ -1,9 +1,9 @@
 package edu.bethlehem.scinexus.ResearchPaper;
 
-import edu.bethlehem.scinexus.Post.Visibility;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import edu.bethlehem.scinexus.Academic.Academic;
 import edu.bethlehem.scinexus.Interaction.Interaction;
 import edu.bethlehem.scinexus.Journal.Journal;
@@ -19,55 +19,29 @@ import org.hibernate.type.SqlTypes;
 
 @Data
 @Entity
+@NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 public class ResearchPaper extends Journal {
     private @Id @GeneratedValue Long id;
-    private String description;
-
-    @OneToOne
-    @JdbcTypeCode(SqlTypes.JSON)
-    private Organization validatedBy;
+    private String language;
+    private String title;
+    private String subject;
+    private Integer noOfPages;
 
     @ManyToMany
     @JoinTable(name = "research_paper_access_request_academics", joinColumns = @JoinColumn(name = "requestsForAccess"), inverseJoinColumns = @JoinColumn(name = "requestsResearchPapers"))
     @JdbcTypeCode(SqlTypes.JSON)
     private List<Academic> requestsForAccess;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "research_paper")
-    @JdbcTypeCode(SqlTypes.JSON)
-    private List<Opinion> opinions;
+    @ManyToMany
+    @JoinTable(name = "research_paper_validated_by_organization", joinColumns = @JoinColumn(name = "validated"), inverseJoinColumns = @JoinColumn(name = "validated_research_papers"))
+    private List<Organization> validatedBy;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "researchPaperPublisherAcademic")
-    @JdbcTypeCode(SqlTypes.JSON)
-    private Organization publisherAcademic;
-
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "ownerResearchPaper")
-    @JdbcTypeCode(SqlTypes.JSON)
-    private List<Media> media;
-
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "researchPaperInteractions")
-    @JdbcTypeCode(SqlTypes.JSON)
-    private List<Interaction> interactions;
-
-    public ResearchPaper(String description, Organization validatedBy, String subject, String language,
-            Integer noOfPages) {
-        this.description = description;
-        this.validatedBy = validatedBy;
+    public ResearchPaper(String title, String description, String subject, User publisher) {
+        super(description, publisher);
+        this.title = title;
+        this.subject = subject;
 
     }
 
-    public ResearchPaper(String name, String description, String subject, String title, String language, User publisher,
-            Integer noOfPages, Visibility visibility, Organization validatedBy) {
-        super(name, description, subject, title, language, publisher, noOfPages,  visibility);
-        this.description = description;
-        this.validatedBy = validatedBy;
-
-    }
-
-    public ResearchPaper() {
-    }
 }

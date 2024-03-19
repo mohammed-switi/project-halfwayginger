@@ -1,10 +1,8 @@
 package edu.bethlehem.scinexus.Academic;
 
 import edu.bethlehem.scinexus.Organization.Organization;
-import edu.bethlehem.scinexus.Post.Post;
 import edu.bethlehem.scinexus.ResearchPaper.ResearchPaper;
 import jakarta.persistence.*;
-import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import edu.bethlehem.scinexus.User.User;
@@ -31,18 +29,6 @@ public class Academic extends User {
     @JdbcTypeCode(SqlTypes.JSON)
     @Enumerated(EnumType.STRING)
     private Position position;
-
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "publisherAcademic")
-    @JdbcTypeCode(SqlTypes.JSON)
-    private List<Post> postsAcademic;
-
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "publisherAcademic")
-    @JdbcTypeCode(SqlTypes.JSON)
-    private List<Post> researchPaperPublisherAcademic;
-
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "publisherAcademic")
-    @JdbcTypeCode(SqlTypes.JSON)
-    private List<Post> articlePublisherAcademic;
 
     @ManyToMany(mappedBy = "requestsForAccess")
     List<ResearchPaper> requestsResearchPapers;

@@ -6,14 +6,15 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-
+import edu.bethlehem.scinexus.Journal.Journal;
 import edu.bethlehem.scinexus.Media.Media;
-
+import edu.bethlehem.scinexus.Notification.Notification;
+import edu.bethlehem.scinexus.Opinion.Opinion;
+import edu.bethlehem.scinexus.ResearchPaper.ResearchPaper;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -28,10 +29,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-
-//@MappedSuperclass
 @Inheritance(strategy = InheritanceType.JOINED)
-public  class User implements UserDetails {
+public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -40,19 +39,17 @@ public  class User implements UserDetails {
     private String name;
     @Column(unique = true)
     private String username;
-    //@JsonIgnore
+
     private String password;
     @Column(unique = true)
     private String email;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "profile_picture_id")
-    @JdbcTypeCode(SqlTypes.JSON)
     private Media profilePicture;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "profile_cover_id")
-    @JdbcTypeCode(SqlTypes.JSON)
     private Media profileCover;
 
     private String bio;
@@ -65,21 +62,25 @@ public  class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    public User(String name, String username, String password, String email,
-            Media profilePicture,
-            Media profileCover, String bio, String phoneNumber, String fieldOfWork, JSONPObject userSettings) {
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "publisher")
+    @JdbcTypeCode(SqlTypes.JSON)
+    private List<Journal> journals;
 
-        this.name = name;
-        this.username = username;
-        this.password = password;
-        this.email = email;
-        this.profilePicture = profilePicture;
-        this.profileCover = profileCover;
-        this.bio = bio;
-        this.phoneNumber = phoneNumber;
-        this.fieldOfWork = fieldOfWork;
-        this.userSettings = userSettings;
-    }
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "notifications")
+    @JdbcTypeCode(SqlTypes.JSON)
+    private List<Notification> notifications;
+
+    @ManyToMany
+    @JoinTable(name = "journal_user_contributors", joinColumns = @JoinColumn(name = "contributs"), inverseJoinColumns = @JoinColumn(name = "contributors"))
+    @JdbcTypeCode(SqlTypes.JSON)
+    private List<Journal> contributs;
+
+    @ManyToMany
+    @JoinTable(name = "user_link_user", joinColumns = @JoinColumn(name = "linkFrom"), inverseJoinColumns = @JoinColumn(name = "LinkTo"))
+    @JdbcTypeCode(SqlTypes.JSON)
+    private List<User> links;
 
     public User(String name, String username, String password, String email) {
         this.name = name;
@@ -88,16 +89,16 @@ public  class User implements UserDetails {
         this.email = email;
     }
 
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role.name()));
     }
 
     @Override
-    public String getUsername(){
+    public String getUsername() {
         return email;
     }
+
     @Override
     public boolean isAccountNonExpired() {
         return true;

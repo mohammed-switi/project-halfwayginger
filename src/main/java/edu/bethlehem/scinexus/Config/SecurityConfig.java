@@ -27,9 +27,9 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(HttpRequestAuthorizer ->
                         HttpRequestAuthorizer.requestMatchers("/api/v1/auth/**")
-                        .permitAll()
-                        .anyRequest()
-                        .authenticated()
+                                .permitAll()
+                                .anyRequest()
+                                .authenticated()
                 )
                 .sessionManagement(sessionConfigurer -> sessionConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider)
@@ -37,7 +37,7 @@ public class SecurityConfig {
 //                .exceptionHandling(httpSecurityExceptionHandlingConfigurer -> {
 //                    httpSecurityExceptionHandlingConfigurer.authenticationEntryPoint(new JwtAuthenticationEntryPoint());
 //                });
-                
+
 
 
         return httpSecurity.build();
