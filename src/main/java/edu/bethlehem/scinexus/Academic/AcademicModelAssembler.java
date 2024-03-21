@@ -9,17 +9,17 @@ import org.springframework.stereotype.Component;
 @Component
 class AcademicModelAssembler implements RepresentationModelAssembler<Academic, EntityModel<Academic>> {
 
-    @Override
-    public EntityModel<Academic> toModel(Academic academic) {
+        @Override
+        public EntityModel<Academic> toModel(Academic academic) {
 
-        return EntityModel.of(
-                academic, //
-                linkTo(methodOn(
-                        AcademicController.class).one(
-                                academic.getId()))
-                        .withSelfRel(),
-                linkTo(methodOn(AcademicController.class).all()).withRel(
-                        "+academics"));
-    }
+                return EntityModel.of(
+                                academic, //
+                                linkTo(methodOn(
+                                                AcademicController.class).one(
+                                                                academic.getId()))
+                                                .withSelfRel(),
+                                linkTo(methodOn(AcademicController.class).all()).withRel(
+                                                "academics"));
+        }
 
 }

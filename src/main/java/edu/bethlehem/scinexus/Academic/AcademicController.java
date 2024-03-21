@@ -9,6 +9,9 @@ import org.springframework.http.*;
 import org.springframework.hateoas.*;
 import org.springframework.web.bind.annotation.*;
 
+import edu.bethlehem.scinexus.User.User;
+import edu.bethlehem.scinexus.User.UserRepository;
+
 @RestController
 @RequestMapping("/academics")
 public class AcademicController {
@@ -21,11 +24,12 @@ public class AcademicController {
     this.assembler = assembler;
   }
 
+  // Gets one Academic by id
   @GetMapping("/{academicId}")
   EntityModel<Academic> one(@PathVariable Long academicId) throws AcademicNotFoundException {
-
+    System.out.println("Academic ID: " + academicId);
     Academic academic = repository.findById(academicId)
-        .orElseThrow(() -> new AcademicNotFoundException(academicId,HttpStatus.NOT_FOUND));
+        .orElseThrow(() -> new AcademicNotFoundException(academicId, HttpStatus.NOT_FOUND));
 
     return assembler.toModel(academic);
   }
@@ -47,7 +51,7 @@ public class AcademicController {
   }
 
   @PutMapping("/{id}")
-  ResponseEntity<?> editAcademic(@RequestBody Academic newAcademic, @PathVariable Long id) {
+  ResponseEntity<?> linkAcademic(@RequestBody Academic newAcademic, @PathVariable Long id) {
 
     return repository.findById(id)
         .map(academic -> {
@@ -81,7 +85,7 @@ public class AcademicController {
   public ResponseEntity<?> updateUserPartially(@PathVariable(value = "id") Long academicId,
       @RequestBody Academic newAcademic) throws AcademicNotFoundException {
     Academic academic = repository.findById(academicId)
-        .orElseThrow(() -> new AcademicNotFoundException(academicId,HttpStatus.NOT_FOUND));
+        .orElseThrow(() -> new AcademicNotFoundException(academicId, HttpStatus.NOT_FOUND));
 
     if (newAcademic.getBadge() != null)
       academic.setBadge(newAcademic.getBadge());
@@ -120,7 +124,8 @@ public class AcademicController {
   @DeleteMapping("/{id}")
   ResponseEntity<?> deleteAcademic(@PathVariable Long id) throws AcademicNotFoundException {
 
-    Academic academic = repository.findById(id).orElseThrow(() -> new AcademicNotFoundException(id,HttpStatus.NOT_FOUND));
+    Academic academic = repository.findById(id)
+        .orElseThrow(() -> new AcademicNotFoundException(id, HttpStatus.NOT_FOUND));
 
     repository.delete(academic);
 
