@@ -129,4 +129,10 @@ public class AcademicController {
     return ResponseEntity.noContent().build();
 
   }
+
+    @GetMapping("/getToken")
+    ResponseEntity<?> getJournals(@RequestHeader("Authorization") String token ){
+
+        return ResponseEntity.ok(token);
+  }
 }

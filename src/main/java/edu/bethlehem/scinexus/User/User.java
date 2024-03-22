@@ -1,5 +1,6 @@
 package edu.bethlehem.scinexus.User;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.util.JSONPObject;
 import jakarta.persistence.*;
 
@@ -123,6 +124,7 @@ public class User implements UserDetails {
 
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "publisher")
+    @JsonIgnore
     @JdbcTypeCode(SqlTypes.JSON)
     private List<Journal> journals;
 

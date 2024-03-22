@@ -1,4 +1,4 @@
-package edu.bethlehem.scinexus.Config;
+package edu.bethlehem.scinexus.SecurityConfig;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

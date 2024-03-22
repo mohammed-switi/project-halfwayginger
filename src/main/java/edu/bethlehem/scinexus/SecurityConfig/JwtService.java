@@ -1,4 +1,4 @@
-package edu.bethlehem.scinexus.Config;
+package edu.bethlehem.scinexus.SecurityConfig;
 
 
 import io.jsonwebtoken.Claims;
@@ -25,13 +25,15 @@ public class JwtService {
         return extractClaim(jwtToken,Claims::getSubject);
     }
 
+
+
+
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver){
         final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
     }
 
     public String generateToken(UserDetails userDetails){
-
         return generateToken(new HashMap<>(),userDetails);
     }
     public String generateToken(

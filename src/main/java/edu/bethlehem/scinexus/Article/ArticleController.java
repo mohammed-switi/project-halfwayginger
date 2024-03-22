@@ -4,6 +4,8 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
 
 import org.springframework.hateoas.*;
@@ -11,15 +13,15 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/articles")
+@RequiredArgsConstructor
 public class ArticleController {
 
   private final ArticleRepository repository;
+
+ // private final UserRepository userRepository;
   private final ArticleModelAssembler assembler;
 
-  ArticleController(ArticleRepository repository, ArticleModelAssembler assembler) {
-    this.repository = repository;
-    this.assembler = assembler;
-  }
+
 
   @GetMapping("/{articleId}")
   EntityModel<Article> one(@PathVariable Long articleId) {
@@ -84,8 +86,8 @@ public class ArticleController {
     if (newArticle.getTitle() != null)
       article.setTitle(newArticle.getTitle());
 
-    if (newArticle.getPublisher() != null)
-      article.setPublisher(newArticle.getPublisher());
+//    if (userRepository.existsById(newArticle.getPublisherId()))
+//      article.setPublisherId(newArticle.getPublisherId());
     if (newArticle.getVisibility() != null)
       article.setVisibility(newArticle.getVisibility());
     if (newArticle.getContributors() != null)

@@ -4,21 +4,23 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
 
 import org.springframework.hateoas.*;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@RequiredArgsConstructor
 public class ResearchPaperController {
 
   private final ResearchPaperRepository repository;
+
+//  private final UserRepository userRepository;
   private final ResearchPaperModelAssembler assembler;
 
-  ResearchPaperController(ResearchPaperRepository repository, ResearchPaperModelAssembler assembler) {
-    this.repository = repository;
-    this.assembler = assembler;
-  }
+
 
   @GetMapping("/researchpapers/{researchpaperId}")
   EntityModel<ResearchPaper> one(@PathVariable Long researchpaperId) {
@@ -88,8 +90,8 @@ public class ResearchPaperController {
       researchpaper.setTitle(newResearchPaper.getTitle());
     if (newResearchPaper.getLanguage() != null)
       researchpaper.setLanguage(newResearchPaper.getLanguage());
-    if (newResearchPaper.getPublisher() != null)
-      researchpaper.setPublisher(newResearchPaper.getPublisher());
+//    if (userRepository.existsById(newResearchPaper.getPublisherId()))
+//      researchpaper.setPublisherId(newResearchPaper.getPublisherId());
     if (newResearchPaper.getVisibility() != null)
       researchpaper.setVisibility(newResearchPaper.getVisibility());
     if (newResearchPaper.getContributors() != null)

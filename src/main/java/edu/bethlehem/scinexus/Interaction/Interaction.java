@@ -4,6 +4,7 @@ import edu.bethlehem.scinexus.Journal.Journal;
 import edu.bethlehem.scinexus.Opinion.Opinion;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import lombok.Data;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;

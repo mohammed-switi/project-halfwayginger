@@ -56,6 +56,7 @@ public class DataLoader implements CommandLineRunner {
                     .phoneNumber(phoneNumber)
                     .fieldOfWork(fieldOfWork)
                     .role(role)
+                    .type(OrganizationType.BUSINESS)
                     .build();
             ((Organization) user).setType(OrganizationType.GOVERNMENT);
             users.add(user);

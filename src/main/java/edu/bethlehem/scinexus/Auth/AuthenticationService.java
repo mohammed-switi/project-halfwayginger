@@ -2,16 +2,14 @@ package edu.bethlehem.scinexus.Auth;
 
 import edu.bethlehem.scinexus.Academic.Academic;
 import edu.bethlehem.scinexus.Academic.AcademicRepository;
-import edu.bethlehem.scinexus.Config.JwtService;
+import edu.bethlehem.scinexus.SecurityConfig.JwtService;
 import edu.bethlehem.scinexus.Organization.Organization;
 import edu.bethlehem.scinexus.Organization.OrganizationRepository;
 import edu.bethlehem.scinexus.User.Role;
 import edu.bethlehem.scinexus.User.User;
 import edu.bethlehem.scinexus.User.UserNotFoundException;
 import edu.bethlehem.scinexus.User.UserRepository;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

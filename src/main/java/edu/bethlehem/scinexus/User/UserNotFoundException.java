@@ -9,4 +9,15 @@ public class UserNotFoundException extends GeneralException {
     super(message,httpStatus);
   }
 
+  public UserNotFoundException(){
+
+    super("User Not Found",HttpStatus.NOT_FOUND);
+  }
+
+  public UserNotFoundException(Long userId){
+
+    super("ID : "+ userId+", User Not Found",HttpStatus.NOT_FOUND);
+
+  }
+
 }

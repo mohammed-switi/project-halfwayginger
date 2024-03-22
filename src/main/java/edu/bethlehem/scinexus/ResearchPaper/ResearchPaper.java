@@ -1,14 +1,12 @@
 package edu.bethlehem.scinexus.ResearchPaper;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import edu.bethlehem.scinexus.Academic.Academic;
-import edu.bethlehem.scinexus.Interaction.Interaction;
 import edu.bethlehem.scinexus.Journal.Journal;
-import edu.bethlehem.scinexus.Media.Media;
-import edu.bethlehem.scinexus.Opinion.Opinion;
 import edu.bethlehem.scinexus.Organization.Organization;
 import edu.bethlehem.scinexus.User.User;
 
@@ -23,9 +21,22 @@ import org.hibernate.type.SqlTypes;
 @EqualsAndHashCode(callSuper = false)
 public class ResearchPaper extends Journal {
     private @Id @GeneratedValue Long id;
-    private String language;
+
+    @Enumerated(EnumType.STRING)
+    @NotNull(message = "The Research Paper Language Can't Be Null")
+    @NotBlank(message = "The Research Paper Language Should Be specified")
+    private ResearchLanguage language;
+
+    @NotNull(message = "The Research Paper Title Can't Be Null")
+    @NotBlank(message = "The Research Paper Title Should Be Specified")
     private String title;
+
+    @NotNull(message = "The Research Paper Subject Can't Be Null")
+    @NotBlank(message = "The Research Paper Subject Should Be Specified")
     private String subject;
+
+    @NotNull(message = "The Research Paper Number Of Pages Can't Be Null")
+    @NotBlank(message = "The Research Paper Number Of Pages Should Be Specified")
     private Integer noOfPages;
 
     @ManyToMany

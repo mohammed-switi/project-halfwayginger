@@ -3,6 +3,8 @@ package edu.bethlehem.scinexus.Academic;
 import edu.bethlehem.scinexus.Organization.Organization;
 import edu.bethlehem.scinexus.ResearchPaper.ResearchPaper;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import edu.bethlehem.scinexus.User.User;
@@ -19,14 +21,25 @@ import org.hibernate.type.SqlTypes;
 @SuperBuilder
 public class Academic extends User {
     private @Id @GeneratedValue Long id;
+
+
     private String badge;
+
+    @NotNull(message = "Education Shouldn't be Null")
+    @NotBlank(message = "Education Shouldn't be Empty")
     private String education;
+
+
 
     @OneToOne
     @JdbcTypeCode(SqlTypes.JSON)
     @JoinColumn(name = "organization_id")
+    @NotBlank(message = "Organization Shouldn't be Null")
+    @NotNull(message = "Organization Shouldn't be Empty")
     private Organization organization;
 
+    @NotNull(message = "The Academic Position Should Be Specified")
+    @NotBlank(message = "The Academic Position Should Be Specified")
     @Enumerated(EnumType.STRING)
     private Position position;
 

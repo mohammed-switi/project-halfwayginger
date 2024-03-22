@@ -1,4 +1,4 @@
-package edu.bethlehem.scinexus.Config;
+package edu.bethlehem.scinexus.SecurityConfig;
 
 
 import edu.bethlehem.scinexus.User.UserNotFoundException;

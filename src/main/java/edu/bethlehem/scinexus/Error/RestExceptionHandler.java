@@ -8,6 +8,7 @@ import io.jsonwebtoken.security.SignatureException;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -15,9 +16,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.WebRequest;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @ControllerAdvice
 public class RestExceptionHandler {
@@ -87,5 +86,29 @@ public class RestExceptionHandler {
         return new ResponseEntity<>(errorResponse,HttpStatus.BAD_REQUEST);
     }
 
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<?> constraintViolationException(ConstraintViolationException ex, WebRequest request) {
+        List<String> errors = new ArrayList<>();
+
+        ex.getConstraintViolations().forEach(cv -> errors.add(cv.getMessage()));
+
+        Map<String, List<String>> result = new HashMap<>();
+
+        result.put("errors", errors);
+
+        return new ResponseEntity<>(result, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<Object> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
+        // You can customize the response entity as per your requirements
+        GeneralErrorResponse errorResponse=GeneralErrorResponse.builder()
+                .message("The request body is invalid or unreadable." + "" + ex.getMessage() +" " + ex.getMostSpecificCause().toString())
+                .status(400)
+                .timestamp(new Date(System.currentTimeMillis()))
+                .build();
+        return new ResponseEntity<>(errorResponse,HttpStatus.BAD_REQUEST);
+    }
 
 }
