@@ -23,11 +23,12 @@ public class AcademicController {
     this.assembler = assembler;
   }
 
+  // Gets one Academic by id
   @GetMapping("/{academicId}")
   EntityModel<Academic> one(@PathVariable Long academicId) throws AcademicNotFoundException {
 
     Academic academic = repository.findById(academicId)
-        .orElseThrow(() -> new AcademicNotFoundException(academicId,HttpStatus.NOT_FOUND));
+        .orElseThrow(() -> new AcademicNotFoundException(academicId, HttpStatus.NOT_FOUND));
 
     return assembler.toModel(academic);
   }
@@ -49,7 +50,7 @@ public class AcademicController {
   }
 
   @PutMapping("/{id}")
-  ResponseEntity<?> editAcademic(@Valid @RequestBody Academic newAcademic, @PathVariable Long id) {
+  ResponseEntity<?> linkAcademic(@Valid @RequestBody Academic newAcademic, @PathVariable Long id) {
 
     return repository.findById(id)
         .map(academic -> {
@@ -122,17 +123,12 @@ public class AcademicController {
   @DeleteMapping("/{id}")
   ResponseEntity<?> deleteAcademic(@PathVariable Long id) throws AcademicNotFoundException {
 
-    Academic academic = repository.findById(id).orElseThrow(() -> new AcademicNotFoundException(id,HttpStatus.NOT_FOUND));
+    Academic academic = repository.findById(id)
+        .orElseThrow(() -> new AcademicNotFoundException(id, HttpStatus.NOT_FOUND));
 
     repository.delete(academic);
 
     return ResponseEntity.noContent().build();
 
-  }
-
-    @GetMapping("/getToken")
-    ResponseEntity<?> getJournals(@RequestHeader("Authorization") String token ){
-
-        return ResponseEntity.ok(token);
   }
 }

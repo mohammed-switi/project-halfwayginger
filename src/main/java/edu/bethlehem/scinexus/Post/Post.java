@@ -19,8 +19,8 @@ import org.hibernate.type.SqlTypes;
 public class Post extends Journal {
     private @Id @GeneratedValue Long id;
 
-    public Post(String content, User publisherId) {
-        super(content, publisherId);
+    public Post(String content, User publisher) {
+        super(content, publisher);
 
     }
 
