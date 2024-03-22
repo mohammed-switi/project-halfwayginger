@@ -2,9 +2,9 @@ package edu.bethlehem.scinexus.Auth;
 
 import edu.bethlehem.scinexus.Academic.Academic;
 import edu.bethlehem.scinexus.Academic.AcademicRepository;
-import edu.bethlehem.scinexus.SecurityConfig.JwtService;
 import edu.bethlehem.scinexus.Organization.Organization;
 import edu.bethlehem.scinexus.Organization.OrganizationRepository;
+import edu.bethlehem.scinexus.SecurityConfig.JwtService;
 import edu.bethlehem.scinexus.User.Role;
 import edu.bethlehem.scinexus.User.User;
 import edu.bethlehem.scinexus.User.UserNotFoundException;

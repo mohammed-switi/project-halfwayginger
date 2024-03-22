@@ -10,7 +10,7 @@ import org.springframework.hateoas.*;
 import org.springframework.web.bind.annotation.*;
 
 import edu.bethlehem.scinexus.Academic.AcademicNotFoundException;
-import edu.bethlehem.scinexus.Config.JwtService;
+import edu.bethlehem.scinexus.SecurityConfig.JwtService;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 
@@ -109,6 +109,7 @@ public class UserController {
                     user.setPhoneNumber(newUser.getPhoneNumber());
                     user.setFieldOfWork(newUser.getFieldOfWork());
                     user.setUserSettings(newUser.getUserSettings());
+                    user.setFirstName(newUser.getFirstName());
 
                     EntityModel<User> entityModel = assembler.toModel(repository.save(user));
                     return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri())
@@ -147,6 +148,8 @@ public class UserController {
             user.setFieldOfWork(newUser.getFieldOfWork());
         if (newUser.getUserSettings() != null)
             user.setUserSettings(newUser.getUserSettings());
+        if (newUser.getFirstName() != null)
+            user.setFirstName(newUser.getFirstName());
 
         EntityModel<User> entityModel = assembler.toModel(repository.save(user));
         return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);

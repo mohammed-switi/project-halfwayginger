@@ -1,5 +1,6 @@
-package edu.bethlehem.scinexus.Config;
+package edu.bethlehem.scinexus.SecurityConfig;
 
+import edu.bethlehem.scinexus.SecurityConfig.UserDetailsImpl;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
@@ -8,8 +9,7 @@ import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
 
 import org.json.JSONObject;
-import org.springframework.boot.json.JsonParser;
-import org.springframework.security.core.userdetails.UserDetails;
+
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;

@@ -34,12 +34,12 @@ public class Academic extends User {
     @OneToOne
     @JdbcTypeCode(SqlTypes.JSON)
     @JoinColumn(name = "organization_id")
-    @NotBlank(message = "Organization Shouldn't be Null")
-    @NotNull(message = "Organization Shouldn't be Empty")
+//    @NotBlank(message = "Organization Shouldn't be Null")
+ //   @NotNull(message = "Organization Shouldn't be Empty")
     private Organization organization;
 
     @NotNull(message = "The Academic Position Should Be Specified")
-    @NotBlank(message = "The Academic Position Should Be Specified")
+//    @NotBlank(message = "The Academic Position Should Be Specified")
     @Enumerated(EnumType.STRING)
     private Position position;
 

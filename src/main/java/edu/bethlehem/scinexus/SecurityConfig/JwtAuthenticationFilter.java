@@ -1,6 +1,7 @@
-package edu.bethlehem.scinexus.Config;
+package edu.bethlehem.scinexus.SecurityConfig;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.bethlehem.scinexus.SecurityConfig.UserDetailsImpl;
 import edu.bethlehem.scinexus.User.UserNotFoundException;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
