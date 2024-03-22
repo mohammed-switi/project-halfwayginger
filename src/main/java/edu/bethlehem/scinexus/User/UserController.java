@@ -5,23 +5,23 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.http.*;
-
+import org.springframework.boot.autoconfigure.security.oauth2.resource.OAuth2ResourceServerProperties.Jwt;
 import org.springframework.hateoas.*;
 import org.springframework.web.bind.annotation.*;
 
 import edu.bethlehem.scinexus.Academic.AcademicNotFoundException;
+import edu.bethlehem.scinexus.Config.JwtService;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/users")
 public class UserController {
 
     private final UserRepository repository;
     private final UserModelAssembler assembler;
-
-    UserController(UserRepository repository, UserModelAssembler assembler) {
-        this.repository = repository;
-        this.assembler = assembler;
-    }
+    private final JwtService jwtService;
 
     @GetMapping("/{userId}")
     EntityModel<User> one(@PathVariable Long userId) throws UserNotFoundException {
@@ -33,8 +33,10 @@ public class UserController {
         return assembler.toModel(user);
     }
 
-    @GetMapping("/{userId}/links")
-    CollectionModel<EntityModel<User>> userLinks(@PathVariable Long userId) throws UserNotFoundException {
+    @GetMapping("/links")
+    CollectionModel<EntityModel<User>> userLinks(@RequestHeader(name = "Authorization") String token)
+            throws UserNotFoundException {
+        Long userId = jwtService.extractId(token);
 
         User user = repository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("The user with id:" + userId + " is not found",
@@ -59,7 +61,7 @@ public class UserController {
     }
 
     @PostMapping()
-    ResponseEntity<?> newUser(@RequestBody User newUser) {
+    ResponseEntity<?> createNewUser(@RequestBody User newUser) {
 
         EntityModel<User> entityModel = assembler.toModel(repository.save(newUser));
 
@@ -67,11 +69,8 @@ public class UserController {
     }
 
     @PutMapping("/linkTo/{userLinkTo}")
-    ResponseEntity<?> editUser(@PathVariable Long userLinkTo) {
-        // this method should be changed in a way to take the {linkFrom} from the
-        // authenticated user
-        // the
-        Long linkFrom = 1L; // this should be changed to the authenticated user
+    ResponseEntity<?> linkUser(@RequestHeader(name = "Authorization") String token, @PathVariable Long userLinkTo) {
+        Long linkFrom = jwtService.extractId(token);
 
         User userTo = repository.findById(
                 userLinkTo).orElseThrow(
@@ -94,26 +93,6 @@ public class UserController {
                         HttpStatus.NOT_FOUND));
     }
 
-    @GetMapping("/links")
-    CollectionModel<EntityModel<User>> academicLinks() throws AcademicNotFoundException {
-        // this method should be changed in a way to take the {userId} from the
-        // authenticated user
-        // the
-        Long userId = 1L; // this should be changed to the authenticated user
-        User user = repository.findById(
-                userId)
-                .orElseThrow(() -> new AcademicNotFoundException(userId, HttpStatus.NOT_FOUND));
-
-        List<EntityModel<User>> links = user.getLinks().stream()
-                .map(link -> {
-                    return assembler.toModel(link);
-                })
-                .collect(Collectors.toList());
-
-        return CollectionModel.of(links, linkTo(methodOn(UserController.class).all()).withSelfRel());
-
-    }
-
     @PutMapping("/{id}")
     ResponseEntity<?> linkUser(@RequestBody User newUser, @PathVariable Long id) {
 
@@ -130,7 +109,6 @@ public class UserController {
                     user.setPhoneNumber(newUser.getPhoneNumber());
                     user.setFieldOfWork(newUser.getFieldOfWork());
                     user.setUserSettings(newUser.getUserSettings());
-                    user.setName(newUser.getName());
 
                     EntityModel<User> entityModel = assembler.toModel(repository.save(user));
                     return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri())
@@ -169,8 +147,6 @@ public class UserController {
             user.setFieldOfWork(newUser.getFieldOfWork());
         if (newUser.getUserSettings() != null)
             user.setUserSettings(newUser.getUserSettings());
-        if (newUser.getName() != null)
-            user.setName(newUser.getName());
 
         EntityModel<User> entityModel = assembler.toModel(repository.save(user));
         return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);

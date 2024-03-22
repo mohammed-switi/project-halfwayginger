@@ -1,6 +1,10 @@
 package edu.bethlehem.scinexus.DatabaseLoading;
 
+import com.github.javafaker.Bool;
 import com.github.javafaker.Faker;
+
+import edu.bethlehem.scinexus.User.Role;
+
 import org.springframework.stereotype.Component;
 
 import java.security.SecureRandom;
@@ -46,8 +50,12 @@ public class RandomDataGenerator {
     }
 
     public String generateRandomEmail(String firstName, String lastName) {
-         return faker.internet().emailAddress();
-      }
+        return faker.internet().emailAddress();
+    }
+
+    public Boolean generateRandomIsVerified() {
+        return faker.bool().bool();
+    }
 
     public String generateRandomPassword() {
         return generateRandomString(MIN_PASSWORD_LENGTH, MAX_PASSWORD_LENGTH,
@@ -56,15 +64,24 @@ public class RandomDataGenerator {
 
     public String generateRandomBio() {
         return faker.backToTheFuture().character();
-        }
+    }
 
     public String generateRandomPhoneNumber() {
-        String phoneNumber=faker.phoneNumber().cellPhone().toString();
+        String phoneNumber = faker.phoneNumber().cellPhone().toString();
         return phoneNumber;
     }
 
     public String generateRandomFieldOfWork() {
         return faker.job().field();
+    }
+
+    public Role generateRandomRole() {
+        if (secureRandom.nextBoolean() == true) {
+            return Role.ACADEMIC;
+        } else {
+            return Role.ORGANIZATION;
+        }
+
     }
 
     private String generateRandomString(int minLength, int maxLength, String characters) {

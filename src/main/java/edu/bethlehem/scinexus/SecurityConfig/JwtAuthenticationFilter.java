@@ -1,20 +1,24 @@
-package edu.bethlehem.scinexus.SecurityConfig;
+package edu.bethlehem.scinexus.Config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.bethlehem.scinexus.User.UserNotFoundException;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -51,8 +55,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             userEmail = jwtService.extractUsername(jwtToken);
             if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
-                UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
-
+                UserDetails userDetailst = this.userDetailsService.loadUserByUsername(userEmail);
+                UserDetailsImpl userDetails = (UserDetailsImpl) userDetailst;
                 if (jwtService.isTokenValid(jwtToken, userDetails)) {
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                             userDetails,
@@ -66,9 +70,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 filterChain.doFilter(request, response);
             }
-        }catch (UserNotFoundException exception) {
+        } catch (UserNotFoundException exception) {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            response.getWriter().write("User Not Found");
+            response.getWriter().write("User Not Found ");
 
         } catch (SignatureException | MalformedJwtException exception) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

@@ -12,6 +12,7 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import edu.bethlehem.scinexus.Config.UserDetailsImpl;
 import edu.bethlehem.scinexus.Journal.Journal;
 import edu.bethlehem.scinexus.Media.Media;
 import edu.bethlehem.scinexus.Notification.Notification;
@@ -25,6 +26,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.annotation.Nullable;
+
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -37,7 +40,7 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
-public class User implements UserDetails {
+public class User implements UserDetailsImpl {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -54,36 +57,32 @@ public class User implements UserDetails {
     @Size(min = 2, max = 30)
     private String lastName;
 
-
     @Column(unique = true)
     @NotNull(message = "Username is mandatory")
     @NotBlank(message = "Username is mandatory")
     @Size(min = 1, max = 50)
     private String username;
 
-
     @NotNull(message = "Email is mandatory")
     @NotBlank(message = "Email Name is mandatory")
-    @Pattern(
-            regexp = "^[a-zA-Z0-9]+[._-]*[a-zA-Z0-9]+@[a-zA-Z0-9]+\\.[a-zA-Z]{2,}(?:\\.[a-zA-Z]{2,})?$",
-            message = "It must start with alphanumeric characters." +
-                    "It may contain dots, hyphens, and underscores." +
-                    "It must have exactly one '@' symbol." +
-                    "It may contain alphanumeric characters in the domain part."+
-                    "It may have a maximum of two dots following the '@' symbol")
+    @Pattern(regexp = "^[a-zA-Z0-9]+[._-]*[a-zA-Z0-9]+@[a-zA-Z0-9]+\\.[a-zA-Z]{2,}(?:\\.[a-zA-Z]{2,})?$", message = "It must start with alphanumeric characters."
+            +
+            "It may contain dots, hyphens, and underscores." +
+            "It must have exactly one '@' symbol." +
+            "It may contain alphanumeric characters in the domain part." +
+            "It may have a maximum of two dots following the '@' symbol")
     @Column(unique = true)
     @Size(min = 3, max = 320, message = "The Email Address should be Between 3 and 320 Characters")
     private String email;
 
     /*
-    Password pattern validation Will Not be held here because the password is stored in the database in encrypted version
-    However The password vaildation will be in the RegisterRequest class
+     * Password pattern validation Will Not be held here because the password is
+     * stored in the database in encrypted version
+     * However The password vaildation will be in the RegisterRequest class
      */
     @NotNull(message = "Password is Mandatory")
     @NotBlank(message = "Password is Mandatory")
     private String password;
-
-
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "profile_picture_id")
@@ -93,27 +92,25 @@ public class User implements UserDetails {
     @JoinColumn(name = "profile_cover_id")
     private Media profileCover;
 
-    @Size(min = 0,max = 220, message = "The bio should be in maximum 220 characters")
+    @Size(min = 0, max = 220, message = "The bio should be in maximum 220 characters")
     private String bio;
-
 
     @Column(unique = true)
     @NotNull(message = "Phone Number is Mandatory")
     @NotBlank(message = "Phone Number is Mandatory")
-    //This Regex Status that phone number is valid in any of these formats :
-    //(123) 456-7890
-    //(123)456-7890
-    //123-456-7890
-    //123.456.7890
-    //1234567890
+    // This Regex Status that phone number is valid in any of these formats :
+    // (123) 456-7890
+    // (123)456-7890
+    // 123-456-7890
+    // 123.456.7890
+    // 1234567890
+    //1-123-123-1234
     @Pattern(regexp = "^\\s*(?:\\+?(\\d{1,3}))?([-. (]*(\\d{3})[-. )]*)?((\\d{3})[-. ]*(\\d{2,4})(?:[-.x ]*(\\d+))?)\\s*$", message = "Phone Number is Not Valid")
     private String phoneNumber;
-
 
     @Nullable
     @Size(max = 320)
     private String fieldOfWork;
-
 
     @JdbcTypeCode(SqlTypes.JSON)
     private JSONPObject userSettings;
@@ -133,14 +130,15 @@ public class User implements UserDetails {
     @JdbcTypeCode(SqlTypes.JSON)
     private List<Notification> notifications;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "journal_user_contributors", joinColumns = @JoinColumn(name = "contributs"), inverseJoinColumns = @JoinColumn(name = "contributors"))
     @JdbcTypeCode(SqlTypes.JSON)
     private List<Journal> contributs;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_link_user", joinColumns = @JoinColumn(name = "linkFrom"), inverseJoinColumns = @JoinColumn(name = "LinkTo"))
     @JdbcTypeCode(SqlTypes.JSON)
+    @JsonIgnore
     private List<User> links;
 
     public User(String firstName, String username, String password, String email) {
@@ -148,6 +146,7 @@ public class User implements UserDetails {
         this.username = username;
         this.password = password;
         this.email = email;
+
     }
 
     @Override
@@ -178,5 +177,10 @@ public class User implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    @Override
+    public Long getId() {
+        return id;
     }
 }

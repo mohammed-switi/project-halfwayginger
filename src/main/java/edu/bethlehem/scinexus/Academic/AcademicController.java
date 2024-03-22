@@ -26,7 +26,7 @@ public class AcademicController {
   // Gets one Academic by id
   @GetMapping("/{academicId}")
   EntityModel<Academic> one(@PathVariable Long academicId) throws AcademicNotFoundException {
-
+    System.out.println("Academic ID: " + academicId);
     Academic academic = repository.findById(academicId)
         .orElseThrow(() -> new AcademicNotFoundException(academicId, HttpStatus.NOT_FOUND));
 
@@ -50,7 +50,7 @@ public class AcademicController {
   }
 
   @PutMapping("/{id}")
-  ResponseEntity<?> linkAcademic(@Valid @RequestBody Academic newAcademic, @PathVariable Long id) {
+  ResponseEntity<?> editAcademic(@Valid @RequestBody Academic newAcademic, @PathVariable Long id) {
 
     return repository.findById(id)
         .map(academic -> {
@@ -79,12 +79,32 @@ public class AcademicController {
           return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
         });
   }
+  // @PutMapping("/{academicId}")
+  // ResponseEntity<?> validateAcademic(@PathVariable Long academicId) {
+
+  // return repository.findById(
+  // academicId)
+  // .map(academic -> {
+
+  // EntityModel<Academic> entityModel =
+  // assembler.toModel(repository.save(academic));
+  // return
+  // ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
+  // })
+  // .orElseGet(() -> {
+  // newAcademic.setId(id);
+  // EntityModel<Academic> entityModel =
+  // assembler.toModel(repository.save(newAcademic));
+  // return
+  // ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
+  // });
+  // }
 
   @PatchMapping("/{id}")
   public ResponseEntity<?> updateUserPartially(@PathVariable(value = "id") Long academicId,
       @RequestBody Academic newAcademic) throws AcademicNotFoundException {
     Academic academic = repository.findById(academicId)
-        .orElseThrow(() -> new AcademicNotFoundException(academicId,HttpStatus.NOT_FOUND));
+        .orElseThrow(() -> new AcademicNotFoundException(academicId, HttpStatus.NOT_FOUND));
 
     if (newAcademic.getBadge() != null)
       academic.setBadge(newAcademic.getBadge());
