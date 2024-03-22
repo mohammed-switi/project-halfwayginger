@@ -4,6 +4,8 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
+import jakarta.validation.Valid;
 import org.springframework.http.*;
 
 import org.springframework.hateoas.*;
@@ -43,7 +45,7 @@ public class AcademicController {
   }
 
   @PostMapping()
-  ResponseEntity<?> newAcademic(@RequestBody Academic newAcademic) {
+  ResponseEntity<?> newAcademic(@Valid @RequestBody Academic newAcademic) {
 
     EntityModel<Academic> entityModel = assembler.toModel(repository.save(newAcademic));
 
@@ -51,7 +53,7 @@ public class AcademicController {
   }
 
   @PutMapping("/{id}")
-  ResponseEntity<?> linkAcademic(@RequestBody Academic newAcademic, @PathVariable Long id) {
+  ResponseEntity<?> editAcademic(@Valid @RequestBody Academic newAcademic, @PathVariable Long id) {
 
     return repository.findById(id)
         .map(academic -> {
@@ -69,7 +71,7 @@ public class AcademicController {
           academic.setPhoneNumber(newAcademic.getPhoneNumber());
           academic.setFieldOfWork(newAcademic.getFieldOfWork());
           academic.setUserSettings(newAcademic.getUserSettings());
-          academic.setName(newAcademic.getName());
+          academic.setFirstName(newAcademic.getFirstName());
 
           EntityModel<Academic> entityModel = assembler.toModel(repository.save(academic));
           return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
@@ -80,6 +82,26 @@ public class AcademicController {
           return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
         });
   }
+  // @PutMapping("/{academicId}")
+  // ResponseEntity<?> validateAcademic(@PathVariable Long academicId) {
+
+  // return repository.findById(
+  // academicId)
+  // .map(academic -> {
+
+  // EntityModel<Academic> entityModel =
+  // assembler.toModel(repository.save(academic));
+  // return
+  // ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
+  // })
+  // .orElseGet(() -> {
+  // newAcademic.setId(id);
+  // EntityModel<Academic> entityModel =
+  // assembler.toModel(repository.save(newAcademic));
+  // return
+  // ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
+  // });
+  // }
 
   @PatchMapping("/{id}")
   public ResponseEntity<?> updateUserPartially(@PathVariable(value = "id") Long academicId,
@@ -114,8 +136,8 @@ public class AcademicController {
       academic.setFieldOfWork(newAcademic.getFieldOfWork());
     if (newAcademic.getUserSettings() != null)
       academic.setUserSettings(newAcademic.getUserSettings());
-    if (newAcademic.getName() != null)
-      academic.setName(newAcademic.getName());
+    if (newAcademic.getFirstName() != null)
+      academic.setFirstName(newAcademic.getFirstName());
 
     EntityModel<Academic> entityModel = assembler.toModel(repository.save(academic));
     return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);

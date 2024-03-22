@@ -4,6 +4,8 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
+import jakarta.validation.Valid;
 import org.springframework.http.*;
 
 import org.springframework.hateoas.*;
@@ -47,7 +49,7 @@ public class OrganizationController {
   }
 
   @PutMapping("/organizations/{id}")
-  ResponseEntity<?> editOrganization(@RequestBody Organization newOrganization, @PathVariable Long id) {
+  ResponseEntity<?> editOrganization(@Valid @RequestBody Organization newOrganization, @PathVariable Long id) {
 
     return repository.findById(id)
         .map(organization -> {
@@ -64,7 +66,7 @@ public class OrganizationController {
           organization.setPhoneNumber(newOrganization.getPhoneNumber());
           organization.setFieldOfWork(newOrganization.getFieldOfWork());
           organization.setUserSettings(newOrganization.getUserSettings());
-          organization.setName(newOrganization.getName());
+          organization.setFirstName(newOrganization.getFirstName());
 
           EntityModel<Organization> entityModel = assembler.toModel(repository.save(organization));
           return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
@@ -78,7 +80,7 @@ public class OrganizationController {
 
   @PatchMapping("/organizations/{id}")
   public ResponseEntity<?> updateUserPartially(@PathVariable(value = "id") Long organizationId,
-      @RequestBody Organization newOrganization) {
+    @Valid @RequestBody Organization newOrganization) {
     Organization organization = repository.findById(organizationId)
         .orElseThrow(() -> new OrganizationNotFoundException(organizationId,HttpStatus.NOT_FOUND));
     if (newOrganization.getType() != null)
@@ -105,8 +107,8 @@ public class OrganizationController {
       organization.setFieldOfWork(newOrganization.getFieldOfWork());
     if (newOrganization.getUserSettings() != null)
       organization.setUserSettings(newOrganization.getUserSettings());
-    if (newOrganization.getName() != null)
-      organization.setName(newOrganization.getName());
+    if (newOrganization.getFirstName() != null)
+      organization.setFirstName(newOrganization.getFirstName());
 
     EntityModel<Organization> entityModel = assembler.toModel(repository.save(organization));
     return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);

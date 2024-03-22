@@ -9,6 +9,7 @@ import edu.bethlehem.scinexus.User.Role;
 import edu.bethlehem.scinexus.User.User;
 import edu.bethlehem.scinexus.User.UserNotFoundException;
 import edu.bethlehem.scinexus.User.UserRepository;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -30,19 +31,36 @@ public class AuthenticationService {
     private final AuthenticationManager authenticationManager;
 
     public AuthenticationResponse register(RegisterRequest request) {
-            User user = null;
+            User user;
 
             if(request.getRole() == Role.ACADEMIC){
-               user = new Academic(request.getName(), request.getUsername(),passwordEncoder.encode(request.getPassword()), request.getEmail());
-                user.setRole(Role.ACADEMIC);
-                academicRepository.save((Academic) user);
+               user = (Academic) Academic.builder()
+                      .firstName(request.getFirstName())
+                      .lastName(request.getLastName())
+                      .email(request.getEmail())
+                      .phoneNumber(passwordEncoder.encode(request.getPassword()))
+                      .password(request.getPassword())
+                      .role(request.getRole())
+                      .bio(request.getBio())
+                      .fieldOfWork(request.getFieldOfWork())
+                      .build();
+
             }
             else {
-            user = new Organization(request.getName(), request.getUsername(),passwordEncoder.encode(request.getPassword()), request.getEmail());
-            user.setRole(Role.ORGANIZATION);
-            organizationRepository.save((Organization) user);
+                 user = Organization.builder()
+                        .firstName(request.getFirstName())
+                        .lastName(request.getLastName())
+                         .username(request.getUsername())
+                        .email(request.getEmail())
+                        .phoneNumber(request.getPhoneNumber())
+                        .password(passwordEncoder.encode(request.getPassword()))
+                        .role(request.getRole())
+                        .bio(request.getBio())
+                        .fieldOfWork(request.getFieldOfWork())
+                        .build();
              }
 
+            userRepository.save(user);
 
         var jwtToken = service.generateToken(user);
             return AuthenticationResponse.builder()

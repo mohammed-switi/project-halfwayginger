@@ -1,5 +1,6 @@
 package edu.bethlehem.scinexus.Config;
 
+import jakarta.servlet.Filter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,9 +29,8 @@ public class SecurityConfig {
                                                 .permitAll()
                                                 .anyRequest()
                                                 .authenticated())
-                                .sessionManagement(
-                                                sessionConfigurer -> sessionConfigurer
-                                                                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                                .sessionManagement(sessionConfigurer -> sessionConfigurer
+                                                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                                 .authenticationProvider(authenticationProvider)
                                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
                 // .exceptionHandling(httpSecurityExceptionHandlingConfigurer -> {

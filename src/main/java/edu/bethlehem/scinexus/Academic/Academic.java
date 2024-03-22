@@ -9,13 +9,14 @@ import edu.bethlehem.scinexus.User.User;
 
 import java.util.List;
 
+import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 @Data
 @Entity
 @EqualsAndHashCode(callSuper = false)
-
+@SuperBuilder
 public class Academic extends User {
     private @Id @GeneratedValue Long id;
     private String badge;
@@ -26,7 +27,6 @@ public class Academic extends User {
     @JoinColumn(name = "organization_id")
     private Organization organization;
 
-    @JdbcTypeCode(SqlTypes.JSON)
     @Enumerated(EnumType.STRING)
     private Position position;
 
