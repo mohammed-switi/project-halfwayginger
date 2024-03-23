@@ -1,6 +1,9 @@
 package edu.bethlehem.scinexus.Journal;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import edu.bethlehem.scinexus.Post.Visibility;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
@@ -24,6 +27,7 @@ import edu.bethlehem.scinexus.User.User;
 @AllArgsConstructor
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
+@JsonSerialize
 public class Journal {
 
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -35,7 +39,7 @@ public class Journal {
     private String description;
 
 
-    @Min(0)
+    @Min(value = 0)
     private Integer interactionCount=0;
 
     private Integer opinionCount;
@@ -50,9 +54,10 @@ public class Journal {
     private Visibility visibility;
 
     @NotNull(message = "The Journal Publisher Shouldn't Be Null")
-    @ManyToOne(fetch =FetchType.EAGER)
+    @ManyToOne(fetch =FetchType.LAZY) // Fetch Type Has been changed From Lazy To Eager, Because I get an error when I request one Journal
     @JoinColumn(name = "publisher")
     @JdbcTypeCode(SqlTypes.JSON)
+    @JsonManagedReference
     private User publisher;
 
     @OneToMany(fetch = FetchType.LAZY)
@@ -63,6 +68,7 @@ public class Journal {
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "journal")
     @JdbcTypeCode(SqlTypes.JSON)
+    @JsonBackReference
     private List<Opinion> opinions;
 
     @OneToMany(fetch = FetchType.LAZY)

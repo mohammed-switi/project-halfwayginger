@@ -1,6 +1,8 @@
 package edu.bethlehem.scinexus.Post;
 
 
+import edu.bethlehem.scinexus.Auth.UserNotAuthorizedException;
+import edu.bethlehem.scinexus.SecurityConfig.JwtService;
 import edu.bethlehem.scinexus.User.User;
 import edu.bethlehem.scinexus.User.UserNotFoundException;
 import edu.bethlehem.scinexus.User.UserRepository;
@@ -8,10 +10,11 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -22,79 +25,88 @@ public class PostService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final PostModelAssembler assembler;
+    private final JwtService jwtService;
 
 
 
-    public Post convertPostDtoToPostEntity(PostRequestDTO postRequestDTO){
+    public Post convertPostDtoToPostEntity(Authentication authentication,PostRequestDTO postRequestDTO){
 
-        return (Post) Post.builder()
+        return Post.builder()
                 .description(postRequestDTO.getDescription())
                 .content(postRequestDTO.getContent())
                 .visibility(postRequestDTO.getVisibility())
-                .publisher(getUserByPublisherId(postRequestDTO.getPublisherId()))
+                .publisher(getUserByPublisherId(jwtService.extractId(authentication)))
                 .build();
     }
 
     public User getUserByPublisherId(long id){
-        Optional<User> user = Optional.ofNullable(userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException("User Not Found", HttpStatus.NOT_FOUND)));
 
-        return user.get();
+       return   userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("User Not Found", HttpStatus.NOT_FOUND));
+
+
     }
 
 
     public User findUserById(Long userId) {
-        Optional<User> optionalUser= Optional.ofNullable((userRepository.findById(userId))
-                .orElseThrow(UserNotFoundException::new));
+      return (userRepository.findById(userId))
+                .orElseThrow(UserNotFoundException::new);
 
-        return  optionalUser.get();
 
     }
 
-    public EntityModel<Post> findPostById(Long postId) {
+    public EntityModel<Post> findPostById(Long postId,Authentication authentication) {
+
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new PostNotFoundException(postId));
+
+        hasAuthorizedVision(authentication,post);
 
         return assembler.toModel(post);
     }
 
+    // We Should Specify An Admin Authority To get All Posts
     public List<EntityModel<Post>> findAllPosts(){
 
-        List<EntityModel<Post>> posts = postRepository
+        return postRepository
                 .findAll()
                 .stream()
                 .map(assembler::toModel)
                 .collect(Collectors.toList());
-        return posts;
     }
 
     public Post savePost(Post post){
         return postRepository.save(post);
     }
 
-    public EntityModel<Post> createPost(PostRequestDTO newPostRequestDTO){
-        Post newPost=convertPostDtoToPostEntity(newPostRequestDTO);
-       return toModel(savePost(newPost));
+    public EntityModel<Post> createPost(Authentication authentication,PostRequestDTO newPostRequestDTO){
+        Post newPost=convertPostDtoToPostEntity(authentication,newPostRequestDTO);
+       return assembler.toModel(savePost(newPost));
     }
 
 
-    public EntityModel<Post> updatePost(PostRequestDTO newPostRequestDTO, Long postId){
+    public EntityModel<Post> updatePost(Long postId, Authentication authentication,PostRequestDTO newPostRequestDTO){
 
         return postRepository.findById(postId)
+                .filter(post -> isUserAuthorized(authentication,post))
                 .map(post -> {
                     post.setContent(newPostRequestDTO.getContent());
                     post.setVisibility(newPostRequestDTO.getVisibility());
                     post.setDescription(newPostRequestDTO.getDescription());
-                    EntityModel<Post> entityModel = assembler.toModel(postRepository.save(post));
-                    return entityModel;
+                    return assembler.toModel(postRepository.save(post));
                 })
                 .orElseThrow(() -> new PostNotFoundException(postId));
     }
 
-    public EntityModel<Post> updatePostPartially(Long postId, PostRequestPatchDTO newPostRequestDTO){
+    public EntityModel<Post> updatePostPartially(Long postId,Authentication authentication, PostRequestPatchDTO newPostRequestDTO){
+
+
 
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new PostNotFoundException(postId,HttpStatus.UNPROCESSABLE_ENTITY));
+
+        isUserAuthorized(authentication,post);
+
 
         if (newPostRequestDTO.getDescription() != null)
             post.setDescription(newPostRequestDTO.getDescription());
@@ -106,16 +118,45 @@ public class PostService {
             post.setPublisher(getUserByPublisherId(newPostRequestDTO.getPublisherId()));
 
 
-        return toModel(postRepository.save(post));
+        return assembler.toModel(postRepository.save(post));
 
     }
 
 
-    public void deletePost(Long postId){
+    public void deletePost(Long postId,Authentication authentication){
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new PostNotFoundException(postId,HttpStatus.UNPROCESSABLE_ENTITY));
 
-        postRepository.delete(findPostById(postId).getContent());
+        isUserAuthorized(authentication,post);
+
+        postRepository.delete(post);
     }
-    public EntityModel<Post> toModel(Post post){
-        return assembler.toModel(post);
+
+
+    private boolean isUserAuthorized(Authentication authentication, Post post){
+        Long userRequestId= jwtService.extractId(authentication);
+        Long publisherId= post.getPublisher().getId();
+
+        if(Objects.equals(userRequestId, publisherId))
+            return true;
+        else
+            throw new UserNotAuthorizedException();
+    }
+
+    private boolean hasAuthorizedVision(Authentication authentication, Post post){
+
+        Long userRequestId= jwtService.extractId(authentication);
+        Long publisherId= post.getPublisher().getId();
+
+        if (post.getVisibility().equals(Visibility.PRIVATE) && isUserAuthorized(authentication,post))
+            return true;
+         else if (post.getVisibility().equals(Visibility.LINKS) && findUserById(userRequestId).getLinks().contains(findUserById(publisherId)))
+            return true;
+        else if (post.getVisibility().equals(Visibility.PUBLIC))
+            return true;
+        else
+            throw new UserNotAuthorizedException(userRequestId);
+
+
     }
 }

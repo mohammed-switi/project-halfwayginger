@@ -3,11 +3,16 @@ package edu.bethlehem.scinexus.Post;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 import java.util.List;
 
+import edu.bethlehem.scinexus.SecurityConfig.JwtService;
+import edu.bethlehem.scinexus.SecurityConfig.UserDetailsImpl;
+import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.*;
 import org.springframework.hateoas.*;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -22,8 +27,9 @@ public class PostController {
 
   @GetMapping("/{postId}")
   public ResponseEntity<EntityModel<Post>> one(@PathVariable
-                                               long postId) {
-      return ResponseEntity.ok(postService.findPostById(postId));
+                                               long postId,
+                                               Authentication authentication) {
+      return ResponseEntity.ok(postService.findPostById(postId, authentication));
   }
   @GetMapping()
   public CollectionModel<EntityModel<Post>> all() {
@@ -34,25 +40,27 @@ public class PostController {
 
 
   @PostMapping()
-  public ResponseEntity<?> createNewPost( @Valid
+  public ResponseEntity<?> createNewPost( Authentication authentication,@Valid
                                           @RequestBody
                                           @NotNull
                                           PostRequestDTO newPostRequestDTO) {
 
-    EntityModel<Post> entityModel = postService.createPost(newPostRequestDTO);
+
+    EntityModel<Post> entityModel = postService.createPost(authentication,newPostRequestDTO);
     return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
   }
 
   @PutMapping("/{id}")
-  public ResponseEntity<?> editPost( @Valid
+  public ResponseEntity<?> editPost( @PathVariable
+                                       @NotNull
+                                       Long id,
+                                     Authentication authentication,
+                                     @Valid
                                      @RequestBody
                                      @NotNull
-                                       PostRequestDTO newPostRequestDTO,
-                                     @PathVariable
-                                     @NotNull
-                                     Long id) {
+                                       PostRequestDTO newPostRequestDTO) {
 
-    EntityModel<Post> entityModel=postService.updatePost(newPostRequestDTO,id);
+    EntityModel<Post> entityModel=postService.updatePost(id,authentication,newPostRequestDTO);
 
     return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
   }
@@ -60,18 +68,18 @@ public class PostController {
   @PatchMapping("/{id}")
   public ResponseEntity<?> updatePostPartially(@PathVariable(value = "id")
                                                Long postId,
-
+                                                Authentication authentication,
                                                @RequestBody
                                                @NotNull
                                                PostRequestPatchDTO newPostRequestDTO) {
 
-        EntityModel<Post> entityModel=postService.updatePostPartially(postId, newPostRequestDTO);
+        EntityModel<Post> entityModel=postService.updatePostPartially(postId, authentication,newPostRequestDTO);
         return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
   }
 
   @DeleteMapping("/{id}")
-  ResponseEntity<?> deletePost(@PathVariable Long id) {
-    postService.deletePost(id);
+  ResponseEntity<?> deletePost(@PathVariable Long id,Authentication authentication) {
+    postService.deletePost(id,authentication);
 
     return ResponseEntity.noContent().build();
   }

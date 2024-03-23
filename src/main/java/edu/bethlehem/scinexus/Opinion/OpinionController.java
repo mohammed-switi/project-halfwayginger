@@ -4,85 +4,76 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
 
 import org.springframework.hateoas.*;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@RequiredArgsConstructor
+@RequestMapping("/opinions")
 public class OpinionController {
 
+  private final OpinionService opinionService;
   private final OpinionRepository repository;
   private final OpinionModelAssembler assembler;
 
-  OpinionController(OpinionRepository repository, OpinionModelAssembler assembler) {
-    this.repository = repository;
-    this.assembler = assembler;
-  }
 
-  @GetMapping("/opinions/{opinionId}")
+
+
+  @GetMapping("/{opinionId}")
   EntityModel<Opinion> one(@PathVariable Long opinionId) {
 
-    Opinion opinion = repository.findById(opinionId)
-        .orElseThrow(() -> new OpinionNotFoundException(opinionId,HttpStatus.NOT_FOUND));
-
-    return assembler.toModel(opinion);
+   return opinionService.getOneOpinion(opinionId);
   }
 
-  @GetMapping("/opinions")
+  @GetMapping()
   CollectionModel<EntityModel<Opinion>> all() {
-    List<EntityModel<Opinion>> opinions = repository.findAll().stream().map(opinion -> assembler.toModel(opinion))
-        .collect(Collectors.toList());
 
-    return CollectionModel.of(opinions, linkTo(methodOn(OpinionController.class).all()).withSelfRel());
+    return CollectionModel.of(opinionService.getAllOpinions(),
+                            linkTo(methodOn(OpinionController.class).all()).withSelfRel());
   }
 
-  @PostMapping("/opinions")
-  ResponseEntity<?> newOpinion(@RequestBody Opinion newOpinion) {
+  @PostMapping()
+  ResponseEntity<?> newOpinion(@RequestBody
+                               @Valid
+                               OpinionDTO newOpinion) {
 
-    EntityModel<Opinion> entityModel = assembler.toModel(repository.save(newOpinion));
+    EntityModel<Opinion> entityModel = opinionService.postOpinion(newOpinion);
 
     return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
   }
 
-  @PutMapping("/opinions/{id}")
-  ResponseEntity<?> editOpinion(@RequestBody Opinion newOpinion, @PathVariable Long id) {
+  @PutMapping("/{id}")
+  public ResponseEntity<?> editOpinion(@RequestBody
+                                @Valid
+                                OpinionDTO newOpinion,
+                                @PathVariable Long id) {
+      EntityModel<Opinion> entityModel = opinionService.updateOpinion(id,newOpinion);
+    return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
 
-    return repository.findById(id)
-        .map(opinion -> {
-
-          opinion.setContent(newOpinion.getContent());
-          EntityModel<Opinion> entityModel = assembler.toModel(repository.save(opinion));
-          return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
-        })
-        .orElseGet(() -> {
-          newOpinion.setId(id);
-          EntityModel<Opinion> entityModel = assembler.toModel(repository.save(newOpinion));
-          return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
-        });
   }
 
-  @PatchMapping("/opinions/{id}")
+  @PatchMapping("{id}")
   public ResponseEntity<?> updateUserPartially(@PathVariable(value = "id") Long opinionId,
-      @RequestBody Opinion newOpinion) {
-    Opinion opinion = repository.findById(opinionId)
-        .orElseThrow(() -> new OpinionNotFoundException(opinionId,HttpStatus.NOT_FOUND));
-    ;
-    if (newOpinion.getContent() != null)
-      opinion.setContent(newOpinion.getContent());
+      @RequestBody
+      @Valid
+      OpinionPatchDTO newOpinion) {
 
-    EntityModel<Opinion> entityModel = assembler.toModel(repository.save(opinion));
+   EntityModel<Opinion> entityModel= opinionService.updateOpinionPartially(opinionId,newOpinion);
+
     return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
   }
 
-  @DeleteMapping("/opinions/{id}")
-  ResponseEntity<?> deleteOpinion(@PathVariable Long id) {
+  @DeleteMapping("/{id}")
+  public ResponseEntity<?> deleteOpinion(@PathVariable Long id) {
 
-    Opinion opinion = repository.findById(id).orElseThrow(() -> new OpinionNotFoundException(id,HttpStatus.NOT_FOUND));
-
-    repository.delete(opinion);
-
+    opinionService.deleteOpinion(id);
     return ResponseEntity.noContent().build();
 
   }
+
 }

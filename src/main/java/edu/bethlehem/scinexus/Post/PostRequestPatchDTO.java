@@ -25,7 +25,7 @@ public class PostRequestPatchDTO {
     @Enumerated(EnumType.STRING)
     private Visibility visibility;
 
-    @Min(value = 0,message = "Id can't be less than Zero")
+    @Min(value = 1,message = "Id can't be less than One")
     private long publisherId;
 }
 

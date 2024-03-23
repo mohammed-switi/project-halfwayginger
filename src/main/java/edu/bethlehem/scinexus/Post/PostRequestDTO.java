@@ -28,6 +28,4 @@ public class PostRequestDTO {
     private Visibility visibility;
 
 
-    @Min(value = 0,message = "Id can't be less than Zero")
-    private long publisherId;
 }

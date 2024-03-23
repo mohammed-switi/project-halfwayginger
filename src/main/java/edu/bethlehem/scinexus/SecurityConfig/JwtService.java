@@ -10,6 +10,7 @@ import io.jsonwebtoken.security.SignatureException;
 
 import org.json.JSONObject;
 
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
@@ -23,10 +24,15 @@ public class JwtService {
 
     private static final String SECRET_KEY = "491ef82099212d650f7da939a3473c3ae12bb6ca0004a0b635245b9c04e4a94f";
 
+
     public String extractUsername(String jwtToken) {
         return extractClaim(jwtToken, Claims::getSubject);
     }
 
+    public Long extractId(Authentication authentication){
+        UserDetailsImpl userDetails=(UserDetailsImpl) authentication.getPrincipal();
+        return userDetails.getId();
+    }
     public Long extractId(String jwtToken) {
         Claims claim = extractClaim(jwtToken.substring(7), claims -> {
             return claims;
@@ -56,7 +62,7 @@ public class JwtService {
                 .add(extraClaims)
                 .subject(userDetails.getUsername())
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + (10000 * 60 * 24)))
+                .expiration(new Date(System.currentTimeMillis() + (1000* 60 * 60 * 24))) // The Jwt Expiry Date Will be 24 Hours After Creation
                 .and()
                 .signWith(getSignInKey(), Jwts.SIG.HS256)
                 .compact();

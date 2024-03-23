@@ -1,6 +1,8 @@
 package edu.bethlehem.scinexus.User;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.util.JSONPObject;
 import jakarta.persistence.*;
 
@@ -36,6 +38,7 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
+@JsonSerialize
 public class User implements UserDetailsImpl {
 
     @Id
@@ -117,8 +120,8 @@ public class User implements UserDetailsImpl {
 
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "publisher")
-    @JsonIgnore
     @JdbcTypeCode(SqlTypes.JSON)
+    @JsonBackReference
     private List<Journal> journals;
 
     @OneToMany(fetch = FetchType.LAZY)
