@@ -2,10 +2,12 @@ package edu.bethlehem.scinexus.Post;
 
 
 import edu.bethlehem.scinexus.Auth.UserNotAuthorizedException;
+import edu.bethlehem.scinexus.Organization.Organization;
 import edu.bethlehem.scinexus.SecurityConfig.JwtService;
 import edu.bethlehem.scinexus.User.User;
 import edu.bethlehem.scinexus.User.UserNotFoundException;
 import edu.bethlehem.scinexus.User.UserRepository;
+import edu.bethlehem.scinexus.User.UserService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.EntityModel;
@@ -26,6 +28,7 @@ public class PostService {
     private final UserRepository userRepository;
     private final PostModelAssembler assembler;
     private final JwtService jwtService;
+    private final UserService userService;
 
 
 
@@ -148,9 +151,11 @@ public class PostService {
         Long userRequestId= jwtService.extractId(authentication);
         Long publisherId= post.getPublisher().getId();
 
+
         if (post.getVisibility().equals(Visibility.PRIVATE) && isUserAuthorized(authentication,post))
             return true;
-         else if (post.getVisibility().equals(Visibility.LINKS) && findUserById(userRequestId).getLinks().contains(findUserById(publisherId)))
+         else if (post.getVisibility().equals(Visibility.LINKS) &&
+                (userService.areUsersLinked(findUserById(userRequestId),findUserById(publisherId))) || isUserAuthorized(authentication,post))
             return true;
         else if (post.getVisibility().equals(Visibility.PUBLIC))
             return true;
