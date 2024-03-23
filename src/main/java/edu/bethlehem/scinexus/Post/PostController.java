@@ -43,7 +43,7 @@ public class PostController {
     return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
   }
 
-  @PutMapping("/posts/{id}")
+  @PutMapping("/{id}")
   public ResponseEntity<?> editPost( @Valid
                                      @RequestBody
                                      @NotNull
@@ -57,21 +57,22 @@ public class PostController {
     return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
   }
 
-  @PatchMapping("/posts/{id}")
+  @PatchMapping("/{id}")
   public ResponseEntity<?> updatePostPartially(@PathVariable(value = "id")
                                                Long postId,
-                                               @Valid
+
                                                @RequestBody
                                                @NotNull
-                                               PostRequestDTO newPostRequestDTO) {
+                                               PostRequestPatchDTO newPostRequestDTO) {
 
         EntityModel<Post> entityModel=postService.updatePostPartially(postId, newPostRequestDTO);
         return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
   }
 
-  @DeleteMapping("/posts/{id}")
+  @DeleteMapping("/{id}")
   ResponseEntity<?> deletePost(@PathVariable Long id) {
     postService.deletePost(id);
+
     return ResponseEntity.noContent().build();
   }
 

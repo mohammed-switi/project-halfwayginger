@@ -2,6 +2,7 @@ package edu.bethlehem.scinexus.Academic;
 
 import edu.bethlehem.scinexus.Organization.Organization;
 import edu.bethlehem.scinexus.ResearchPaper.ResearchPaper;
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -34,12 +35,10 @@ public class Academic extends User {
     @OneToOne
     @JdbcTypeCode(SqlTypes.JSON)
     @JoinColumn(name = "organization_id")
-//    @NotBlank(message = "Organization Shouldn't be Null")
- //   @NotNull(message = "Organization Shouldn't be Empty")
+    @Nullable
     private Organization organization;
 
     @NotNull(message = "The Academic Position Should Be Specified")
-//    @NotBlank(message = "The Academic Position Should Be Specified")
     @Enumerated(EnumType.STRING)
     private Position position;
 

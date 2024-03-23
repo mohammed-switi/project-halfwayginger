@@ -91,7 +91,7 @@ public class PostService {
                 .orElseThrow(() -> new PostNotFoundException(postId));
     }
 
-    public EntityModel<Post> updatePostPartially(Long postId, PostRequestDTO newPostRequestDTO){
+    public EntityModel<Post> updatePostPartially(Long postId, PostRequestPatchDTO newPostRequestDTO){
 
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new PostNotFoundException(postId,HttpStatus.UNPROCESSABLE_ENTITY));
@@ -102,7 +102,7 @@ public class PostService {
             post.setContent(newPostRequestDTO.getContent());
         if (newPostRequestDTO.getVisibility() != null)
             post.setVisibility(newPostRequestDTO.getVisibility());
-        if (newPostRequestDTO.getPublisherId() >=0)
+        if (newPostRequestDTO.getPublisherId() >=1)
             post.setPublisher(getUserByPublisherId(newPostRequestDTO.getPublisherId()));
 
 
