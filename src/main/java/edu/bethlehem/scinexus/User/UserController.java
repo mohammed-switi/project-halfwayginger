@@ -5,13 +5,14 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.http.*;
-import org.springframework.boot.autoconfigure.security.oauth2.resource.OAuth2ResourceServerProperties.Jwt;
 import org.springframework.hateoas.*;
 import org.springframework.web.bind.annotation.*;
 
-import edu.bethlehem.scinexus.Academic.AcademicNotFoundException;
+import edu.bethlehem.scinexus.Article.Article;
+import edu.bethlehem.scinexus.Article.ArticleRepository;
+import edu.bethlehem.scinexus.Article.ArticleModelAssembler;
 import edu.bethlehem.scinexus.Config.JwtService;
-import lombok.NoArgsConstructor;
+import edu.bethlehem.scinexus.User.UserRepository;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -20,7 +21,9 @@ import lombok.RequiredArgsConstructor;
 public class UserController {
 
     private final UserRepository repository;
+    private final ArticleRepository articleRepository;
     private final UserModelAssembler assembler;
+    private final ArticleModelAssembler articleAssembler;
     private final JwtService jwtService;
 
     @GetMapping("/{userId}")
@@ -34,7 +37,7 @@ public class UserController {
     }
 
     @GetMapping("/links")
-    CollectionModel<EntityModel<User>> userLinks(@RequestHeader(name = "Authorization") String token)
+    CollectionModel<EntityModel<User>> getUserLinks(@RequestHeader(name = "Authorization") String token)
             throws UserNotFoundException {
         Long userId = jwtService.extractId(token);
 
@@ -48,6 +51,24 @@ public class UserController {
                 .collect(Collectors.toList());
 
         return CollectionModel.of(links, linkTo(methodOn(UserController.class).all()).withSelfRel());
+
+    }
+
+    @GetMapping("/articles")
+    CollectionModel<EntityModel<Article>> getUserArticles(@RequestHeader(name = "Authorization") String token)
+            throws UserNotFoundException {
+        Long userId = jwtService.extractId(token);
+
+        User user = repository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("The user with id:" + userId + " is not found",
+                        HttpStatus.NOT_FOUND));
+
+        List<EntityModel<Article>> articles = articleRepository.findByPublisherId(userId).stream()
+                .map(userLinked -> articleAssembler.toModel(
+                        userLinked))
+                .collect(Collectors.toList());
+
+        return CollectionModel.of(articles, linkTo(methodOn(UserController.class).all()).withSelfRel());
 
     }
 
@@ -82,7 +103,9 @@ public class UserController {
                     if (user.getLinks().contains(userTo))
                         return ResponseEntity.badRequest().body("The user with id:" + linkFrom
                                 + " is already linked to the user with id:" + userLinkTo);
-
+                    if (user.getId() == userTo.getId())
+                        return ResponseEntity.badRequest().body("The user with id:" + linkFrom
+                                + " cannot link to itself");
                     user.getLinks().add(userTo);
 
                     EntityModel<User> entityModel = assembler.toModel(repository.save(user));
@@ -98,8 +121,6 @@ public class UserController {
 
         return repository.findById(id)
                 .map(user -> {
-
-                    // User Properties
                     user.setUsername(newUser.getUsername());
                     user.setPassword(newUser.getPassword());
                     user.setEmail(newUser.getEmail());
@@ -114,11 +135,8 @@ public class UserController {
                     return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri())
                             .body(entityModel);
                 })
-                .orElseGet(() -> {
-                    newUser.setId(id);
-                    EntityModel<User> entityModel = assembler.toModel(repository.save(newUser));
-                    return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri())
-                            .body(entityModel);
+                .orElseThrow(() -> {
+                    return new UserNotFoundException("The user with id:" + id + " is not found", HttpStatus.NOT_FOUND);
                 });
     }
 

@@ -9,17 +9,17 @@ import org.springframework.stereotype.Component;
 @Component
 class PostModelAssembler implements RepresentationModelAssembler<Post, EntityModel<Post>> {
 
-    @Override
-    public EntityModel<Post> toModel(Post post) {
+        @Override
+        public EntityModel<Post> toModel(Post post) {
 
-        return EntityModel.of(
-                post, //
-                linkTo(methodOn(
-                        PostController.class).one(
-                                post.getId()))
-                        .withSelfRel(),
-                linkTo(methodOn(PostController.class).all()).withRel(
-                        "+posts"));
-    }
+                return EntityModel.of(
+                                post, //
+                                linkTo(methodOn(
+                                                PostController.class).one(
+                                                                post.getId()))
+                                                .withSelfRel(),
+                                linkTo(methodOn(PostController.class).all()).withRel(
+                                                "+posts"));
+        }
 
 }

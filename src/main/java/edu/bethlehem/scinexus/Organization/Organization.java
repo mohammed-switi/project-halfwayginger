@@ -5,7 +5,6 @@ import java.util.List;
 import edu.bethlehem.scinexus.ResearchPaper.ResearchPaper;
 import edu.bethlehem.scinexus.User.User;
 import jakarta.persistence.*;
-import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.SuperBuilder;
@@ -22,7 +21,7 @@ public class Organization extends User {
     private OrganizationType type;
     private Boolean verified;
 
-    @ManyToMany(mappedBy = "validatedBy")
+    @ManyToMany(mappedBy = "validatedBy", fetch = FetchType.EAGER)
     List<ResearchPaper> validateds;
 
     public Organization(String name, String username, String password, String email, OrganizationType type) {

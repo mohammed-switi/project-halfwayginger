@@ -6,25 +6,23 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.*;
 
 import org.springframework.hateoas.*;
 import org.springframework.web.bind.annotation.*;
 
-import edu.bethlehem.scinexus.User.User;
-import edu.bethlehem.scinexus.User.UserRepository;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/academics")
 public class AcademicController {
 
   private final AcademicRepository repository;
   private final AcademicModelAssembler assembler;
-
-  AcademicController(AcademicRepository repository, AcademicModelAssembler assembler) {
-    this.repository = repository;
-    this.assembler = assembler;
-  }
 
   // Gets one Academic by id
   @GetMapping("/{academicId}")
@@ -76,32 +74,11 @@ public class AcademicController {
           EntityModel<Academic> entityModel = assembler.toModel(repository.save(academic));
           return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
         })
-        .orElseGet(() -> {
-          newAcademic.setId(id);
-          EntityModel<Academic> entityModel = assembler.toModel(repository.save(newAcademic));
-          return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
+        .orElseThrow(() -> {
+          return new AcademicNotFoundException(id, HttpStatus.NOT_FOUND);
+
         });
   }
-  // @PutMapping("/{academicId}")
-  // ResponseEntity<?> validateAcademic(@PathVariable Long academicId) {
-
-  // return repository.findById(
-  // academicId)
-  // .map(academic -> {
-
-  // EntityModel<Academic> entityModel =
-  // assembler.toModel(repository.save(academic));
-  // return
-  // ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
-  // })
-  // .orElseGet(() -> {
-  // newAcademic.setId(id);
-  // EntityModel<Academic> entityModel =
-  // assembler.toModel(repository.save(newAcademic));
-  // return
-  // ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
-  // });
-  // }
 
   @PatchMapping("/{id}")
   public ResponseEntity<?> updateUserPartially(@PathVariable(value = "id") Long academicId,

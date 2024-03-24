@@ -1,6 +1,5 @@
 package edu.bethlehem.scinexus.Error;
 
-
 import edu.bethlehem.scinexus.User.UserNotFoundException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
@@ -22,34 +21,31 @@ import java.util.Map;
 @ControllerAdvice
 public class RestExceptionHandler {
 
-
-
     @ExceptionHandler(GeneralException.class)
     ResponseEntity<GeneralErrorResponse> restExceptionHandler(GeneralException ex) {
 
-        GeneralErrorResponse errorResponse= GeneralErrorResponse
-                                                .builder()
-                                                .status(ex.getHttpStatus().value())
-                                                .message(ex.getMessage())
-                                                .timestamp(new Date(System.currentTimeMillis()))
-                                                .build();
+        GeneralErrorResponse errorResponse = GeneralErrorResponse
+                .builder()
+                .status(ex.getHttpStatus().value())
+                .message(ex.getMessage())
+                .timestamp(new Date(System.currentTimeMillis()))
+                .build();
 
-        return new ResponseEntity<>(errorResponse,ex.getHttpStatus());
+        return new ResponseEntity<>(errorResponse, ex.getHttpStatus());
 
     }
+
     @ExceptionHandler(UserNotFoundException.class)
     public final ResponseEntity<Object> handleUserNotFoundException(UserNotFoundException ex) {
-            GeneralErrorResponse errorResponse = GeneralErrorResponse
-                                                .builder()
-                                                .status(ex.getHttpStatus().value())
-                                                .message(ex.getMessage())
-                                                .timestamp(new Date(System.currentTimeMillis()))
-                                                .build();
-            return new ResponseEntity<>(errorResponse,ex.getHttpStatus());
+        GeneralErrorResponse errorResponse = GeneralErrorResponse
+                .builder()
+                .status(ex.getHttpStatus().value())
+                .message(ex.getMessage())
+                .timestamp(new Date(System.currentTimeMillis()))
+                .build();
+        return new ResponseEntity<>(errorResponse, ex.getHttpStatus());
 
-        }
-
-
+    }
 
     @ExceptionHandler(SignatureException.class)
     public ResponseEntity<String> handleSignatureException(SignatureException e) {
@@ -62,30 +58,29 @@ public class RestExceptionHandler {
                     .body("Internal Server Error: " + cause.getMessage());
         }
     }
+
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<GeneralErrorResponse> handleValidationExceptions(MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();
 
-                ex
+        ex
                 .getBindingResult()
                 .getAllErrors()
                 .forEach((error) -> {
-                                        String fieldName = ((FieldError) error).getField();
-                                        String errorMessage = error.getDefaultMessage();
-                                        errors.put(fieldName, errorMessage);
-                                     }
-                         );
-                GeneralErrorResponse errorResponse=GeneralErrorResponse
-                        .builder()
-                        .message("Vaildation Constraint Violation")
-                        .status(HttpStatus.BAD_REQUEST.value())
-                        .timestamp(new Date(System.currentTimeMillis()))
-                        .validationError(errors)
-                        .build();
+                    String fieldName = ((FieldError) error).getField();
+                    String errorMessage = error.getDefaultMessage();
+                    errors.put(fieldName, errorMessage);
+                });
+        GeneralErrorResponse errorResponse = GeneralErrorResponse
+                .builder()
+                .message("Vaildation Constraint Violation")
+                .status(HttpStatus.BAD_REQUEST.value())
+                .timestamp(new Date(System.currentTimeMillis()))
+                .validationError(errors)
+                .build();
 
-        return new ResponseEntity<>(errorResponse,HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
-
 
 }

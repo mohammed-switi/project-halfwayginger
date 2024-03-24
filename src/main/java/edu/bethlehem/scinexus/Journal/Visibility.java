@@ -1,4 +1,4 @@
-package edu.bethlehem.scinexus.Post;
+package edu.bethlehem.scinexus.Journal;
 
 public enum Visibility {
     PUBLIC, PRIVATE, LINKS

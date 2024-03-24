@@ -1,6 +1,7 @@
 package edu.bethlehem.scinexus.User;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.databind.util.JSONPObject;
 import jakarta.persistence.*;
 
@@ -29,7 +30,9 @@ import javax.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 // @Entity
 // @Table(name = "_user")
@@ -40,6 +43,7 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
+@Table(name = "users")
 public class User implements UserDetailsImpl {
 
     @Id
@@ -117,20 +121,22 @@ public class User implements UserDetailsImpl {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @OneToMany(fetch = FetchType.LAZY)
+    @OneToMany(fetch = FetchType.EAGER)
     @JoinColumn(name = "publisher")
-    @JdbcTypeCode(SqlTypes.JSON)
-    private List<Journal> journals;
+    @JsonIgnore
+    private Set<Journal> journals = new HashSet<Journal>();
 
-    @OneToMany(fetch = FetchType.LAZY)
+    @OneToMany(fetch = FetchType.EAGER)
     @JoinColumn(name = "notifications")
     @JdbcTypeCode(SqlTypes.JSON)
+    @JsonIgnore
     private List<Notification> notifications;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinTable(name = "journal_user_contributors", joinColumns = @JoinColumn(name = "contributs"), inverseJoinColumns = @JoinColumn(name = "contributors"))
     @JdbcTypeCode(SqlTypes.JSON)
-    private List<Journal> contributs;
+    @JsonIgnore
+    private Set<Journal> contributs = new HashSet<Journal>();
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_link_user", joinColumns = @JoinColumn(name = "linkFrom"), inverseJoinColumns = @JoinColumn(name = "LinkTo"))
