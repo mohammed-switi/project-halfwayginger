@@ -118,7 +118,6 @@ public class SecurityConfig {
                                         return new AuthorizationDecision(true);
                                 }
 
-                                System.out.println("journalOwnerFLSE");
                                 return new AuthorizationDecision(false);
 
                         }

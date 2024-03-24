@@ -116,4 +116,15 @@ public class RestExceptionHandler {
         return new ResponseEntity<>(message, HttpStatus.METHOD_NOT_ALLOWED);
     }
 
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Object> handleAll(Exception ex) {
+        // Customize your response here, for example:
+        GeneralErrorResponse errorResponse = GeneralErrorResponse.builder()
+                .message("An error occurred while processing the request." + ex.getMessage())
+                .status(500)
+                .timestamp(new Date(System.currentTimeMillis()))
+                .build();
+        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
 }
