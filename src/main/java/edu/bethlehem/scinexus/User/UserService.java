@@ -12,6 +12,8 @@ public class UserService {
     @PersistenceContext
     private EntityManager entityManager;
 
+
+    //USING Java Persistence Query Language (JPQL), (Tested: Works Well!)
     public boolean areUsersLinked(User user1, User user2) {
         Long count = entityManager.createQuery(
                         "SELECT COUNT(u) FROM User u JOIN u.links l " +
@@ -22,5 +24,19 @@ public class UserService {
 
         return count > 0;
     }
+
+    //Using Native MySQL Query Language (Not Tested Yet!)
+//    public boolean areUsersLinked(User user1, User user2) {
+//        Query query = entityManager.createNativeQuery(
+//                "SELECT COUNT(*) FROM user_links " +
+//                        "WHERE user_id = :userId1 AND linked_user_id = :userId2");
+//
+//        query.setParameter("userId1", user1.getId());
+//        query.setParameter("userId2", user2.getId());
+//
+//        Long count = ((Number) query.getSingleResult()).longValue();
+//
+//        return count > 0;
+//    }
 
 }

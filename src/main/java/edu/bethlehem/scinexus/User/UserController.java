@@ -92,7 +92,6 @@ public class UserController {
     @PutMapping("/linkTo/{userLinkTo}")
     ResponseEntity<?> linkUser(@RequestHeader(name = "Authorization") String token, @PathVariable Long userLinkTo) {
         Long linkFrom = jwtService.extractId(token);
-
         User userTo = repository.findById(
                 userLinkTo).orElseThrow(
                         () -> new UserNotFoundException("The user with id:" +
