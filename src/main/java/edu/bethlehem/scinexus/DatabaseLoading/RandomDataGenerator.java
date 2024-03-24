@@ -1,17 +1,15 @@
 package edu.bethlehem.scinexus.DatabaseLoading;
 
-import com.github.javafaker.Bool;
 import com.github.javafaker.Faker;
 
+import edu.bethlehem.scinexus.Journal.Visibility;
 import edu.bethlehem.scinexus.User.Role;
 
 import org.springframework.stereotype.Component;
 
 import java.security.SecureRandom;
-import java.util.ArrayList;
-import java.util.List;
+
 import java.util.Locale;
-import java.util.Random;
 
 @Component
 public class RandomDataGenerator {
@@ -46,7 +44,12 @@ public class RandomDataGenerator {
     }
 
     public String generateRandomLastName() {
+
         return faker.name().lastName();
+    }
+
+    public String generateRandomUniversityName() {
+        return faker.university().name();
     }
 
     public String generateRandomEmail(String firstName, String lastName) {
@@ -62,6 +65,11 @@ public class RandomDataGenerator {
                 LOWERCASE_CHARACTERS + UPPERCASE_CHARACTERS + NUMERIC_CHARACTERS + SPECIAL_CHARACTERS);
     }
 
+    public String generateRandomWords() {
+        return generateRandomString(100, 100,
+                LOWERCASE_CHARACTERS + UPPERCASE_CHARACTERS);
+    }
+
     public String generateRandomBio() {
         return faker.backToTheFuture().character();
     }
@@ -73,6 +81,12 @@ public class RandomDataGenerator {
 
     public String generateRandomFieldOfWork() {
         return faker.job().field();
+    }
+
+    public Visibility generateRandomVisibility() {
+        int randomIndex = secureRandom.nextInt(Visibility.values().length);
+        return Visibility.values()[randomIndex];
+
     }
 
     public Role generateRandomRole() {

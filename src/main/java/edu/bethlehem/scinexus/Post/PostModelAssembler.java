@@ -12,18 +12,18 @@ import org.springframework.stereotype.Component;
 @Component
 class PostModelAssembler implements RepresentationModelAssembler<Post, EntityModel<Post>> {
 
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-    Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
-    @Override
-    public @NotNull EntityModel<Post> toModel(@NotNull Post post) {
-        return EntityModel.of(
-                post, //
-                linkTo(methodOn(
-                        PostController.class).one(
-                                post.getId(),authentication))
-                        .withSelfRel(),
-                linkTo(methodOn(PostController.class).all()).withRel(
-                        "+posts"));
-    }
+        @Override
+        public @NotNull EntityModel<Post> toModel(@NotNull Post post) {
+                return EntityModel.of(
+                                post, //
+                                linkTo(methodOn(
+                                                PostController.class).one(
+                                                                post.getId(), authentication))
+                                                .withSelfRel(),
+                                linkTo(methodOn(PostController.class).all()).withRel(
+                                                "+posts"));
+        }
 
 }

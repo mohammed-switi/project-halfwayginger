@@ -7,31 +7,34 @@ import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
-
+import org.springframework.security.core.Authentication;
 import org.springframework.hateoas.*;
 import org.springframework.web.bind.annotation.*;
 
+import edu.bethlehem.scinexus.User.User;
+import edu.bethlehem.scinexus.User.UserNotFoundException;
+import edu.bethlehem.scinexus.User.UserRepository;
+import lombok.RequiredArgsConstructor;
+
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/researchpapers")
 public class ResearchPaperController {
 
   private final ResearchPaperRepository repository;
-
-//  private final UserRepository userRepository;
+  private final UserRepository userRepository;
   private final ResearchPaperModelAssembler assembler;
 
-
-
-  @GetMapping("/researchpapers/{researchpaperId}")
+  @GetMapping("/{researchpaperId}")
   EntityModel<ResearchPaper> one(@PathVariable Long researchpaperId) {
 
     ResearchPaper researchpaper = repository.findById(researchpaperId)
-        .orElseThrow(() -> new ResearchPaperNotFoundException(researchpaperId,HttpStatus.NOT_FOUND));
+        .orElseThrow(() -> new ResearchPaperNotFoundException(researchpaperId, HttpStatus.NOT_FOUND));
 
     return assembler.toModel(researchpaper);
   }
 
-  @GetMapping("/researchpapers")
+  @GetMapping()
   CollectionModel<EntityModel<ResearchPaper>> all() {
     List<EntityModel<ResearchPaper>> researchpapers = repository.findAll().stream()
         .map(researchpaper -> assembler.toModel(researchpaper))
@@ -40,15 +43,19 @@ public class ResearchPaperController {
     return CollectionModel.of(researchpapers, linkTo(methodOn(ResearchPaperController.class).all()).withSelfRel());
   }
 
-  @PostMapping("/researchpapers")
-  ResponseEntity<?> newResearchPaper(@RequestBody ResearchPaper newResearchPaper) {
+  @PostMapping()
+  ResponseEntity<?> newResearchPaper(@RequestBody ResearchPaper newResearchPaper, Authentication authentication) {
 
+    User userObj = (User) authentication.getPrincipal();
+    User user = userRepository.findById(userObj.getId())
+        .orElseThrow(() -> new UserNotFoundException(userObj.getId().toString(), HttpStatus.NOT_FOUND));
+    newResearchPaper.setPublisher(user);
     EntityModel<ResearchPaper> entityModel = assembler.toModel(repository.save(newResearchPaper));
 
     return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
   }
 
-  @PutMapping("/researchpapers/{id}")
+  @PutMapping("/{id}")
   ResponseEntity<?> editResearchPaper(@RequestBody ResearchPaper newResearchPaper, @PathVariable Long id) {
 
     return repository.findById(id)
@@ -72,11 +79,11 @@ public class ResearchPaperController {
         });
   }
 
-  @PatchMapping("/researchpapers/{id}")
+  @PatchMapping("/{id}")
   public ResponseEntity<?> updateUserPartially(@PathVariable(value = "id") Long researchpaperId,
       @RequestBody ResearchPaper newResearchPaper) {
     ResearchPaper researchpaper = repository.findById(researchpaperId)
-        .orElseThrow(() -> new ResearchPaperNotFoundException(researchpaperId,HttpStatus.NOT_FOUND));
+        .orElseThrow(() -> new ResearchPaperNotFoundException(researchpaperId, HttpStatus.NOT_FOUND));
 
     if (newResearchPaper.getDescription() != null)
       researchpaper.setDescription(newResearchPaper.getDescription());
@@ -90,8 +97,8 @@ public class ResearchPaperController {
       researchpaper.setTitle(newResearchPaper.getTitle());
     if (newResearchPaper.getLanguage() != null)
       researchpaper.setLanguage(newResearchPaper.getLanguage());
-//    if (userRepository.existsById(newResearchPaper.getPublisherId()))
-//      researchpaper.setPublisherId(newResearchPaper.getPublisherId());
+    // if (userRepository.existsById(newResearchPaper.getPublisherId()))
+    // researchpaper.setPublisherId(newResearchPaper.getPublisherId());
     if (newResearchPaper.getVisibility() != null)
       researchpaper.setVisibility(newResearchPaper.getVisibility());
     if (newResearchPaper.getContributors() != null)
@@ -101,10 +108,11 @@ public class ResearchPaperController {
     return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
   }
 
-  @DeleteMapping("/researchpapers/{id}")
+  @DeleteMapping("/{id}")
   ResponseEntity<?> deleteResearchPaper(@PathVariable Long id) {
 
-    ResearchPaper researchpaper = repository.findById(id).orElseThrow(() -> new ResearchPaperNotFoundException(id,HttpStatus.NOT_FOUND));
+    ResearchPaper researchpaper = repository.findById(id)
+        .orElseThrow(() -> new ResearchPaperNotFoundException(id, HttpStatus.NOT_FOUND));
 
     repository.delete(researchpaper);
 

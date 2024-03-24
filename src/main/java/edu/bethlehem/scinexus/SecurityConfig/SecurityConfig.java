@@ -1,6 +1,5 @@
 package edu.bethlehem.scinexus.SecurityConfig;
 
-
 import jakarta.servlet.Filter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;

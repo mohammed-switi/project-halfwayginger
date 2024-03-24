@@ -3,6 +3,7 @@ package edu.bethlehem.scinexus.User;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.databind.util.JSONPObject;
 import jakarta.persistence.*;
 
@@ -27,7 +28,9 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import javax.annotation.Nullable;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 // @Entity
 // @Table(name = "_user")
@@ -44,7 +47,6 @@ public class User implements UserDetailsImpl {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-
 
     @NotNull(message = "First Name is mandatory")
     @NotBlank(message = "First Name is mandatory")
@@ -103,7 +105,7 @@ public class User implements UserDetailsImpl {
     // 123-456-7890
     // 123.456.7890
     // 1234567890
-    //1-123-123-1234
+    // 1-123-123-1234
     @Pattern(regexp = "^\\s*(?:\\+?(\\d{1,3}))?([-. (]*(\\d{3})[-. )]*)?((\\d{3})[-. ]*(\\d{2,4})(?:[-.x ]*(\\d+))?)\\s*$", message = "Phone Number is Not Valid")
     private String phoneNumber;
 
@@ -118,21 +120,23 @@ public class User implements UserDetailsImpl {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @OneToMany(fetch = FetchType.LAZY)
+    @OneToMany(fetch = FetchType.EAGER)
     @JoinColumn(name = "publisher")
     @JdbcTypeCode(SqlTypes.JSON)
     @JsonBackReference
     private List<Journal> journals;
 
-    @OneToMany(fetch = FetchType.LAZY)
+    @OneToMany(fetch = FetchType.EAGER)
     @JoinColumn(name = "notifications")
     @JdbcTypeCode(SqlTypes.JSON)
+    @JsonIgnore
     private List<Notification> notifications;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinTable(name = "journal_user_contributors", joinColumns = @JoinColumn(name = "contributs"), inverseJoinColumns = @JoinColumn(name = "contributors"))
     @JdbcTypeCode(SqlTypes.JSON)
-    private List<Journal> contributs;
+    @JsonIgnore
+    private Set<Journal> contributs = new HashSet<Journal>();
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_link_user", joinColumns = @JoinColumn(name = "linkFrom"), inverseJoinColumns = @JoinColumn(name = "LinkTo"))

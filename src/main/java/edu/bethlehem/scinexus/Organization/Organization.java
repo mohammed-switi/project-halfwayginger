@@ -20,12 +20,12 @@ public class Organization extends User {
     private @Id @GeneratedValue Long id;
 
     @Enumerated(EnumType.STRING)
-//    @NotBlank(message = "The Organization Type Must Be Determined")
-//    @NotNull(message = "The Organization Type Must Be Determined")
+    // @NotBlank(message = "The Organization Type Must Be Determined")
+    // @NotNull(message = "The Organization Type Must Be Determined")
     private OrganizationType type;
 
-//    @NotNull(message = "You should Specify if Verified Or Not")
-//    @NotBlank(message = "You should Specify if Verified Or Not")
+    // @NotNull(message = "You should Specify if Verified Or Not")
+    // @NotBlank(message = "You should Specify if Verified Or Not")
     private Boolean verified;
 
     @ManyToMany(mappedBy = "validatedBy")

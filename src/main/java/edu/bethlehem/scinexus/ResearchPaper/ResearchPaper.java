@@ -24,7 +24,6 @@ public class ResearchPaper extends Journal {
 
     @Enumerated(EnumType.STRING)
     @NotNull(message = "The Research Paper Language Can't Be Null")
-    @NotBlank(message = "The Research Paper Language Should Be specified")
     private ResearchLanguage language;
 
     @NotNull(message = "The Research Paper Title Can't Be Null")
@@ -36,7 +35,6 @@ public class ResearchPaper extends Journal {
     private String subject;
 
     @NotNull(message = "The Research Paper Number Of Pages Can't Be Null")
-    @NotBlank(message = "The Research Paper Number Of Pages Should Be Specified")
     private Integer noOfPages;
 
     @ManyToMany
