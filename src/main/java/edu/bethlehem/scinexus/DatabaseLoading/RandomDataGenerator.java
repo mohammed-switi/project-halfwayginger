@@ -90,7 +90,7 @@ public class RandomDataGenerator {
     }
 
     public Role generateRandomRole() {
-        if (secureRandom.nextBoolean() == true) {
+        if (secureRandom.nextBoolean() == false) {
             return Role.ACADEMIC;
         } else {
             return Role.ORGANIZATION;

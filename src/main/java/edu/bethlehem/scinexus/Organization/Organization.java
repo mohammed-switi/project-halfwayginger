@@ -13,6 +13,7 @@ import lombok.experimental.SuperBuilder;
 
 @Data
 @Entity
+@DiscriminatorValue("ORGANIATION")
 @EqualsAndHashCode(callSuper = false)
 public class Organization extends User {
 

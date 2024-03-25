@@ -15,9 +15,11 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import edu.bethlehem.scinexus.SecurityConfig.UserDetailsImpl;
+import edu.bethlehem.scinexus.Academic.Academic;
 import edu.bethlehem.scinexus.Journal.Journal;
 import edu.bethlehem.scinexus.Media.Media;
 import edu.bethlehem.scinexus.Notification.Notification;
+import edu.bethlehem.scinexus.Organization.Organization;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -44,6 +46,7 @@ import java.util.Set;
 @Inheritance(strategy = InheritanceType.JOINED)
 @JsonSerialize
 @Builder
+@DiscriminatorColumn(name = "user_role", discriminatorType = DiscriminatorType.STRING)
 public class User implements UserDetailsImpl {
 
     @Id
@@ -120,6 +123,7 @@ public class User implements UserDetailsImpl {
 
     @NotNull
     @Enumerated(EnumType.STRING)
+    @Column(insertable = false, updatable = false)
     private Role role;
 
     @OneToMany(fetch = FetchType.EAGER)
@@ -198,5 +202,36 @@ public class User implements UserDetailsImpl {
     @Override
     public Long getId() {
         return id;
+    }
+
+    public Academic toAcademic() {
+        Academic academic = new Academic();
+        academic.setId(id);
+        academic.setFirstName(firstName);
+        academic.setLastName(lastName);
+        academic.setUsername(username);
+        academic.setEmail(email);
+        academic.setPassword(password);
+        academic.setBio(bio);
+        academic.setPhoneNumber(phoneNumber);
+        academic.setFieldOfWork(fieldOfWork);
+        academic.setRole(role);
+        return academic;
+    }
+
+    public Organization toOrganization() {
+        Organization organization = new Organization();
+        organization.setId(id);
+        organization.setFirstName(firstName);
+        organization.setLastName(lastName);
+        organization.setUsername(username);
+        organization.setEmail(email);
+        organization.setPassword(password);
+        organization.setBio(bio);
+        organization.setPhoneNumber(phoneNumber);
+        organization.setFieldOfWork(fieldOfWork);
+        organization.setRole(role);
+        return organization;
+
     }
 }

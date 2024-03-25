@@ -119,9 +119,9 @@ public class DataLoader implements CommandLineRunner {
                 academic.setPhoneNumber(phoneNumber);
                 academic.setFieldOfWork(fieldOfWork);
                 academic.setRole(role);
-                // acasemic.setPosition(Position.PROFESSOR);
-                // acasemic.setEducation(bio);
-                // acasemic.setBadge(bio);
+                // academic.setPosition(Position.PROFESSOR);
+                // academic.setEducation(bio);
+                // academic.setBadge(bio);
                 users.add(academic);
             }
 
@@ -137,9 +137,28 @@ public class DataLoader implements CommandLineRunner {
                 organization.setPhoneNumber(phoneNumber);
                 organization.setFieldOfWork(fieldOfWork);
                 organization.setRole(role);
+
+                // organization.setType(OrganizationType.BUSINESS);
+                // organization.setVerified(true);
+
                 users.add(organization);
             }
-            userRepository.saveAll(users);
+            users = userRepository.saveAll(users);
+            // for (User user : users) {
+            // if (user.getRole() == Role.ACADEMIC) {
+            // Academic academic = user.toAcademic();
+
+            // academic.setPosition(Position.PROFESSOR);
+            // academic.setEducation(dataGenerator.generateRandomWords());
+            // academic.setBadge(dataGenerator.generateRandomWords());
+            // academicRepository.save(academic);
+            // } else {
+            // Organization organization = user.toOrganization();
+            // organization.setType(OrganizationType.BUSINESS);
+            // organization.setVerified(true);
+            // organizationRepository.save(organization);
+            // }
+            // }
 
         }
     }
@@ -181,7 +200,8 @@ public class DataLoader implements CommandLineRunner {
             for (int i = 0; i < 2; i++) {
 
                 ResearchPaper researchPaper = new ResearchPaper(dataGenerator.generateRandomUniversityName(),
-                        dataGenerator.generateRandomWords(), dataGenerator.generateRandomFieldOfWork(), user);
+                        dataGenerator.generateRandomWords(), dataGenerator.generateRandomBio(),
+                        dataGenerator.generateRandomFieldOfWork(), user);
                 System.out.println(user.getUsername());
                 researchPaper.setLanguage(ResearchLanguage.ENGLISH);
                 researchPaper.setNoOfPages(random.nextInt(500));

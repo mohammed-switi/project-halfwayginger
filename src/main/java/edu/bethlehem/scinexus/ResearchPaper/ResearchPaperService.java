@@ -80,7 +80,6 @@ public class ResearchPaperService {
     }
 
     public ResearchPaper saveResearchPaper(ResearchPaper researchPaper) {
-        System.out.println("Research Paper: //////////////////////////////////////////////////////////////////");
         return researchPaperRepository.save(researchPaper);
     }
 

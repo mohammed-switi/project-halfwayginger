@@ -18,6 +18,7 @@ import org.hibernate.type.SqlTypes;
 
 @Data
 @Entity
+@DiscriminatorValue("ACADEMIC")
 @EqualsAndHashCode(callSuper = false)
 public class Academic extends User {
     private @Id @GeneratedValue Long id;

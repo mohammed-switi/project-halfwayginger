@@ -99,6 +99,7 @@ public class Journal implements Serializable {
     public Journal(String content, User publisher) {
         this.publisher = publisher;
         this.content = content;
+
     }
 
 }

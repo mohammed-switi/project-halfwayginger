@@ -55,10 +55,11 @@ public class ResearchPaper extends Journal {
     @JoinTable(name = "research_paper_validated_by_organization", joinColumns = @JoinColumn(name = "validated"), inverseJoinColumns = @JoinColumn(name = "validated_research_papers"))
     private List<Organization> validatedBy;
 
-    public ResearchPaper(String title, String description, String subject, User publisher) {
-        super(description, publisher);
+    public ResearchPaper(String title, String content, String description, String subject, User publisher) {
+        super(content, publisher);
         this.title = title;
         this.subject = subject;
+        this.description = description;
 
     }
 
