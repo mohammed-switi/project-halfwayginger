@@ -39,27 +39,28 @@ public class Journal implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private @Id Long id;
 
-    @NotNull(message = "The Journal Description Shouldn't Be Null")
-    @NotBlank(message = "The Journal Description Shouldn't Be Empty")
-    private String description;
+    // to be moved to researchpaper
 
     @Min(value = 0)
     private Integer interactionCount = 0;
 
-    private Integer opinionCount;
+    @Min(value = 0)
+    private Integer opinionCount = 0;
 
     @NotNull(message = "The Journal Content Shouldn't Be Null")
     @NotBlank(message = "The Journal Content Shouldn't Be Empty")
     private String content;
 
+    // add default value to be private
     @Enumerated(EnumType.STRING)
     @NotNull(message = "The Journal Visibility Shouldn't Be Null")
     // @NotBlank(message = "The Journal Visibility Shouldn't Be Empty")
     private Visibility visibility;
 
     // @NotNull(message = "The Journal Publisher Shouldn't Be Null")
-    @ManyToOne(fetch = FetchType.LAZY) // Fetch Type Has been changed From Lazy To Eager, Because I get an error when I
-                                       // request one Journal
+    @ManyToOne(fetch = FetchType.LAZY) // Fetch Type Has been changed From Lazy To Eager,
+                                       // Because I get an error when I
+    // request one Journal
     @JoinColumn(name = "publisher")
     @JdbcTypeCode(SqlTypes.JSON)
     @JsonManagedReference

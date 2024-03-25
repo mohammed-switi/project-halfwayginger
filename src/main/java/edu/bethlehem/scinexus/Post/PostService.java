@@ -3,11 +3,12 @@ package edu.bethlehem.scinexus.Post;
 import edu.bethlehem.scinexus.Auth.UserNotAuthorizedException;
 import edu.bethlehem.scinexus.Journal.Visibility;
 import edu.bethlehem.scinexus.Organization.Organization;
+import edu.bethlehem.scinexus.User.UserService;
 import edu.bethlehem.scinexus.SecurityConfig.JwtService;
 import edu.bethlehem.scinexus.User.User;
 import edu.bethlehem.scinexus.User.UserNotFoundException;
 import edu.bethlehem.scinexus.User.UserRepository;
-import edu.bethlehem.scinexus.User.UserService;
+import edu.bethlehem.scinexus.User.UserResponsDTO;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.EntityModel;
@@ -15,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -33,7 +35,6 @@ public class PostService {
     public Post convertPostDtoToPostEntity(Authentication authentication, PostRequestDTO postRequestDTO) {
 
         return Post.builder()
-                .description(postRequestDTO.getDescription())
                 .content(postRequestDTO.getContent())
                 .visibility(postRequestDTO.getVisibility())
                 .publisher(getUserByPublisherId(jwtService.extractId(authentication)))
@@ -82,14 +83,14 @@ public class PostService {
         return assembler.toModel(savePost(newPost));
     }
 
-    public EntityModel<Post> updatePost(Long postId, Authentication authentication, PostRequestDTO newPostRequestDTO) {
+    public EntityModel<Post> updatePost(Long postId, Authentication authentication,
+            PostRequestDTO newPostRequestDTO) {
 
         return postRepository.findById(postId)
                 .filter(post -> isUserAuthorized(authentication, post))
                 .map(post -> {
                     post.setContent(newPostRequestDTO.getContent());
                     post.setVisibility(newPostRequestDTO.getVisibility());
-                    post.setDescription(newPostRequestDTO.getDescription());
                     return assembler.toModel(postRepository.save(post));
                 })
                 .orElseThrow(() -> new PostNotFoundException(postId));
@@ -103,14 +104,20 @@ public class PostService {
 
         isUserAuthorized(authentication, post);
 
-        if (newPostRequestDTO.getDescription() != null)
-            post.setDescription(newPostRequestDTO.getDescription());
-        if (newPostRequestDTO.getContent() != null)
-            post.setContent(newPostRequestDTO.getContent());
-        if (newPostRequestDTO.getVisibility() != null)
-            post.setVisibility(newPostRequestDTO.getVisibility());
-        if (newPostRequestDTO.getPublisherId() >= 1)
-            post.setPublisher(getUserByPublisherId(newPostRequestDTO.getPublisherId()));
+        try {
+            for (Method method : PostRequestPatchDTO.class.getMethods()) {
+                if (method.getName().startsWith("get") && method.getParameterCount() == 0) {
+                    Object value = method.invoke(newPostRequestDTO);
+                    if (value != null) {
+                        String propertyName = method.getName().substring(3); // remove "get"
+                        Method setter = Post.class.getMethod("set" + propertyName, method.getReturnType());
+                        setter.invoke(post, value);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         return assembler.toModel(postRepository.save(post));
 

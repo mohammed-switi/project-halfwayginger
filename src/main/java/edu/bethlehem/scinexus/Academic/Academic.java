@@ -19,18 +19,14 @@ import org.hibernate.type.SqlTypes;
 @Data
 @Entity
 @EqualsAndHashCode(callSuper = false)
-@SuperBuilder
 public class Academic extends User {
     private @Id @GeneratedValue Long id;
-
 
     private String badge;
 
     @NotNull(message = "Education Shouldn't be Null")
     @NotBlank(message = "Education Shouldn't be Empty")
     private String education;
-
-
 
     @OneToOne
     @JdbcTypeCode(SqlTypes.JSON)

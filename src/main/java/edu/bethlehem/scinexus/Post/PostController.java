@@ -20,17 +20,14 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/posts")
 public class PostController {
 
-
   private final PostService postService;
 
-
-
   @GetMapping("/{postId}")
-  public ResponseEntity<EntityModel<Post>> one(@PathVariable
-                                               long postId,
-                                               Authentication authentication) {
-      return ResponseEntity.ok(postService.findPostById(postId, authentication));
+  public ResponseEntity<EntityModel<Post>> one(@PathVariable long postId,
+      Authentication authentication) {
+    return ResponseEntity.ok(postService.findPostById(postId, authentication));
   }
+
   @GetMapping()
   public CollectionModel<EntityModel<Post>> all() {
     List<EntityModel<Post>> posts = postService.findAllPosts();
@@ -38,52 +35,38 @@ public class PostController {
     return CollectionModel.of(posts, linkTo(methodOn(PostController.class).all()).withSelfRel());
   }
 
-
   @PostMapping()
-  public ResponseEntity<?> createNewPost( Authentication authentication,@Valid
-                                          @RequestBody
-                                          @NotNull
-                                          PostRequestDTO newPostRequestDTO) {
+  public ResponseEntity<?> createNewPost(Authentication authentication,
+      @Valid @RequestBody @NotNull PostRequestDTO newPostRequestDTO) {
 
-
-    EntityModel<Post> entityModel = postService.createPost(authentication,newPostRequestDTO);
+    EntityModel<Post> entityModel = postService.createPost(authentication, newPostRequestDTO);
     return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
   }
 
   @PutMapping("/{id}")
-  public ResponseEntity<?> editPost( @PathVariable
-                                       @NotNull
-                                       Long id,
-                                     Authentication authentication,
-                                     @Valid
-                                     @RequestBody
-                                     @NotNull
-                                       PostRequestDTO newPostRequestDTO) {
+  public ResponseEntity<?> editPost(@PathVariable @NotNull Long id,
+      Authentication authentication,
+      @Valid @RequestBody @NotNull PostRequestDTO newPostRequestDTO) {
 
-    EntityModel<Post> entityModel=postService.updatePost(id,authentication,newPostRequestDTO);
+    EntityModel<Post> entityModel = postService.updatePost(id, authentication, newPostRequestDTO);
 
     return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
   }
 
   @PatchMapping("/{id}")
-  public ResponseEntity<?> updatePostPartially(@PathVariable(value = "id")
-                                               Long postId,
-                                                Authentication authentication,
-                                               @RequestBody
-                                               @NotNull
-                                               PostRequestPatchDTO newPostRequestDTO) {
+  public ResponseEntity<?> updatePostPartially(@PathVariable(value = "id") Long postId,
+      Authentication authentication,
+      @RequestBody @NotNull PostRequestPatchDTO newPostRequestDTO) {
 
-        EntityModel<Post> entityModel=postService.updatePostPartially(postId, authentication,newPostRequestDTO);
-        return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
+    EntityModel<Post> entityModel = postService.updatePostPartially(postId, authentication, newPostRequestDTO);
+    return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
   }
 
   @DeleteMapping("/{id}")
-  ResponseEntity<?> deletePost(@PathVariable Long id,Authentication authentication) {
-    postService.deletePost(id,authentication);
+  ResponseEntity<?> deletePost(@PathVariable Long id, Authentication authentication) {
+    postService.deletePost(id, authentication);
 
     return ResponseEntity.noContent().build();
   }
-
-
 
 }

@@ -37,11 +37,36 @@ public class DataLoader implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
+        generateUser();
         generateRandomUsers(10);
         generateLinks();
         generateResearchPapers();
         generateArticles();
 
+    }
+
+    private void generateUser() {
+        Random random = new Random();
+        User user = new User();
+        user.setFirstName("Mohammed");
+        user.setLastName("Switi");
+        user.setUsername("Aaboduh");
+        user.setEmail("obada@gmail.com");
+        user.setPassword(passwordEncoder.encode("Mohammed1234!"));
+        user.setPhoneNumber("123.456.7890");
+        user.setRole(Role.ORGANIZATION);
+
+        user = userRepository.save(user);
+        Article article = new Article(dataGenerator.generateRandomUniversityName(),
+                dataGenerator.generateRandomWords(), dataGenerator.generateRandomFieldOfWork(), user);
+        System.out.println(user.getUsername());
+        article.setInteractionCount(random.nextInt(1000));
+        article.setOpinionCount(random.nextInt(1000));
+        article.setVisibility(dataGenerator.generateRandomVisibility());
+        article = articleRepository.save(article);
+        user.addJournal(article);
+
+        userRepository.save(user);
     }
 
     private void generateLinks() {
@@ -53,7 +78,7 @@ public class DataLoader implements CommandLineRunner {
         Random random = new Random();
 
         for (User user : users) {
-            for (int i = 0; i < 5; i++) {
+            for (int i = 0; i < 3; i++) {
                 User linkTo = users.get(random.nextInt(users.size()));
                 if (!user.getLinks().contains(linkTo) && user != linkTo) {
 
@@ -69,8 +94,7 @@ public class DataLoader implements CommandLineRunner {
     }
 
     private void generateRandomUsers(int count) {
-        List<Academic> academics = new ArrayList<>();
-        List<Organization> organizations = new ArrayList<>();
+        List<User> users = new ArrayList<>();
         Set<String> usedUsernames = new HashSet<>();
 
         for (int i = 0; i < count; i++) {
@@ -84,40 +108,40 @@ public class DataLoader implements CommandLineRunner {
             String fieldOfWork = dataGenerator.generateRandomFieldOfWork();
 
             Role role = dataGenerator.generateRandomRole(); // Assuming role is constant for all users
-            if (role == Role.ACADEMIC)
-                academics.add(Academic.builder()
-                        .firstName(firstName)
-                        .lastName(lastName)
-                        .username(username)
-                        .email(email)
-                        .password(passwordEncoder.encode(password))
-                        .bio(bio)
-                        .phoneNumber(phoneNumber)
-                        .fieldOfWork(fieldOfWork)
-                        .role(role)
-                        .position(Position.PROFESSOR)
-                        .education(bio)
-                        .badge(bio)
-                        .build());
+            if (role == Role.ACADEMIC) {
+                User academic = new User();
+                academic.setFirstName(firstName);
+                academic.setLastName(lastName);
+                academic.setUsername(username);
+                academic.setEmail(email);
+                academic.setPassword(passwordEncoder.encode(password));
+                academic.setBio(bio);
+                academic.setPhoneNumber(phoneNumber);
+                academic.setFieldOfWork(fieldOfWork);
+                academic.setRole(role);
+                // acasemic.setPosition(Position.PROFESSOR);
+                // acasemic.setEducation(bio);
+                // acasemic.setBadge(bio);
+                users.add(academic);
+            }
 
-            else
-                organizations.add(Organization.builder()
-                        .firstName(firstName)
-                        .lastName(lastName)
-                        .username(username)
-                        .email(email)
-                        .password(passwordEncoder.encode(password))
-                        .bio(bio)
-                        .phoneNumber(phoneNumber)
-                        .fieldOfWork(fieldOfWork)
-                        .role(role)
-                        .type(OrganizationType.GOVERNMENT)
-                        .build());
+            else {
+
+                User organization = new User();
+                organization.setFirstName(firstName);
+                organization.setLastName(lastName);
+                organization.setUsername(username);
+                organization.setEmail(email);
+                organization.setPassword(passwordEncoder.encode(password));
+                organization.setBio(bio);
+                organization.setPhoneNumber(phoneNumber);
+                organization.setFieldOfWork(fieldOfWork);
+                organization.setRole(role);
+                users.add(organization);
+            }
+            userRepository.saveAll(users);
 
         }
-        academicRepository.saveAll((List<Academic>) academics);
-        organizationRepository.saveAll((List<Organization>) organizations);
-
     }
 
     private String generateUniqueUsername(Set<String> usedUsernames) {
@@ -131,33 +155,30 @@ public class DataLoader implements CommandLineRunner {
 
     private void generateArticles() {
         List<User> users = userRepository.findAll();
-        List<Article> articlesList = new ArrayList<>();
         Random random = new Random();
         for (User user : users) {
-            for (int i = 0; i < 5; i++) {
+            for (int i = 0; i < 2; i++) {
                 Article article = new Article(dataGenerator.generateRandomUniversityName(),
                         dataGenerator.generateRandomWords(), dataGenerator.generateRandomFieldOfWork(), user);
                 System.out.println(user.getUsername());
                 article.setInteractionCount(random.nextInt(1000));
                 article.setOpinionCount(random.nextInt(1000));
                 article.setVisibility(dataGenerator.generateRandomVisibility());
-                article.setDescription(dataGenerator.generateRandomWords());
-                article.setPublisher(user);
-                user.getJournals().add(article);
+                article = articleRepository.save(article);
 
-                articlesList.add(article);
+                user.addJournal(article);
+                userRepository.save(user);
+
             }
         }
-        articleRepository.saveAll(articlesList);
-        userRepository.saveAll(users);
+
     }
 
     private void generateResearchPapers() {
         List<User> users = userRepository.findAll();
-        List<ResearchPaper> researchPapersList = new ArrayList<>();
         Random random = new Random();
         for (User user : users) {
-            for (int i = 0; i < 5; i++) {
+            for (int i = 0; i < 2; i++) {
 
                 ResearchPaper researchPaper = new ResearchPaper(dataGenerator.generateRandomUniversityName(),
                         dataGenerator.generateRandomWords(), dataGenerator.generateRandomFieldOfWork(), user);
@@ -168,19 +189,11 @@ public class DataLoader implements CommandLineRunner {
                 researchPaper.setOpinionCount(random.nextInt(1000));
                 researchPaper.setVisibility(dataGenerator.generateRandomVisibility());
                 researchPaper.setDescription(dataGenerator.generateRandomWords());
-                researchPaper.setPublisher(user);
-
-                user.getJournals().add(researchPaper);
-                researchPapersList.add(researchPaper);
+                researchPaper = researchPaperRepository.save(researchPaper);
+                user.addJournal(researchPaper);
+                userRepository.save(user);
             }
         }
-        userRepository.saveAll(users);
-        researchPaperRepository.saveAll(researchPapersList);
-        // List<ResearchPaper> researchPapers = researchPaperRepository.findAll();
 
-        // for (ResearchPaper researchPaper : researchPapers)
-        // researchPaper.setPublisher(users.get(random.nextInt(users.size())));
-
-        // researchPaperRepository.saveAll(researchPapers);
     }
 }

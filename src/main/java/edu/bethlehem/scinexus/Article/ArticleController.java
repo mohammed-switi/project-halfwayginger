@@ -70,7 +70,6 @@ public class ArticleController {
       throw new ArticleNotFoundException(id, HttpStatus.NOT_FOUND);
 
     article.setContent(newArticle.getContent());
-    article.setDescription(newArticle.getDescription());
     article.setSubject(newArticle.getSubject());
     article.setTitle(newArticle.getTitle());
     article.setPublisher(newArticle.getPublisher());
@@ -96,8 +95,6 @@ public class ArticleController {
     // //////////////////////////////////////////////////////////////////////
     if (newArticle.getContent() != null)
       article.setContent(newArticle.getContent());
-    if (newArticle.getDescription() != null)
-      article.setDescription(newArticle.getDescription());
     if (newArticle.getSubject() != null)
       article.setSubject(newArticle.getSubject());
     if (newArticle.getTitle() != null)

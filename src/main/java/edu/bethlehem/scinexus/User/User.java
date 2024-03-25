@@ -12,6 +12,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import edu.bethlehem.scinexus.SecurityConfig.UserDetailsImpl;
 import edu.bethlehem.scinexus.Journal.Journal;
@@ -42,6 +43,7 @@ import java.util.Set;
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 @JsonSerialize
+@Builder
 public class User implements UserDetailsImpl {
 
     @Id
@@ -124,7 +126,7 @@ public class User implements UserDetailsImpl {
     @JoinColumn(name = "publisher")
     @JdbcTypeCode(SqlTypes.JSON)
     @JsonBackReference
-    private List<Journal> journals;
+    private Set<Journal> journals = new HashSet<Journal>();
 
     @OneToMany(fetch = FetchType.EAGER)
     @JoinColumn(name = "notifications")
@@ -150,6 +152,17 @@ public class User implements UserDetailsImpl {
         this.password = password;
         this.email = email;
 
+    }
+
+    public void addJournal(Journal journal) {
+        if (journals == null) {
+            journals = new HashSet<>();
+        }
+        if (journals.contains(journal)) {
+            return;
+        }
+
+        journals.add(journal);
     }
 
     @Override

@@ -14,7 +14,6 @@ import lombok.experimental.SuperBuilder;
 @Data
 @Entity
 @EqualsAndHashCode(callSuper = false)
-@SuperBuilder
 public class Organization extends User {
 
     private @Id @GeneratedValue Long id;

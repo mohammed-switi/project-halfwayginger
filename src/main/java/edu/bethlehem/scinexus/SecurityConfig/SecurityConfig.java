@@ -1,5 +1,7 @@
 package edu.bethlehem.scinexus.SecurityConfig;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import jakarta.servlet.Filter;
 import lombok.RequiredArgsConstructor;
 
@@ -28,6 +30,7 @@ import edu.bethlehem.scinexus.Journal.Journal;
 import edu.bethlehem.scinexus.Journal.JournalNotFoundException;
 import edu.bethlehem.scinexus.Journal.JournalRepository;
 import edu.bethlehem.scinexus.Journal.Visibility;
+import edu.bethlehem.scinexus.User.UserService;
 import edu.bethlehem.scinexus.User.User;
 
 @EnableWebSecurity
@@ -38,6 +41,9 @@ public class SecurityConfig {
         private final JwtAuthenticationFilter jwtAuthFilter;
         private final AuthenticationProvider authenticationProvider;
         private final JournalRepository journalRepository;
+
+        @PersistenceContext
+        private EntityManager entityManager;
 
         @Bean
         public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
@@ -94,7 +100,18 @@ public class SecurityConfig {
                                         return new AuthorizationDecision(true);
 
                                 // add LINKS Visibility check
+                                if (journal.getVisibility().equals(Visibility.LINKS)) {
+                                        Long count = entityManager.createQuery(
+                                                        "SELECT COUNT(u) FROM User u JOIN u.links l " +
+                                                                        "WHERE u.id = :userId1 AND l.id = :userId2",
+                                                        Long.class)
+                                                        .setParameter("userId1", user.getId())
+                                                        .setParameter("userId2", journal.getPublisher().getId())
+                                                        .getSingleResult();
 
+                                        if (count > 0)
+                                                return new AuthorizationDecision(true);
+                                }
                                 return new AuthorizationDecision(false);
 
                         }
