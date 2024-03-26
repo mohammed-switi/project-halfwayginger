@@ -30,7 +30,13 @@ public class Opinion {
     @NotBlank(message = "The Opinion Content Can't Be Empty")
     private String content;
 
-    @ManyToOne(fetch = FetchType.LAZY) // Fetch Type Has been Changed from Lazy To Eager, Because When I request one opinion there is an error, and this is how I solved it
+    @Min(value = 0)
+    private Integer interactionsCount;
+    @Min(value = 0)
+    private Integer opinionsCount;
+
+    @ManyToOne(fetch = FetchType.LAZY) // Fetch Type Has been Changed from Lazy To Eager, Because When I request one
+                                       // opinion there is an error, and this is how I solved it
     @JoinColumn(name = "journal")
     @NotNull(message = "The Opinion Reference Journal Shouldn't Be Null")
     @JsonManagedReference
@@ -52,13 +58,32 @@ public class Opinion {
     @JoinColumn(name = "opinion")
     private List<Interaction> interactions;
 
-
-
     public Opinion(String content) {
-
+        this.interactionsCount = 0;
+        this.opinionsCount = 0;
         this.content = content;
     }
 
     public Opinion() {
+    }
+
+    public void removeInteraction(Interaction interaction) {
+        this.interactions.remove(interaction);
+        interactionsCount--;
+    }
+
+    public void addInteraction(Interaction interaction) {
+        this.interactions.add(interaction);
+        interactionsCount++;
+    }
+
+    public void removeOpinion(Opinion opinion) {
+        this.opinions.remove(opinion);
+        opinionsCount--;
+    }
+
+    public void addOpinion(Opinion opinion) {
+        this.opinions.add(opinion);
+        opinionsCount++;
     }
 }

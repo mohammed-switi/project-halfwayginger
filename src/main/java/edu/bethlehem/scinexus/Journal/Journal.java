@@ -97,9 +97,31 @@ public class Journal implements Serializable {
     }
 
     public Journal(String content, User publisher) {
+        this.interactionCount = 0;
+        this.opinionCount = 0;
         this.publisher = publisher;
         this.content = content;
 
+    }
+
+    public void removeInteraction(Interaction interaction) {
+        this.interactions.remove(interaction);
+        interactionCount--;
+    }
+
+    public void removeOpinion(Opinion opinion) {
+        this.opinions.remove(opinion);
+        opinionCount--;
+    }
+
+    public void addInteraction(Interaction interaction) {
+        this.interactions.add(interaction);
+        interactionCount++;
+    }
+
+    public void addOpinion(Opinion opinion) {
+        this.opinions.add(opinion);
+        opinionCount++;
     }
 
 }
