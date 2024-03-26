@@ -35,7 +35,7 @@ public class DataLoader implements CommandLineRunner {
     @Override
     public void run(String... args) {
         generateUser();
-        generateRandomUsers(10);
+        generateRandomUsers(2);
         generateLinks();
         generateResearchPapers();
         generateArticles();

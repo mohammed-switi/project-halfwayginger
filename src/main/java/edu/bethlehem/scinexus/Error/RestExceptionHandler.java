@@ -7,6 +7,7 @@ import io.jsonwebtoken.security.SignatureException;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageConversionException;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.transaction.TransactionSystemException;
 import org.springframework.validation.FieldError;
@@ -131,6 +132,19 @@ public class RestExceptionHandler {
 
     @ExceptionHandler(TransactionSystemException.class)
     public ResponseEntity<Object> handleTransactionException(TransactionSystemException ex) {
+        // Customize your response here, for example:
+        GeneralErrorResponse errorResponse = GeneralErrorResponse.builder()
+                .message("An error occurred while processing the request. " + ex.getMostSpecificCause().getMessage()
+                        + "  "
+                        + ex.getStackTrace().toString())
+                .status(500)
+                .timestamp(new Date(System.currentTimeMillis()))
+                .build();
+        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(HttpMessageConversionException.class)
+    public ResponseEntity<Object> handleHttpMessageConversionException(HttpMessageConversionException ex) {
         // Customize your response here, for example:
         GeneralErrorResponse errorResponse = GeneralErrorResponse.builder()
                 .message("An error occurred while processing the request. " + ex.getMostSpecificCause().getMessage()

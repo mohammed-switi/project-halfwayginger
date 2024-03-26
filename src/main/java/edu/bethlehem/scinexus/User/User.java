@@ -164,6 +164,7 @@ public class User implements UserDetailsImpl {
     @JdbcTypeCode(SqlTypes.JSON)
     @JoinColumn(name = "id")
     @Nullable
+    @JsonIgnore
     private User organization;
 
     @ManyToMany(mappedBy = "requestsForAccess")
