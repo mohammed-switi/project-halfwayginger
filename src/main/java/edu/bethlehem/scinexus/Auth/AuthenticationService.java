@@ -1,11 +1,8 @@
 package edu.bethlehem.scinexus.Auth;
 
-import edu.bethlehem.scinexus.Academic.Academic;
-import edu.bethlehem.scinexus.Academic.AcademicRepository;
 import edu.bethlehem.scinexus.SecurityConfig.JwtService;
 import edu.bethlehem.scinexus.User.UserRepository;
-import edu.bethlehem.scinexus.Organization.Organization;
-import edu.bethlehem.scinexus.Organization.OrganizationRepository;
+
 import edu.bethlehem.scinexus.SecurityConfig.JwtService;
 import edu.bethlehem.scinexus.User.Role;
 import edu.bethlehem.scinexus.User.User;
@@ -23,8 +20,7 @@ import org.springframework.stereotype.Service;
 public class AuthenticationService {
 
         private final UserRepository userRepository;
-        private final AcademicRepository academicRepository;
-        private final OrganizationRepository organizationRepository;
+
         private final PasswordEncoder passwordEncoder;
         private final JwtService service;
 
@@ -34,7 +30,7 @@ public class AuthenticationService {
                 User user;
 
                 if (request.getRole() == Role.ACADEMIC) {
-                        user = (Academic) Academic.builder()
+                        user = User.builder()
                                         .firstName(request.getFirstName())
                                         .lastName(request.getLastName())
                                         .email(request.getEmail())
@@ -46,7 +42,7 @@ public class AuthenticationService {
                                         .build();
 
                 } else {
-                        user = Organization.builder()
+                        user = User.builder()
                                         .firstName(request.getFirstName())
                                         .lastName(request.getLastName())
                                         .username(request.getUsername())

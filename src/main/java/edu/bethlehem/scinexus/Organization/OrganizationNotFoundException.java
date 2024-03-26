@@ -9,6 +9,10 @@ public class OrganizationNotFoundException extends GeneralException {
     super("Organization With Id : " + id + ", Is Not Found", httpStatus);
   }
 
+  public OrganizationNotFoundException(long id) {
+    super("Organization With Id : " + id + ", Is Not Found", HttpStatus.NOT_FOUND);
+  }
+
   public OrganizationNotFoundException(String message, HttpStatus httpStatus) {
     super(message, httpStatus);
   }

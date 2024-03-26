@@ -61,14 +61,14 @@ public class UserService {
         return assembler.toModel(user);
     }
 
-    ResponseEntity<?> updateUserPartially(UserResponsDTO editUser, Long userId) {
+    ResponseEntity<?> updateUserPartially(UserRequestPatchDTO editUser, Long userId) {
         User user = repository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("The user with id:" + userId + " is not found",
                         HttpStatus.NOT_FOUND));
         // User Properties
 
         try {
-            for (Method method : UserResponsDTO.class.getMethods()) {
+            for (Method method : UserRequestDTO.class.getMethods()) {
                 if (method.getName().startsWith("get") && method.getParameterCount() == 0) {
                     Object value = method.invoke(editUser);
                     if (value != null) {

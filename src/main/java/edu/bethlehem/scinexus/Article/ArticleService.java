@@ -11,9 +11,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
-import edu.bethlehem.scinexus.Organization.Organization;
 import edu.bethlehem.scinexus.Organization.OrganizationNotFoundException;
-import edu.bethlehem.scinexus.Organization.OrganizationRepository;
 import edu.bethlehem.scinexus.Article.Article;
 import edu.bethlehem.scinexus.Article.ArticleNotFoundException;
 import edu.bethlehem.scinexus.Article.ArticleRepository;
@@ -33,7 +31,6 @@ public class ArticleService {
     private final JwtService jwtService;
     private final UserRepository userRepository;
     private final ArticleRepository articleRepository;
-    private final OrganizationRepository organizationRepository;
     private final ArticleModelAssembler assembler;
 
     public Article convertArticleDtoToArticleEntity(Authentication authentication,

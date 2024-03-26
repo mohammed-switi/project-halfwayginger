@@ -1,18 +1,15 @@
 package edu.bethlehem.scinexus.DatabaseLoading;
 
-import edu.bethlehem.scinexus.Academic.Academic;
-import edu.bethlehem.scinexus.Academic.AcademicRepository;
-import edu.bethlehem.scinexus.Academic.Position;
 import edu.bethlehem.scinexus.Article.Article;
 import edu.bethlehem.scinexus.Article.ArticleRepository;
-import edu.bethlehem.scinexus.Journal.Journal;
+
 import edu.bethlehem.scinexus.User.UserRepository;
-import edu.bethlehem.scinexus.Organization.Organization;
-import edu.bethlehem.scinexus.Organization.OrganizationRepository;
-import edu.bethlehem.scinexus.Organization.OrganizationType;
+
 import edu.bethlehem.scinexus.ResearchPaper.ResearchLanguage;
 import edu.bethlehem.scinexus.ResearchPaper.ResearchPaper;
 import edu.bethlehem.scinexus.ResearchPaper.ResearchPaperRepository;
+import edu.bethlehem.scinexus.User.OrganizationType;
+import edu.bethlehem.scinexus.User.Position;
 import edu.bethlehem.scinexus.User.Role;
 import edu.bethlehem.scinexus.User.User;
 import lombok.RequiredArgsConstructor;
@@ -27,11 +24,11 @@ import java.util.*;
 public class DataLoader implements CommandLineRunner {
 
     private final UserRepository userRepository;
-    private final AcademicRepository academicRepository;
+
     private final ArticleRepository articleRepository;
 
     private final ResearchPaperRepository researchPaperRepository;
-    private final OrganizationRepository organizationRepository;
+
     private final RandomDataGenerator dataGenerator;
     private final PasswordEncoder passwordEncoder;
 
@@ -55,6 +52,7 @@ public class DataLoader implements CommandLineRunner {
         user.setPassword(passwordEncoder.encode("Mohammed1234!"));
         user.setPhoneNumber("123.456.7890");
         user.setRole(Role.ORGANIZATION);
+        user.setType(OrganizationType.BUSINESS);
 
         user = userRepository.save(user);
         Article article = new Article(dataGenerator.generateRandomUniversityName(),
@@ -110,6 +108,7 @@ public class DataLoader implements CommandLineRunner {
             Role role = dataGenerator.generateRandomRole(); // Assuming role is constant for all users
             if (role == Role.ACADEMIC) {
                 User academic = new User();
+                academic.setRole(Role.ACADEMIC);
                 academic.setFirstName(firstName);
                 academic.setLastName(lastName);
                 academic.setUsername(username);
@@ -118,16 +117,16 @@ public class DataLoader implements CommandLineRunner {
                 academic.setBio(bio);
                 academic.setPhoneNumber(phoneNumber);
                 academic.setFieldOfWork(fieldOfWork);
-                academic.setRole(role);
-                // academic.setPosition(Position.PROFESSOR);
-                // academic.setEducation(bio);
-                // academic.setBadge(bio);
+                academic.setPosition(Position.PROFESSOR);
+                academic.setEducation(bio);
+                academic.setBadge(bio);
                 users.add(academic);
             }
 
             else {
 
                 User organization = new User();
+                organization.setRole(Role.ORGANIZATION);
                 organization.setFirstName(firstName);
                 organization.setLastName(lastName);
                 organization.setUsername(username);
@@ -136,10 +135,9 @@ public class DataLoader implements CommandLineRunner {
                 organization.setBio(bio);
                 organization.setPhoneNumber(phoneNumber);
                 organization.setFieldOfWork(fieldOfWork);
-                organization.setRole(role);
 
-                // organization.setType(OrganizationType.BUSINESS);
-                // organization.setVerified(true);
+                organization.setType(OrganizationType.BUSINESS);
+                organization.setVerified(true);
 
                 users.add(organization);
             }

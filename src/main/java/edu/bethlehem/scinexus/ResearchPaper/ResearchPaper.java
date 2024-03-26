@@ -9,9 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.Builder.Default;
 import lombok.experimental.SuperBuilder;
-import edu.bethlehem.scinexus.Academic.Academic;
 import edu.bethlehem.scinexus.Journal.Journal;
-import edu.bethlehem.scinexus.Organization.Organization;
 import edu.bethlehem.scinexus.User.User;
 
 import java.util.List;
@@ -49,11 +47,11 @@ public class ResearchPaper extends Journal {
     @ManyToMany
     @JoinTable(name = "research_paper_access_request_academics", joinColumns = @JoinColumn(name = "requestsForAccess"), inverseJoinColumns = @JoinColumn(name = "requestsResearchPapers"))
     @JdbcTypeCode(SqlTypes.JSON)
-    private List<Academic> requestsForAccess;
+    private List<User> requestsForAccess;
 
     @ManyToMany
     @JoinTable(name = "research_paper_validated_by_organization", joinColumns = @JoinColumn(name = "validated"), inverseJoinColumns = @JoinColumn(name = "validated_research_papers"))
-    private List<Organization> validatedBy;
+    private List<User> validatedBy;
 
     public ResearchPaper(String title, String content, String description, String subject, User publisher) {
         super(content, publisher);

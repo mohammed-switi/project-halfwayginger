@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import java.security.SecureRandom;
 
 import java.util.Locale;
+import java.util.Random;
 
 @Component
 public class RandomDataGenerator {
@@ -90,7 +91,9 @@ public class RandomDataGenerator {
     }
 
     public Role generateRandomRole() {
-        if (secureRandom.nextBoolean() == false) {
+        Random random = new Random();
+
+        if (random.nextInt(2) == 1) {
             return Role.ACADEMIC;
         } else {
             return Role.ORGANIZATION;

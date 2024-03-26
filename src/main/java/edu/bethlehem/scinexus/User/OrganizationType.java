@@ -1,4 +1,4 @@
-package edu.bethlehem.scinexus.Organization;
+package edu.bethlehem.scinexus.User;
 
 public enum OrganizationType {
     BUSINESS,

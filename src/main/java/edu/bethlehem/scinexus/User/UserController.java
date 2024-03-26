@@ -42,7 +42,7 @@ public class UserController {
 
     @PatchMapping("/{id}")
     public ResponseEntity<?> updateUserPartially(@PathVariable(value = "id") Long userId,
-            @RequestBody UserResponsDTO newUser) throws UserNotFoundException {
+            @RequestBody UserRequestPatchDTO newUser) throws UserNotFoundException {
         return service.updateUserPartially(newUser, userId);
     }
 

@@ -15,11 +15,11 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import edu.bethlehem.scinexus.SecurityConfig.UserDetailsImpl;
-import edu.bethlehem.scinexus.Academic.Academic;
+import edu.bethlehem.scinexus.Conditional.Conditional;
 import edu.bethlehem.scinexus.Journal.Journal;
 import edu.bethlehem.scinexus.Media.Media;
 import edu.bethlehem.scinexus.Notification.Notification;
-import edu.bethlehem.scinexus.Organization.Organization;
+import edu.bethlehem.scinexus.ResearchPaper.ResearchPaper;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -39,14 +39,16 @@ import java.util.Set;
 // @Table(name = "_user")
 
 @Data
-@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 @JsonSerialize
 @Builder
-@DiscriminatorColumn(name = "user_role", discriminatorType = DiscriminatorType.STRING)
+@Conditional(selected = "role", values = { "ACADEMIC" }, required = {
+        "education", "badge", "position" })
+@Conditional(selected = "role", values = { "ORGANIATION" }, required = {
+        "type" })
 public class User implements UserDetailsImpl {
 
     @Id
@@ -123,7 +125,7 @@ public class User implements UserDetailsImpl {
 
     @NotNull
     @Enumerated(EnumType.STRING)
-    @Column(insertable = false, updatable = false)
+
     private Role role;
 
     @OneToMany(fetch = FetchType.EAGER)
@@ -149,6 +151,36 @@ public class User implements UserDetailsImpl {
     @JdbcTypeCode(SqlTypes.JSON)
     @JsonIgnore
     private List<User> links;
+
+    // Academic Specific Fields
+    private String badge;
+
+    private String education;
+
+    @Enumerated(EnumType.STRING)
+    private Position position;
+
+    @OneToOne
+    @JdbcTypeCode(SqlTypes.JSON)
+    @JoinColumn(name = "id")
+    @Nullable
+    private User organization;
+
+    @ManyToMany(mappedBy = "requestsForAccess")
+    List<ResearchPaper> requestsResearchPapers;
+
+    // Organization Specific Fields
+    @Enumerated(EnumType.STRING)
+    // @NotBlank(message = "The Organization Type Must Be Determined")
+    // @NotNull(message = "The Organization Type Must Be Determined")
+    private OrganizationType type;
+
+    // @NotBlank(message = "You should Specify if Verified Or Not")
+    // @NotNull(message = "You should Specify if Verified Or Not")
+    private Boolean verified;
+
+    @ManyToMany(mappedBy = "validatedBy")
+    List<ResearchPaper> validated;
 
     public User(String firstName, String username, String password, String email) {
         this.firstName = firstName;
@@ -204,34 +236,4 @@ public class User implements UserDetailsImpl {
         return id;
     }
 
-    public Academic toAcademic() {
-        Academic academic = new Academic();
-        academic.setId(id);
-        academic.setFirstName(firstName);
-        academic.setLastName(lastName);
-        academic.setUsername(username);
-        academic.setEmail(email);
-        academic.setPassword(password);
-        academic.setBio(bio);
-        academic.setPhoneNumber(phoneNumber);
-        academic.setFieldOfWork(fieldOfWork);
-        academic.setRole(role);
-        return academic;
-    }
-
-    public Organization toOrganization() {
-        Organization organization = new Organization();
-        organization.setId(id);
-        organization.setFirstName(firstName);
-        organization.setLastName(lastName);
-        organization.setUsername(username);
-        organization.setEmail(email);
-        organization.setPassword(password);
-        organization.setBio(bio);
-        organization.setPhoneNumber(phoneNumber);
-        organization.setFieldOfWork(fieldOfWork);
-        organization.setRole(role);
-        return organization;
-
-    }
 }

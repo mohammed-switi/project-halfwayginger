@@ -2,6 +2,7 @@ package edu.bethlehem.scinexus.User;
 
 import com.fasterxml.jackson.databind.util.JSONPObject;
 
+import edu.bethlehem.scinexus.Conditional.Conditional;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotBlank;
@@ -13,7 +14,11 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserResponsDTO {
+@Conditional(selected = "role", values = { "ACADEMIC" }, required = {
+        "education", "badge", "position" })
+@Conditional(selected = "role", values = { "ORGANIATION" }, required = {
+        "type" })
+public class UserRequestDTO {
 
     @NotBlank(message = "The First Name Shouldn't Be Empty")
     private String firstName;

@@ -2,13 +2,12 @@ package edu.bethlehem.scinexus.Post;
 
 import edu.bethlehem.scinexus.Auth.UserNotAuthorizedException;
 import edu.bethlehem.scinexus.Journal.Visibility;
-import edu.bethlehem.scinexus.Organization.Organization;
 import edu.bethlehem.scinexus.User.UserService;
 import edu.bethlehem.scinexus.SecurityConfig.JwtService;
 import edu.bethlehem.scinexus.User.User;
 import edu.bethlehem.scinexus.User.UserNotFoundException;
 import edu.bethlehem.scinexus.User.UserRepository;
-import edu.bethlehem.scinexus.User.UserResponsDTO;
+import edu.bethlehem.scinexus.User.UserRequestDTO;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.EntityModel;

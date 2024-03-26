@@ -14,9 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
-import edu.bethlehem.scinexus.Organization.Organization;
 import edu.bethlehem.scinexus.Organization.OrganizationNotFoundException;
-import edu.bethlehem.scinexus.Organization.OrganizationRepository;
 import edu.bethlehem.scinexus.ResearchPaper.ResearchPaper;
 import edu.bethlehem.scinexus.ResearchPaper.ResearchPaperNotFoundException;
 import edu.bethlehem.scinexus.ResearchPaper.ResearchPaperRequestPatchDTO;
@@ -25,7 +23,7 @@ import edu.bethlehem.scinexus.SecurityConfig.JwtService;
 import edu.bethlehem.scinexus.User.User;
 import edu.bethlehem.scinexus.User.UserNotFoundException;
 import edu.bethlehem.scinexus.User.UserRepository;
-import edu.bethlehem.scinexus.User.UserResponsDTO;
+import edu.bethlehem.scinexus.User.UserRequestDTO;
 
 @Service
 @RequiredArgsConstructor
@@ -34,9 +32,8 @@ public class ResearchPaperService {
     @PersistenceContext
     private EntityManager entityManager;
     private final JwtService jwtService;
-    private final UserRepository userRepository;
     private final ResearchPaperRepository researchPaperRepository;
-    private final OrganizationRepository organizationRepository;
+    private final UserRepository userRepository;
     private final ResearchPaperModelAssembler assembler;
 
     public ResearchPaper convertResearchPaperDtoToResearchPaperEntity(Authentication authentication,
@@ -145,12 +142,12 @@ public class ResearchPaperService {
         ResearchPaper researchPaper = researchPaperRepository.findById(researchPaperId)
                 .orElseThrow(
                         () -> new ResearchPaperNotFoundException(researchPaperId, HttpStatus.UNPROCESSABLE_ENTITY));
-        Organization organization = organizationRepository.findById(jwtService.extractId(authentication))
+        User organization = userRepository.findById(jwtService.extractId(authentication))
                 .orElseThrow(() -> new OrganizationNotFoundException("Organization Not Found", HttpStatus.NOT_FOUND));
         researchPaper.getValidatedBy().add(organization);
         organization.getValidated().add(researchPaper);
 
-        organizationRepository.save(organization);
+        userRepository.save(organization);
         return assembler.toModel(researchPaperRepository.save(researchPaper));
     }
 
