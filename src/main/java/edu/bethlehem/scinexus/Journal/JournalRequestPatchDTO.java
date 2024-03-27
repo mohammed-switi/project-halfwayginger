@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class JournalPatchDTO {
+public class JournalRequestPatchDTO {
 
     @NotBlank(message = "The Journal Content Shouldn't Be Empty")
     private String content;

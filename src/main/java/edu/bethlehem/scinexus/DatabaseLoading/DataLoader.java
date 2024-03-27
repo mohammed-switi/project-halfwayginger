@@ -34,12 +34,17 @@ public class DataLoader implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
+        long startTime = System.currentTimeMillis();
+
         generateUser();
-        generateRandomUsers(2);
+        generateRandomUsers(10);
         generateLinks();
         generateResearchPapers();
         generateArticles();
 
+        long endTime = System.currentTimeMillis();
+        long totalTime = endTime - startTime;
+        System.out.println("Total execution time: " + totalTime + " milliseconds");
     }
 
     private void generateUser() {
@@ -142,21 +147,6 @@ public class DataLoader implements CommandLineRunner {
                 users.add(organization);
             }
             users = userRepository.saveAll(users);
-            // for (User user : users) {
-            // if (user.getRole() == Role.ACADEMIC) {
-            // Academic academic = user.toAcademic();
-
-            // academic.setPosition(Position.PROFESSOR);
-            // academic.setEducation(dataGenerator.generateRandomWords());
-            // academic.setBadge(dataGenerator.generateRandomWords());
-            // academicRepository.save(academic);
-            // } else {
-            // Organization organization = user.toOrganization();
-            // organization.setType(OrganizationType.BUSINESS);
-            // organization.setVerified(true);
-            // organizationRepository.save(organization);
-            // }
-            // }
 
         }
     }
@@ -172,6 +162,7 @@ public class DataLoader implements CommandLineRunner {
 
     private void generateArticles() {
         List<User> users = userRepository.findAll();
+        List<Article> articles = new ArrayList<>();
         Random random = new Random();
         for (User user : users) {
             for (int i = 0; i < 2; i++) {
@@ -181,18 +172,20 @@ public class DataLoader implements CommandLineRunner {
                 article.setInteractionCount(random.nextInt(1000));
                 article.setOpinionCount(random.nextInt(1000));
                 article.setVisibility(dataGenerator.generateRandomVisibility());
-                article = articleRepository.save(article);
 
                 user.addJournal(article);
-                userRepository.save(user);
+                articles.add(article);
 
             }
+            userRepository.saveAll(users);
+            articleRepository.saveAll(articles);
         }
 
     }
 
     private void generateResearchPapers() {
         List<User> users = userRepository.findAll();
+        List<ResearchPaper> researchPapers = new ArrayList<>();
         Random random = new Random();
         for (User user : users) {
             for (int i = 0; i < 2; i++) {
@@ -207,11 +200,13 @@ public class DataLoader implements CommandLineRunner {
                 researchPaper.setOpinionCount(random.nextInt(1000));
                 researchPaper.setVisibility(dataGenerator.generateRandomVisibility());
                 researchPaper.setDescription(dataGenerator.generateRandomWords());
-                researchPaper = researchPaperRepository.save(researchPaper);
                 user.addJournal(researchPaper);
-                userRepository.save(user);
+                researchPapers.add(researchPaper);
             }
         }
+
+        userRepository.saveAll(users);
+        researchPaperRepository.saveAll(researchPapers);
 
     }
 }

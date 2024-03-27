@@ -29,22 +29,18 @@ public class JournalController {
     private final JournalModelAssembler assembler;
     private final UserRepository userRepository;
     private final InteractionRepository interactionRepository;
+    private final JournalService service;
 
     @GetMapping("/{journalId}")
     EntityModel<Journal> one(@PathVariable Long journalId) {
 
-        Journal journal = repository.findById(journalId)
-                .orElseThrow(() -> new JournalNotFoundException(journalId, HttpStatus.NOT_FOUND));
-
-        return assembler.toModel(journal);
+        return service.findJournalById(journalId);
     }
 
     @GetMapping()
     CollectionModel<EntityModel<Journal>> all() {
-        List<EntityModel<Journal>> journals = repository.findAll().stream().map(journal -> assembler.toModel(journal))
-                .collect(Collectors.toList());
 
-        return CollectionModel.of(journals, linkTo(methodOn(JournalController.class).all()).withSelfRel());
+        return service.findAllJournals();
     }
 
     @PostMapping("/{journalId}/contributors/{contributorId}")
@@ -52,47 +48,14 @@ public class JournalController {
             @PathVariable(value = "journalId") Long journalId,
             @PathVariable Long contributorId) {
 
-        User contributorUser = userRepository.findById(contributorId)
-                .orElseThrow(() -> new UserNotFoundException("User is not found with id: " + contributorId,
-                        HttpStatus.NOT_FOUND));
-        Journal journal = repository.findById(
-                journalId)
-                .orElseThrow(() -> new JournalNotFoundException(journalId, HttpStatus.NOT_FOUND));
-
-        if (journal.getContributors().stream().anyMatch(u -> u.getId() == contributorId)) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("The user is already a contributor");
-        }
-
-        journal.getContributors().add(contributorUser);
-        repository.save(journal);
-
-        contributorUser.getContributs().add(journal);
-        userRepository.save(contributorUser);
-
-        EntityModel<Journal> entityModel = assembler.toModel(journal);
-        return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
+        return service.addContributor(journalId, contributorId);
     }
 
     @DeleteMapping("/{journalId}/contributors/{contributorId}")
     public ResponseEntity<?> removeContributor(@PathVariable(value = "journalId") Long journalId,
             @PathVariable Long contributorId) {
 
-        Journal journal = repository.findById(
-                journalId)
-                .orElseThrow(() -> new JournalNotFoundException(journalId, HttpStatus.NOT_FOUND));
-
-        User contributor = userRepository.findById(contributorId)
-                .orElseThrow(() -> new UserNotFoundException("Contributor is not found with id: " + contributorId,
-                        HttpStatus.NOT_FOUND));
-        if (journal.getContributors().stream().anyMatch(u -> u.getId() == contributorId)) {
-            contributor.getContributs().remove(journal);
-            journal.getContributors().remove(contributor);
-        } else {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("The user is already not a contributor");
-        }
-        userRepository.save(contributor);
-        EntityModel<Journal> entityModel = assembler.toModel(repository.save(journal));
-        return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
+        return service.removeContributor(journalId, contributorId);
     }
 
 }
