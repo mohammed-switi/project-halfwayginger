@@ -2,12 +2,11 @@ package edu.bethlehem.scinexus.SecurityConfig;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import jakarta.servlet.Filter;
 import lombok.RequiredArgsConstructor;
 
 import java.util.function.Supplier;
 
-import org.json.HTTP;
+import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -16,16 +15,20 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authorization.AuthorizationDecision;
 import org.springframework.security.authorization.AuthorizationManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.intercept.RequestAuthorizationContext;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import edu.bethlehem.scinexus.Article.Article;
 import edu.bethlehem.scinexus.Journal.Journal;
 import edu.bethlehem.scinexus.Journal.JournalNotFoundException;
 import edu.bethlehem.scinexus.Journal.JournalRepository;
@@ -69,14 +72,21 @@ public class SecurityConfig {
                                 .sessionManagement(sessionConfigurer -> sessionConfigurer
                                                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                                 .authenticationProvider(authenticationProvider)
+                                .formLogin(Customizer.withDefaults())
                                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
-                // .exceptionHandling(httpSecurityExceptionHandlingConfigurer -> {
-                // httpSecurityExceptionHandlingConfigurer.authenticationEntryPoint(new
-                // JwtAuthenticationEntryPoint());
-                // });
 
                 return httpSecurity.build();
         }
+
+
+//        @Bean
+//        public InMemoryUserDetailsManager userDetailsManager(){
+//                InMemoryUserDetailsManager inMemoryUserDetailsManager=new InMemoryUserDetailsManager();
+//                UserDetails admin= org.springframework.security.core.userdetails.User.withUsername("admin").password("1234").authorities("admin").build();
+//                inMemoryUserDetailsManager.createUser(admin);
+//                return inMemoryUserDetailsManager;
+//        }
+
 
         AuthorizationManager<RequestAuthorizationContext> readJournals() {
                 return new AuthorizationManager<RequestAuthorizationContext>() {
