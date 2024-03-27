@@ -117,7 +117,7 @@ public class InteractionService {
 
                 interaction = interactionRepository.save(interaction);
 
-                opinion.addInteraction(interaction);
+                opinion.addInteraction();
 
                 opinionRepository.save(opinion);
                 EntityModel<Interaction> entityModel = assembler.toModel(interaction);
@@ -148,7 +148,7 @@ public class InteractionService {
 
                 interaction = interactionRepository.save(interaction);
 
-                journal.addInteraction(interaction);
+                // journal.addInteraction(interaction);
 
                 journalRepository.save(journal);
                 EntityModel<Interaction> entityModel = assembler.toModel(interaction);
@@ -162,14 +162,11 @@ public class InteractionService {
                                 .orElseThrow(
                                                 () -> new InteractionNotFoundException(interactionId,
                                                                 HttpStatus.UNPROCESSABLE_ENTITY));
+
                 if (interaction.getJournal() != null)
-                        interaction.getJournal().removeInteraction(interaction);
+                        interaction.getJournal().removeInteraction();
                 if (interaction.getOpinion() != null)
-                        interaction.getOpinion().removeInteraction(interaction);
-
-                journalRepository.save(interaction.getJournal());
-                opinionRepository.save(interaction.getOpinion());
-
+                        interaction.getOpinion().removeInteraction();
                 interactionRepository.delete(interaction);
         }
 

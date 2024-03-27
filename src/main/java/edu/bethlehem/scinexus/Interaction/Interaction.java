@@ -18,8 +18,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Builder
 @AllArgsConstructor
 public class Interaction {
+
     private @Id @GeneratedValue Long id;
-    private Long interactionId;
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Enumerated(EnumType.STRING)
@@ -39,10 +39,25 @@ public class Interaction {
     @JoinColumn(name = "user")
     private User interactorUser;
 
+    // This constructor Should be removed
     public Interaction(InteractionType type, User interactorUser) {
 
         this.type = type;
         this.interactorUser = interactorUser;
+    }
+
+    public Interaction(InteractionType type, User interactorUser, Journal journal) {
+
+        this.type = type;
+        this.interactorUser = interactorUser;
+        this.journal = journal;
+    }
+
+    public Interaction(InteractionType type, User interactorUser, Opinion opinion) {
+
+        this.type = type;
+        this.interactorUser = interactorUser;
+        this.opinion = opinion;
     }
 
     public Interaction() {

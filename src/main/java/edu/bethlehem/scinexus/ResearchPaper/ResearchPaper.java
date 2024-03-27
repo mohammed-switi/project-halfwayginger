@@ -22,6 +22,7 @@ import org.hibernate.type.SqlTypes;
 @NoArgsConstructor
 @SuperBuilder
 @EqualsAndHashCode(callSuper = false)
+@DiscriminatorValue("research_paper")
 public class ResearchPaper extends Journal {
     private @Id @GeneratedValue Long id;
 

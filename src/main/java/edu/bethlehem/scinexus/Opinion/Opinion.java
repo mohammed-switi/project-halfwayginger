@@ -10,7 +10,7 @@ import org.hibernate.type.SqlTypes;
 
 import edu.bethlehem.scinexus.Interaction.Interaction;
 import edu.bethlehem.scinexus.Journal.Journal;
-
+import edu.bethlehem.scinexus.User.User;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -42,48 +42,48 @@ public class Opinion {
     @JsonManagedReference
     private Journal journal;
 
-    @NotNull(message = "Opinion Creation Date Can't be Null")
-    private Date createdAt;
-
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "reOpinion")
+    @JoinColumn(name = "papaOpinion")
     @JdbcTypeCode(SqlTypes.JSON)
-    private Opinion reOpinion;
+    private Opinion papaOpinion;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "id", cascade = CascadeType.ALL)
-    @JsonIgnore
-    private List<Opinion> opinions;
+    // @OneToMany(fetch = FetchType.LAZY, mappedBy = "id", cascade =
+    // CascadeType.ALL)
+    // @JsonIgnore
+    // private List<Opinion> opinions;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "opinion")
     private List<Interaction> interactions;
 
-    public Opinion(String content) {
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "opinionOwner")
+    private User opinionOwner;
+
+    public Opinion(String content, Journal journal, User opinionOwner) {
         this.interactionsCount = 0;
         this.opinionsCount = 0;
         this.content = content;
+        this.journal = journal;
+        this.opinionOwner = opinionOwner;
     }
 
     public Opinion() {
     }
 
-    public void removeInteraction(Interaction interaction) {
-        this.interactions.remove(interaction);
+    public void removeInteraction() {
         interactionsCount--;
     }
 
-    public void addInteraction(Interaction interaction) {
-        this.interactions.add(interaction);
+    public void addInteraction() {
         interactionsCount++;
     }
 
-    public void removeOpinion(Opinion opinion) {
-        this.opinions.remove(opinion);
+    public void removeOpinion() {
         opinionsCount--;
     }
 
-    public void addOpinion(Opinion opinion) {
-        this.opinions.add(opinion);
+    public void addOpinion() {
         opinionsCount++;
     }
 }
