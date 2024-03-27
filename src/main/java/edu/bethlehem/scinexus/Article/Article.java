@@ -14,6 +14,7 @@ import lombok.experimental.SuperBuilder;
 @Entity
 @SuperBuilder
 @EqualsAndHashCode(callSuper = false)
+@DiscriminatorValue("article")
 public class Article extends Journal {
 
     private @Id @GeneratedValue Long id;

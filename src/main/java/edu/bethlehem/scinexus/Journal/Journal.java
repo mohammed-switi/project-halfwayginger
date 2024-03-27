@@ -10,8 +10,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.Builder.Default;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -33,19 +35,18 @@ import edu.bethlehem.scinexus.User.User;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Inheritance(strategy = InheritanceType.JOINED)
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "journal_type")
 public class Journal implements Serializable {
 
     @GeneratedValue(strategy = GenerationType.AUTO)
     private @Id Long id;
 
-    // to be moved to researchpaper
+    @Min(value = 0)
+    private Integer interactionsCount = 0;
 
     @Min(value = 0)
-    private Integer interactionCount = 0;
-
-    @Min(value = 0)
-    private Integer opinionCount = 0;
+    private Integer opinionsCount = 0;
 
     @NotNull(message = "The Journal Content Shouldn't Be Null")
     @NotBlank(message = "The Journal Content Shouldn't Be Empty")
@@ -58,18 +59,18 @@ public class Journal implements Serializable {
     private Visibility visibility;
 
     // @NotNull(message = "The Journal Publisher Shouldn't Be Null")
-    @ManyToOne(fetch = FetchType.LAZY) // Fetch Type Has been changed From Lazy To Eager,
-                                       // Because I get an error when I
+    @ManyToOne(fetch = FetchType.EAGER) // Fetch Type Has been changed From Lazy To Eager,
+    // Because I get an error when I
     // request one Journal
-    @JoinColumn(name = "publisher")
+    @JoinColumn(name = "publisher", nullable = false, updatable = false)
     @JdbcTypeCode(SqlTypes.JSON)
     @JsonManagedReference
     private User publisher;
 
-    @OneToMany(fetch = FetchType.EAGER)
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "journal")
     @JdbcTypeCode(SqlTypes.JSON)
-    private List<Interaction> interactions;
+    private Set<Interaction> interactions;
 
     @OneToMany(fetch = FetchType.EAGER)
     @JoinColumn(name = "journal")
@@ -87,19 +88,37 @@ public class Journal implements Serializable {
     @JdbcTypeCode(SqlTypes.JSON)
     private Journal reShare;
 
-    @ManyToMany(mappedBy = "contributs", fetch = FetchType.LAZY)
+    @ManyToMany(mappedBy = "contributs", fetch = FetchType.EAGER)
     @JdbcTypeCode(SqlTypes.JSON)
     // @JsonIgnore
-    private Set<User> contributors = new HashSet<User>();
+    private Set<User> contributors;
 
     public void setPublisher(User publisher) {
         this.publisher = publisher;
     }
 
     public Journal(String content, User publisher) {
+        this.interactionsCount = 0;
+        this.opinionsCount = 0;
         this.publisher = publisher;
         this.content = content;
 
+    }
+
+    public void removeInteraction() {
+        interactionsCount--;
+    }
+
+    public void addInteraction() {
+        interactionsCount++;
+    }
+
+    public void removeOpinion() {
+        opinionsCount--;
+    }
+
+    public void addOpinion() {
+        opinionsCount++;
     }
 
 }

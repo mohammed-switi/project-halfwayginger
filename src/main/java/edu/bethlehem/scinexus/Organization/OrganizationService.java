@@ -15,6 +15,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import edu.bethlehem.scinexus.SecurityConfig.JwtService;
+import edu.bethlehem.scinexus.User.Role;
 import edu.bethlehem.scinexus.User.User;
 import edu.bethlehem.scinexus.User.UserNotFoundException;
 import edu.bethlehem.scinexus.User.UserRepository;
@@ -37,30 +38,30 @@ public class OrganizationService {
 
     }
 
-    public EntityModel<User> findOrganizationById(Long academicId) {
+    public EntityModel<User> findOrganizationById(Long organizationId) {
 
-        User academic = userRepository.findById(academicId)
-                .orElseThrow(() -> new OrganizationNotFoundException(academicId));
+        User organization = userRepository.findByIdAndRole(organizationId, Role.ORGANIZATION)
+                .orElseThrow(() -> new OrganizationNotFoundException(organizationId));
 
-        return assembler.toModel(academic);
+        return assembler.toModel(organization);
     }
 
-    // We Should Specify An Admin Authority To get All Academics
+    // We Should Specify An Admin Authority To get All organizations
     public CollectionModel<EntityModel<User>> findAllOrganizations() {
 
-        List<EntityModel<User>> academics = userRepository.findAll().stream()
-                .map(academic -> assembler.toModel(academic))
+        List<EntityModel<User>> organizations = userRepository.findAllByRole(Role.ORGANIZATION).stream()
+                .map(organization -> assembler.toModel(organization))
                 .collect(Collectors.toList());
 
-        return CollectionModel.of(academics, linkTo(methodOn(OrganizationController.class).all()).withSelfRel());
+        return CollectionModel.of(organizations, linkTo(methodOn(OrganizationController.class).all()).withSelfRel());
 
     }
 
-    public EntityModel<User> updateOrganization(Long academicId,
+    public EntityModel<User> updateOrganization(Long organizationId,
             OrganizationRequestDTO newOrganizationRequestDTO) {
 
-        User academic = userRepository.findById(academicId)
-                .orElseThrow(() -> new OrganizationNotFoundException(academicId));
+        User organization = userRepository.findById(organizationId)
+                .orElseThrow(() -> new OrganizationNotFoundException(organizationId));
 
         try {
             for (Method method : OrganizationRequestDTO.class.getMethods()) {
@@ -69,21 +70,21 @@ public class OrganizationService {
 
                     String propertyName = method.getName().substring(3); // remove "get"
                     Method setter = User.class.getMethod("set" + propertyName, method.getReturnType());
-                    setter.invoke(academic, value);
+                    setter.invoke(organization, value);
 
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return assembler.toModel(userRepository.save(academic));
+        return assembler.toModel(userRepository.save(organization));
     }
 
-    public EntityModel<User> updateOrganizationPartially(Long academicId,
+    public EntityModel<User> updateOrganizationPartially(Long organizationId,
             OrganizationRequestPatchDTO newOrganizationRequestDTO) {
 
-        User academic = userRepository.findById(academicId)
-                .orElseThrow(() -> new OrganizationNotFoundException(academicId, HttpStatus.UNPROCESSABLE_ENTITY));
+        User organization = userRepository.findById(organizationId)
+                .orElseThrow(() -> new OrganizationNotFoundException(organizationId, HttpStatus.UNPROCESSABLE_ENTITY));
 
         try {
             for (Method method : OrganizationRequestPatchDTO.class.getMethods()) {
@@ -92,7 +93,7 @@ public class OrganizationService {
                     if (value != null) {
                         String propertyName = method.getName().substring(3); // remove "get"
                         Method setter = User.class.getMethod("set" + propertyName, method.getReturnType());
-                        setter.invoke(academic, value);
+                        setter.invoke(organization, value);
                     }
                 }
             }
@@ -100,14 +101,14 @@ public class OrganizationService {
             e.printStackTrace();
         }
 
-        return assembler.toModel(userRepository.save(academic));
+        return assembler.toModel(userRepository.save(organization));
 
     }
 
-    public void deleteOrganization(Long academicId) {
-        User academic = userRepository.findById(academicId)
-                .orElseThrow(() -> new OrganizationNotFoundException(academicId, HttpStatus.NOT_FOUND));
-        userRepository.delete(academic);
+    public void deleteOrganization(Long organizationId) {
+        User organization = userRepository.findById(organizationId)
+                .orElseThrow(() -> new OrganizationNotFoundException(organizationId, HttpStatus.NOT_FOUND));
+        userRepository.delete(organization);
     }
 
 }

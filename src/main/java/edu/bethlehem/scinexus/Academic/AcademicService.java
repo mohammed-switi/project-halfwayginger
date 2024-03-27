@@ -17,7 +17,9 @@ import org.springframework.stereotype.Service;
 import edu.bethlehem.scinexus.Academic.AcademicNotFoundException;
 import edu.bethlehem.scinexus.Academic.AcademicRequestDTO;
 import edu.bethlehem.scinexus.Academic.AcademicRequestPatchDTO;
+import edu.bethlehem.scinexus.Organization.OrganizationNotFoundException;
 import edu.bethlehem.scinexus.SecurityConfig.JwtService;
+import edu.bethlehem.scinexus.User.Role;
 import edu.bethlehem.scinexus.User.User;
 import edu.bethlehem.scinexus.User.UserNotFoundException;
 import edu.bethlehem.scinexus.User.UserRepository;
@@ -32,15 +34,6 @@ public class AcademicService {
     private final JwtService jwtService;
     private final UserService userService;
 
-    public User convertAcademicDtoToAcademicEntity(Authentication authentication,
-            AcademicRequestDTO academicRequestDTO) {
-
-        return User.builder()
-                .education(academicRequestDTO.getEducation())
-
-                .build();
-    }
-
     public User getUserById(long id) {
 
         return userRepository.findById(id)
@@ -50,7 +43,7 @@ public class AcademicService {
 
     public EntityModel<User> findAcademicById(Long academicId) {
 
-        User academic = userRepository.findById(academicId)
+        User academic = userRepository.findByIdAndRole(academicId, Role.ACADEMIC)
                 .orElseThrow(() -> new AcademicNotFoundException(academicId));
 
         return assembler.toModel(academic);
@@ -59,7 +52,7 @@ public class AcademicService {
     // We Should Specify An Admin Authority To get All Academics
     public CollectionModel<EntityModel<User>> findAllAcademics() {
 
-        List<EntityModel<User>> academics = userRepository.findAll().stream()
+        List<EntityModel<User>> academics = userRepository.findAllByRole(Role.ACADEMIC).stream()
                 .map(academic -> assembler.toModel(academic))
                 .collect(Collectors.toList());
 

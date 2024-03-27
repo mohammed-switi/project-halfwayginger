@@ -2,6 +2,7 @@ package edu.bethlehem.scinexus.DatabaseLoading;
 
 import com.github.javafaker.Faker;
 
+import edu.bethlehem.scinexus.Interaction.InteractionType;
 import edu.bethlehem.scinexus.Journal.Visibility;
 import edu.bethlehem.scinexus.User.Role;
 
@@ -98,6 +99,13 @@ public class RandomDataGenerator {
         } else {
             return Role.ORGANIZATION;
         }
+
+    }
+
+    public InteractionType generateRandomInteractionType() {
+        Random random = new Random();
+        int randomIndex = random.nextInt(InteractionType.values().length);
+        return InteractionType.values()[randomIndex];
 
     }
 

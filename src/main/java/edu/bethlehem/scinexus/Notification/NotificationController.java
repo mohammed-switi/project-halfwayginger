@@ -9,81 +9,52 @@ import org.springframework.http.*;
 import org.springframework.hateoas.*;
 import org.springframework.web.bind.annotation.*;
 
+import lombok.RequiredArgsConstructor;
+
 @RestController
+@RequiredArgsConstructor
+@RequestMapping("/notifications")
+
 public class NotificationController {
 
   private final NotificationRepository repository;
   private final NotificationModelAssembler assembler;
+  private final NotificationService service;
 
-  NotificationController(NotificationRepository repository, NotificationModelAssembler assembler) {
-    this.repository = repository;
-    this.assembler = assembler;
-  }
-
-  @GetMapping("/notifications/{notificationId}")
+  @GetMapping("/{notificationId}")
   EntityModel<Notification> one(@PathVariable Long notificationId) {
 
-    Notification notification = repository.findById(notificationId)
-        .orElseThrow(() -> new NotificationNotFoundException(notificationId,HttpStatus.NOT_FOUND));
-
-    return assembler.toModel(notification);
+    return service.findNotificationById(notificationId);
   }
 
-  @GetMapping("/notifications")
+  @GetMapping()
   CollectionModel<EntityModel<Notification>> all() {
-    List<EntityModel<Notification>> notifications = repository.findAll().stream()
-        .map(notification -> assembler.toModel(notification))
-        .collect(Collectors.toList());
-
-    return CollectionModel.of(notifications, linkTo(methodOn(NotificationController.class).all()).withSelfRel());
+    return service.findAllNotifications();
   }
 
-  @PostMapping("/notifications")
-  ResponseEntity<?> newNotification(@RequestBody Notification newNotification) {
+  @PostMapping("/{userId}")
+  ResponseEntity<?> newNotification(@RequestBody NotificationRequestDTO newNotification, @PathVariable Long userId) {
 
-    EntityModel<Notification> entityModel = assembler.toModel(repository.save(newNotification));
-
-    return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
+    return ResponseEntity.ok(service.createNotification(newNotification, userId));
   }
 
-  @PutMapping("/notifications/{id}")
-  ResponseEntity<?> editNotification(@RequestBody Notification newNotification, @PathVariable Long id) {
+  @PutMapping("/{notificationId}")
+  ResponseEntity<?> editNotification(@RequestBody NotificationRequestDTO newNotification,
+      @PathVariable Long notificationId) {
 
-    return repository.findById(id)
-        .map(notification -> {
-
-          notification.setContent(newNotification.getContent());
-          notification.setStatus(newNotification.getStatus());
-          EntityModel<Notification> entityModel = assembler.toModel(repository.save(notification));
-          return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
-        })
-        .orElseGet(() -> {
-          newNotification.setId(id);
-          EntityModel<Notification> entityModel = assembler.toModel(repository.save(newNotification));
-          return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
-        });
+    return ResponseEntity.ok(service.updateNotification(notificationId, newNotification));
   }
 
-  @PatchMapping("/notifications/{id}")
-  public ResponseEntity<?> updateUserPartially(@PathVariable(value = "id") Long notificationId,
-      @RequestBody Notification newNotification) {
-    Notification notification = repository.findById(notificationId)
-        .orElseThrow(() -> new NotificationNotFoundException(notificationId,HttpStatus.NOT_FOUND));
-    if (newNotification.getContent() != null)
-      notification.setContent(newNotification.getContent());
-    if (newNotification.getStatus() != null)
-      notification.setStatus(newNotification.getStatus());
-
-    EntityModel<Notification> entityModel = assembler.toModel(repository.save(notification));
-    return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
+  @PatchMapping("/{notificationId}")
+  public ResponseEntity<?> updateUserPartially(@PathVariable(value = "notificationId") Long notificationId,
+      @RequestBody NotificationRequestDTO newNotification) {
+    return ResponseEntity.ok(service.updateNotificationPartially(notificationId, newNotification));
   }
 
-  @DeleteMapping("/notifications/{id}")
-  ResponseEntity<?> deleteNotification(@PathVariable Long id) {
+  @DeleteMapping("/{notificationId}")
+  ResponseEntity<?> deleteNotification(@PathVariable Long notificationId) {
 
-    Notification notification = repository.findById(id).orElseThrow(() -> new NotificationNotFoundException(id,HttpStatus.NOT_FOUND));
-
-    repository.delete(notification);
+    service.deleteNotification(notificationId);
 
     return ResponseEntity.noContent().build();
 

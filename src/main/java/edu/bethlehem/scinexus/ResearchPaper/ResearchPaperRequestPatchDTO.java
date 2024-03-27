@@ -1,7 +1,7 @@
 package edu.bethlehem.scinexus.ResearchPaper;
 
-import edu.bethlehem.scinexus.Journal.JournalPatchDTO;
-import edu.bethlehem.scinexus.Journal.JournalPutDTO;
+import edu.bethlehem.scinexus.Journal.JournalRequestPatchDTO;
+import edu.bethlehem.scinexus.Journal.JournalRequestDTO;
 import edu.bethlehem.scinexus.Journal.Visibility;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -11,7 +11,7 @@ import lombok.*;
 
 @Builder
 @Data
-public class ResearchPaperRequestPatchDTO extends JournalPatchDTO {
+public class ResearchPaperRequestPatchDTO extends JournalRequestPatchDTO {
 
     @Enumerated(EnumType.STRING)
     private ResearchLanguage language;

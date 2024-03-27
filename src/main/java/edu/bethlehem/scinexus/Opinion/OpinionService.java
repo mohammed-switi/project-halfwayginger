@@ -1,6 +1,5 @@
 package edu.bethlehem.scinexus.Opinion;
 
-
 import edu.bethlehem.scinexus.Journal.JournalNotFoundException;
 import edu.bethlehem.scinexus.Journal.JournalRepository;
 import lombok.Builder;
@@ -26,37 +25,34 @@ public class OpinionService {
     private final OpinionRepository opinionRepository;
     private final OpinionModelAssembler assembler;
 
-
-    public Opinion convertOpinionDtoToOpinionEntity(OpinionDTO opinionDTO){
+    public Opinion convertOpinionDtoToOpinionEntity(OpinionDTO opinionDTO) {
 
         return Opinion.builder()
                 .content(opinionDTO.getContent())
                 .journal(journalRepository.findById(opinionDTO.getJournalId())
-                                                                .orElseThrow(() -> new JournalNotFoundException(opinionDTO.getJournalId())))
-                .createdAt(new Date(System.currentTimeMillis()))
+                        .orElseThrow(() -> new JournalNotFoundException(opinionDTO.getJournalId())))
                 .build();
 
     }
 
-
-    public EntityModel<Opinion> getOneOpinion(Long opinionId){
+    public EntityModel<Opinion> getOneOpinion(Long opinionId) {
         Opinion opinion = opinionRepository.findById(opinionId)
                 .orElseThrow(() -> new OpinionNotFoundException(opinionId, HttpStatus.NOT_FOUND));
         return assembler.toModel(opinion);
     }
 
-    public List<EntityModel<Opinion>> getAllOpinions(){
+    public List<EntityModel<Opinion>> getAllOpinions() {
 
         return opinionRepository.findAll().stream().map(assembler::toModel)
                 .collect(Collectors.toList());
     }
 
-    public EntityModel<Opinion> postOpinion(OpinionDTO newOpinionDTO){
-        Opinion newOpinion=convertOpinionDtoToOpinionEntity(newOpinionDTO);
+    public EntityModel<Opinion> postOpinion(OpinionDTO newOpinionDTO) {
+        Opinion newOpinion = convertOpinionDtoToOpinionEntity(newOpinionDTO);
         return assembler.toModel(opinionRepository.save(newOpinion));
     }
 
-    public EntityModel<Opinion> updateOpinion(Long id,OpinionDTO opinionDTO){
+    public EntityModel<Opinion> updateOpinion(Long id, OpinionDTO opinionDTO) {
 
         return opinionRepository.findById(id)
                 .map(opinion -> {
@@ -65,13 +61,12 @@ public class OpinionService {
                 })
                 .orElseThrow(() -> new JournalNotFoundException(id));
 
-
     }
 
-    public EntityModel<Opinion> updateOpinionPartially(Long opinionId, OpinionPatchDTO opinionPatchDTO){
+    public EntityModel<Opinion> updateOpinionPartially(Long opinionId, OpinionPatchDTO opinionPatchDTO) {
 
         Opinion opinion = opinionRepository.findById(opinionId)
-                .orElseThrow(() -> new OpinionNotFoundException(opinionId,HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new OpinionNotFoundException(opinionId, HttpStatus.NOT_FOUND));
 
         if (opinionPatchDTO.getContent() != null)
             opinion.setContent(opinionPatchDTO.getContent());
@@ -80,12 +75,10 @@ public class OpinionService {
 
     }
 
-    public void deleteOpinion(Long id){
+    public void deleteOpinion(Long id) {
 
         opinionRepository.deleteById(id);
 
     }
 
 }
-
-

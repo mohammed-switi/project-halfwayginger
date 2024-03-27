@@ -1,10 +1,10 @@
 package edu.bethlehem.scinexus.Post;
 
-import edu.bethlehem.scinexus.Journal.JournalPatchDTO;
+import edu.bethlehem.scinexus.Journal.JournalRequestPatchDTO;
 
 import lombok.*;
 
 @Builder
-public class PostRequestPatchDTO extends JournalPatchDTO {
+public class PostRequestPatchDTO extends JournalRequestPatchDTO {
 
 }

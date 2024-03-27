@@ -2,9 +2,16 @@ package edu.bethlehem.scinexus.DatabaseLoading;
 
 import edu.bethlehem.scinexus.Article.Article;
 import edu.bethlehem.scinexus.Article.ArticleRepository;
-
+import edu.bethlehem.scinexus.Interaction.Interaction;
+import edu.bethlehem.scinexus.Interaction.InteractionRepository;
+import edu.bethlehem.scinexus.Journal.Journal;
+import edu.bethlehem.scinexus.Journal.JournalRepository;
+import edu.bethlehem.scinexus.Opinion.Opinion;
+import edu.bethlehem.scinexus.Opinion.OpinionRepository;
 import edu.bethlehem.scinexus.User.UserRepository;
-
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.PersistenceContext;
 import edu.bethlehem.scinexus.ResearchPaper.ResearchLanguage;
 import edu.bethlehem.scinexus.ResearchPaper.ResearchPaper;
 import edu.bethlehem.scinexus.ResearchPaper.ResearchPaperRepository;
@@ -28,22 +35,34 @@ public class DataLoader implements CommandLineRunner {
     private final ArticleRepository articleRepository;
 
     private final ResearchPaperRepository researchPaperRepository;
+    private final JournalRepository journalRepository;
+    private final OpinionRepository opinionRepository;
+    private final InteractionRepository interactionRepository;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     private final RandomDataGenerator dataGenerator;
     private final PasswordEncoder passwordEncoder;
 
     @Override
     public void run(String... args) {
+        long startTime = System.currentTimeMillis();
+
         generateUser();
-        generateRandomUsers(10);
+        generateRandomUsers(3);
         generateLinks();
         generateResearchPapers();
         generateArticles();
+        generateOpinions();
+        generateInteractions();
 
+        long endTime = System.currentTimeMillis();
+        long totalTime = endTime - startTime;
+        System.out.println("Total execution time: " + totalTime + " milliseconds");
     }
 
     private void generateUser() {
-        Random random = new Random();
         User user = new User();
         user.setFirstName("Mohammed");
         user.setLastName("Switi");
@@ -58,8 +77,8 @@ public class DataLoader implements CommandLineRunner {
         Article article = new Article(dataGenerator.generateRandomUniversityName(),
                 dataGenerator.generateRandomWords(), dataGenerator.generateRandomFieldOfWork(), user);
         System.out.println(user.getUsername());
-        article.setInteractionCount(random.nextInt(1000));
-        article.setOpinionCount(random.nextInt(1000));
+        article.setInteractionsCount(0);
+        article.setOpinionsCount(0);
         article.setVisibility(dataGenerator.generateRandomVisibility());
         article = articleRepository.save(article);
         user.addJournal(article);
@@ -142,21 +161,6 @@ public class DataLoader implements CommandLineRunner {
                 users.add(organization);
             }
             users = userRepository.saveAll(users);
-            // for (User user : users) {
-            // if (user.getRole() == Role.ACADEMIC) {
-            // Academic academic = user.toAcademic();
-
-            // academic.setPosition(Position.PROFESSOR);
-            // academic.setEducation(dataGenerator.generateRandomWords());
-            // academic.setBadge(dataGenerator.generateRandomWords());
-            // academicRepository.save(academic);
-            // } else {
-            // Organization organization = user.toOrganization();
-            // organization.setType(OrganizationType.BUSINESS);
-            // organization.setVerified(true);
-            // organizationRepository.save(organization);
-            // }
-            // }
 
         }
     }
@@ -172,27 +176,30 @@ public class DataLoader implements CommandLineRunner {
 
     private void generateArticles() {
         List<User> users = userRepository.findAll();
+        List<Article> articles = new ArrayList<>();
         Random random = new Random();
         for (User user : users) {
             for (int i = 0; i < 2; i++) {
                 Article article = new Article(dataGenerator.generateRandomUniversityName(),
                         dataGenerator.generateRandomWords(), dataGenerator.generateRandomFieldOfWork(), user);
                 System.out.println(user.getUsername());
-                article.setInteractionCount(random.nextInt(1000));
-                article.setOpinionCount(random.nextInt(1000));
+                article.setInteractionsCount(0);
+                article.setOpinionsCount(0);
                 article.setVisibility(dataGenerator.generateRandomVisibility());
-                article = articleRepository.save(article);
 
                 user.addJournal(article);
-                userRepository.save(user);
+                articles.add(article);
 
             }
+            userRepository.saveAll(users);
+            articleRepository.saveAll(articles);
         }
 
     }
 
     private void generateResearchPapers() {
         List<User> users = userRepository.findAll();
+        List<ResearchPaper> researchPapers = new ArrayList<>();
         Random random = new Random();
         for (User user : users) {
             for (int i = 0; i < 2; i++) {
@@ -203,15 +210,86 @@ public class DataLoader implements CommandLineRunner {
                 System.out.println(user.getUsername());
                 researchPaper.setLanguage(ResearchLanguage.ENGLISH);
                 researchPaper.setNoOfPages(random.nextInt(500));
-                researchPaper.setInteractionCount(random.nextInt(1000));
-                researchPaper.setOpinionCount(random.nextInt(1000));
+                researchPaper.setInteractionsCount(0);
+                researchPaper.setOpinionsCount(0);
                 researchPaper.setVisibility(dataGenerator.generateRandomVisibility());
                 researchPaper.setDescription(dataGenerator.generateRandomWords());
-                researchPaper = researchPaperRepository.save(researchPaper);
                 user.addJournal(researchPaper);
-                userRepository.save(user);
+
+                researchPapers.add(researchPaper);
             }
         }
+        // userRepository.saveAll(users);
+        researchPaperRepository.saveAll(researchPapers);
+
+    }
+
+    private void generateOpinions() {
+        List<Journal> journals = journalRepository.findAll();
+        List<User> users = userRepository.findAll();
+        List<Opinion> opinions = new ArrayList<>();
+        Random random = new Random();
+        for (Journal journal : journals) {
+            for (int j = 0; j < random.nextInt(10); j++) {
+                Opinion opinion = new Opinion(dataGenerator.generateRandomWords(), journal,
+                        users.get(random.nextInt(users.size())));
+
+                journal.addOpinion();
+                opinions.add(opinion);
+            }
+        }
+        opinionRepository.saveAll(opinions);
+        List<Opinion> opinions2 = opinionRepository.findAll();
+        for (Opinion opinion : opinions) {
+            for (int j = 0; j < random.nextInt(10); j++) {
+                Opinion reOpinion = new Opinion(dataGenerator.generateRandomWords(), opinion.getJournal(),
+                        users.get(random.nextInt(users.size())));
+
+                reOpinion.setPapaOpinion(opinion);
+                opinion.addOpinion();
+
+                // reOpinion.addOpinion();
+                opinions2.add(reOpinion);
+            }
+        }
+        journalRepository.saveAll(journals);
+        opinionRepository.saveAll(opinions2);
+        opinionRepository.saveAll(opinions);
+
+    }
+
+    private void generateInteractions() {
+
+        List<Journal> journals = journalRepository.findAll();
+        List<Opinion> opinions = opinionRepository.findAll();
+        List<User> users = userRepository.findAll();
+
+        List<Interaction> interactions = new ArrayList<>();
+        Random random = new Random();
+        for (Journal journal : journals) {
+            for (int j = 0; j < random.nextInt(10); j++) {
+
+                Interaction interaction = new Interaction(
+                        dataGenerator.generateRandomInteractionType(), users.get(random.nextInt(users.size())),
+                        journal);
+                journal.addInteraction();
+                interactions.add(interaction);
+            }
+        }
+
+        for (Opinion opinion : opinions) {
+            for (int j = 0; j < random.nextInt(10); j++) {
+
+                Interaction interaction = new Interaction(
+                        dataGenerator.generateRandomInteractionType(), users.get(random.nextInt(users.size())),
+                        opinion);
+                opinion.addInteraction();
+                interactions.add(interaction);
+            }
+        }
+        journalRepository.saveAll(journals);
+        opinionRepository.saveAll(opinions);
+        interactionRepository.saveAll(interactions);
 
     }
 }
