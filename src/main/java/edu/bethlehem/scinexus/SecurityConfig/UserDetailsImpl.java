@@ -8,4 +8,5 @@ public interface UserDetailsImpl extends UserDetails {
     public Long id = 0L;
 
     Long getId();
+
 }

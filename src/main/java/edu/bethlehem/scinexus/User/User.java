@@ -140,11 +140,16 @@ public class User implements UserDetailsImpl {
     @JsonIgnore
     private List<Notification> notifications;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
-    @JoinTable(name = "journal_user_contributors", joinColumns = @JoinColumn(name = "contributs"), inverseJoinColumns = @JoinColumn(name = "contributors"))
-    @JdbcTypeCode(SqlTypes.JSON)
-    @JsonIgnore
-    private Set<Journal> contributs = new HashSet<Journal>();
+//    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+//    @JoinTable(name = "journal_user_contributors", joinColumns = @JoinColumn(name = "contributs"), inverseJoinColumns = @JoinColumn(name = "contributors"))
+//    @JdbcTypeCode(SqlTypes.JSON)
+//    @JsonIgnore
+//    private Set<Journal> contributs = new HashSet<Journal>();
+@ManyToMany(fetch = FetchType.EAGER)
+@JoinTable(name = "journal_user_contributors", joinColumns = @JoinColumn(name = "contributs"), inverseJoinColumns = @JoinColumn(name = "contributors"))
+@JdbcTypeCode(SqlTypes.JSON)
+@JsonIgnore
+private Set<Journal> contributs = new HashSet<Journal>();
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_link_user", joinColumns = @JoinColumn(name = "linkFrom"), inverseJoinColumns = @JoinColumn(name = "LinkTo"))
@@ -235,6 +240,22 @@ public class User implements UserDetailsImpl {
     @Override
     public Long getId() {
         return id;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", username='" + username + '\'' +
+                ", email='" + email + '\'' +
+                ", bio='" + bio + '\'' +
+                ", phoneNumber='" + phoneNumber + '\'' +
+                ", fieldOfWork='" + fieldOfWork + '\'' +
+                ", role=" + role +
+                // Include other relevant fields here
+                '}';
     }
 
 }

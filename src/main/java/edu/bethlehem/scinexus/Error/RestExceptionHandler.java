@@ -4,11 +4,14 @@ import edu.bethlehem.scinexus.User.UserNotFoundException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.SignatureException;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageConversionException;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.transaction.TransactionSystemException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -17,7 +20,10 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.ModelAndView;
 
+import java.io.IOException;
+import java.rmi.AccessException;
 import java.util.*;
 
 @ControllerAdvice
@@ -113,9 +119,12 @@ public class RestExceptionHandler {
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     public ResponseEntity<Object> handleHttpRequestMethodNotSupportedException(
             HttpRequestMethodNotSupportedException ex) {
-        // Customize your response here, for example:
-        String message = "Method not supported";
-        return new ResponseEntity<>(message, HttpStatus.METHOD_NOT_ALLOWED);
+        GeneralErrorResponse errorResponse = GeneralErrorResponse.builder()
+                .message("Http Request Method Not Supported. " + ex.getMessage() +" " + Arrays.toString(ex.getStackTrace()))
+                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                .timestamp(new Date(System.currentTimeMillis()))
+                .build();
+        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(Exception.class)
@@ -123,7 +132,7 @@ public class RestExceptionHandler {
         // Customize your response here, for example:
         GeneralErrorResponse errorResponse = GeneralErrorResponse.builder()
                 .message("An error occurred while processing the request. " + ex.getMessage() + "  "
-                        + ex.getStackTrace().toString())
+                        + Arrays.toString(ex.getStackTrace()))
                 .status(500)
                 .timestamp(new Date(System.currentTimeMillis()))
                 .build();
@@ -149,8 +158,26 @@ public class RestExceptionHandler {
         GeneralErrorResponse errorResponse = GeneralErrorResponse.builder()
                 .message("An error occurred while processing the request. " + ex.getMostSpecificCause().getMessage()
                         + "  "
-                        + ex.getStackTrace().toString())
-                .status(500)
+                        + Arrays.toString(ex.getStackTrace()))
+                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                .timestamp(new Date(System.currentTimeMillis()))
+                .build();
+        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(value = AccessDeniedException.class)
+    public void handleConflict(HttpServletResponse response) throws IOException {
+        response.sendError(403, "Your Message");
+    }
+
+    @ExceptionHandler(InternalAuthenticationServiceException.class)
+    public ResponseEntity<Object> handleInternalAuthenticationServiceException(InternalAuthenticationServiceException ex) {
+        // Log the exception for troubleshooting
+
+        // Customize your response here
+        GeneralErrorResponse errorResponse = GeneralErrorResponse.builder()
+                .message("Internal authentication service error. " + ex.getMessage())
+                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
                 .timestamp(new Date(System.currentTimeMillis()))
                 .build();
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);

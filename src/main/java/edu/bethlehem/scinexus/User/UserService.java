@@ -14,10 +14,14 @@ import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.mysql.cj.x.protobuf.MysqlxCrud.Collection;
-
 import edu.bethlehem.scinexus.Article.Article;
 import edu.bethlehem.scinexus.Article.ArticleModelAssembler;
 import edu.bethlehem.scinexus.Article.ArticleRepository;
@@ -25,7 +29,7 @@ import edu.bethlehem.scinexus.SecurityConfig.JwtService;
 
 @Service
 @RequiredArgsConstructor
-public class UserService {
+public class UserService  {
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -146,6 +150,20 @@ public class UserService {
         return ResponseEntity.noContent().build();
 
     }
+
+//    @Override
+//    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+//       String userName = null, password=null;
+//       List<GrantedAuthority> authorities=null;
+//       User user=repository.findByEmail(username).orElseThrow(() -> new UserNotFoundException());
+//
+//       userName=user.getEmail();
+//       password=user.getPassword();
+//       authorities=new ArrayList<>();
+//       authorities.add(new SimpleGrantedAuthority(user.getRole().toString()));
+//
+//        return  new org.springframework.security.core.userdetails.User(username,password,authorities);
+//    }
 
     // if (editUser.getUsername() != null)
     // user.setUsername(editUser.getUsername());
