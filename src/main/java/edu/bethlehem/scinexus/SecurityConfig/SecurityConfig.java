@@ -41,7 +41,6 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
                                 .requestMatchers("/api/v1/auth/**").permitAll()
-                                .requestMatchers("/login*").permitAll()
 
                                 .requestMatchers(HttpMethod.GET, "/articles/{journalId}")
                                 .access(authorizationManager.readJournals())
@@ -60,7 +59,7 @@ public class SecurityConfig {
                 )
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
-                .formLogin(AbstractAuthenticationFilterConfigurer::permitAll)
+                .formLogin(Customizer.withDefaults())
                 .oauth2Login(Customizer.withDefaults())
                 .sessionManagement(sessionConfigurer ->
                         sessionConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
