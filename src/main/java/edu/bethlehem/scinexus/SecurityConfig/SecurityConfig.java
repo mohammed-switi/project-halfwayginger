@@ -9,6 +9,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.SecurityBuilder;
+import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractAuthenticationFilterConfigurer;
@@ -23,7 +25,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 @Configuration
 @RequiredArgsConstructor
-public class SecurityConfig {
+public class SecurityConfig  {
 
         private final JwtAuthenticationFilter jwtAuthFilter;
         private final AuthenticationProvider authenticationProvider;
@@ -58,10 +60,11 @@ public class SecurityConfig {
                                                                 "/journals/{journalId}/contributors/{contributorId}")
                                                 .access(authorizationManager.journalOwnerNew())
 
+
                                                 .anyRequest().authenticated())
 
-                                // .formLogin(Customizer.withDefaults())
-                                // .oauth2Login(Customizer.withDefaults())
+                                 .formLogin(Customizer.withDefaults())
+                                 .oauth2Login(Customizer.withDefaults())
                                 .sessionManagement(sessionConfigurer -> sessionConfigurer
                                                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                                 .authenticationProvider(authenticationProvider)
@@ -69,5 +72,6 @@ public class SecurityConfig {
 
                 return httpSecurity.build();
         }
+
 
 }

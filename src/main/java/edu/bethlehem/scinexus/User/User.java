@@ -25,10 +25,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import javax.annotation.Nullable;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 // @Entity
 // @Table(name = "_user")
@@ -120,6 +117,11 @@ public class User implements UserDetailsImpl {
     @Size(max = 320)
     private String fieldOfWork;
 
+//    @NotNull
+    private Boolean locked;
+//    @NotNull
+    private Boolean enabled;
+
     @JdbcTypeCode(SqlTypes.JSON)
     private JSONPObject userSettings;
 
@@ -188,11 +190,13 @@ public class User implements UserDetailsImpl {
     @ManyToMany(mappedBy = "validatedBy")
     List<ResearchPaper> validated;
 
-    public User(String firstName, String username, String password, String email) {
+    public User(String firstName, String username, String password, String email,Boolean locked, Boolean enabled) {
         this.firstName = firstName;
         this.username = username;
         this.password = password;
         this.email = email;
+        this.locked=locked;
+        this.enabled=enabled;
 
     }
 
@@ -209,7 +213,7 @@ public class User implements UserDetailsImpl {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(role.name()));
+        return Collections.singletonList(new SimpleGrantedAuthority(role.name()));
     }
 
     @Override
@@ -224,9 +228,9 @@ public class User implements UserDetailsImpl {
     }
 
     @Override
-    @JsonIgnore
+   // @JsonIgnore
     public boolean isAccountNonLocked() {
-        return true;
+        return !locked;
     }
 
     @Override
@@ -236,9 +240,9 @@ public class User implements UserDetailsImpl {
     }
 
     @Override
-    @JsonIgnore
+   // @JsonIgnore
     public boolean isEnabled() {
-        return true;
+        return enabled;
     }
 
     @Override

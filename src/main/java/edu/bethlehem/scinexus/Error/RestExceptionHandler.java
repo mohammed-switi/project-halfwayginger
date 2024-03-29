@@ -1,11 +1,13 @@
 package edu.bethlehem.scinexus.Error;
 
+import edu.bethlehem.scinexus.Auth.Email.EmailException;
 import edu.bethlehem.scinexus.User.UserNotFoundException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.ConstraintViolationException;
+import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageConversionException;
@@ -25,6 +27,7 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.io.IOException;
 import java.rmi.AccessException;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @ControllerAdvice
@@ -36,8 +39,9 @@ public class RestExceptionHandler {
         GeneralErrorResponse errorResponse = GeneralErrorResponse
                 .builder()
                 .status(ex.getHttpStatus().value())
-                .message(ex.getMessage())
+                .message("This is Form the General Exception : "+ex.getMessage())
                 .timestamp(new Date(System.currentTimeMillis()))
+                .throwable(ex.getCause())
                 .build();
 
         return new ResponseEntity<>(errorResponse, ex.getHttpStatus());
@@ -51,6 +55,7 @@ public class RestExceptionHandler {
                 .status(ex.getHttpStatus().value())
                 .message(ex.getMessage())
                 .timestamp(new Date(System.currentTimeMillis()))
+                .throwable(ex.getCause())
                 .build();
         return new ResponseEntity<>(errorResponse, ex.getHttpStatus());
 
@@ -87,6 +92,7 @@ public class RestExceptionHandler {
                 .status(HttpStatus.BAD_REQUEST.value())
                 .timestamp(new Date(System.currentTimeMillis()))
                 .validationError(errors)
+                .throwable(ex.getCause())
                 .build();
 
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
@@ -119,6 +125,7 @@ public class RestExceptionHandler {
                 .message(ex.getMessage())
                 .status(HttpStatus.BAD_REQUEST.value())
                 .timestamp(new Date(System.currentTimeMillis()))
+                .throwable(ex.getCause())
                 .validationError((Map<String, String>) errors).build();
 
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
@@ -129,10 +136,11 @@ public class RestExceptionHandler {
     public ResponseEntity<Object> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
         // You can customize the response entity as per your requirements
         GeneralErrorResponse errorResponse = GeneralErrorResponse.builder()
-                .message("The request body is invalid or unreadable." + "" + ex.getMessage() + " "
+                .message("This is happend From HttpMessageNotReadableException : The request body is invalid or unreadable." + "" + ex.getMessage() + " "
                         + ex.getMostSpecificCause().toString())
                 .status(400)
                 .timestamp(new Date(System.currentTimeMillis()))
+                .throwable(ex.getCause())
                 .build();
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
@@ -144,6 +152,7 @@ public class RestExceptionHandler {
                 .message("Http Request Method Not Supported. " + ex.getMessage() +" " + Arrays.toString(ex.getStackTrace()))
                 .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
                 .timestamp(new Date(System.currentTimeMillis()))
+                .throwable(ex.getCause())
                 .build();
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -156,6 +165,7 @@ public class RestExceptionHandler {
                         + Arrays.toString(ex.getStackTrace()))
                 .status(500)
                 .timestamp(new Date(System.currentTimeMillis()))
+                        .throwable(ex.getCause())
                 .build();
 
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -171,6 +181,7 @@ public class RestExceptionHandler {
                         + ex.getStackTrace().toString())
                 .status(500)
                 .timestamp(new Date(System.currentTimeMillis()))
+                .throwable(ex.getCause())
                 .build();
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -186,6 +197,7 @@ public class RestExceptionHandler {
                         + Arrays.toString(ex.getStackTrace()))
                 .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
                 .timestamp(new Date(System.currentTimeMillis()))
+                .throwable(ex.getCause())
                 .build();
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
 
@@ -199,7 +211,8 @@ public class RestExceptionHandler {
         GeneralErrorResponse errorResponse=GeneralErrorResponse.builder()
                 .status(HttpStatus.NOT_FOUND.value())
                 .timestamp(new Date(System.currentTimeMillis()))
-                .message(ex.getMessage() +" " + ex.getBody().toString())
+                .message("this is from NO Resoucre Found Exception"+ex.getMessage() +" " + ex.getBody().toString())
+                .throwable(ex.getCause())
                 .build();
         return new ResponseEntity<>(errorResponse,HttpStatus.NOT_FOUND);
     }
@@ -218,10 +231,25 @@ public class RestExceptionHandler {
                 .message("Internal authentication service error. " + ex.getMessage())
                 .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
                 .timestamp(new Date(System.currentTimeMillis()))
+                .throwable(ex.getCause())
                 .build();
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+
+
+    @ExceptionHandler(EmailException.class)
+    public ResponseEntity<Object> handleEmailException(EmailException exception){
+        GeneralErrorResponse errorResponse= GeneralErrorResponse.builder()
+                .message(exception.getMessage())
+                .status(HttpStatus.BAD_REQUEST.value())
+                .timestamp(new Date(System.currentTimeMillis()))
+                .throwable(exception.getCause())
+                .build();
+
+
+        return new ResponseEntity<>(errorResponse,exception.getHttpStatus());
+    }
 
 
 }

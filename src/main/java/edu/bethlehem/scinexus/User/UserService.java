@@ -29,7 +29,7 @@ import edu.bethlehem.scinexus.SecurityConfig.JwtService;
 
 @Service
 @RequiredArgsConstructor
-public class UserService  {
+public class UserService implements UserDetailsService {
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -149,6 +149,15 @@ public class UserService  {
 
         return ResponseEntity.noContent().build();
 
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        return repository.findByEmail(username).orElseThrow(UserNotFoundException::new);
+    }
+
+    public int enableUser(String email) {
+        return repository.enableAppUser(email);
     }
 
 //    @Override
