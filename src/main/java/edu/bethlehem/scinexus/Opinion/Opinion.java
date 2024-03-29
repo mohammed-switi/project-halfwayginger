@@ -37,8 +37,8 @@ public class Opinion {
 
     @ManyToOne(fetch = FetchType.LAZY) // Fetch Type Has been Changed from Lazy To Eager, Because When I request one
                                        // opinion there is an error, and this is how I solved it
-    @JoinColumn(name = "journal")
-    @NotNull(message = "The Opinion Reference Journal Shouldn't Be Null")
+    @JoinColumn(name = "journal", updatable = false)
+    // @NotNull(message = "The Opinion Reference Journal Shouldn't Be Null")
     @JsonManagedReference
     private Journal journal;
 

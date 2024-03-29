@@ -34,11 +34,26 @@ public class JournalController {
     }
 
     @PostMapping()
-    public ResponseEntity<?> addContributor(@RequestBody @Valid
-                                            ContributionDTO contributionDTO) {
+    public ResponseEntity<?> addContributor(@RequestBody @Valid ContributionDTO contributionDTO) {
 
-        EntityModel<Journal> entityModel=service.addContributor(contributionDTO);
+        EntityModel<Journal> entityModel = service.addContributor(contributionDTO);
         return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
+    }
+
+    @PatchMapping("/{journalId}/contributors/{contributorId}")
+    public ResponseEntity<?> addContributorNew(@PathVariable Long journalId, @PathVariable Long contributorId) {
+
+        EntityModel<Journal> entityModel = service.addContributor(journalId, contributorId);
+        return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
+    }
+
+    @DeleteMapping("/{journalId}/contributors/{contributorId}")
+    public ResponseEntity<?> removeContributorNew(@PathVariable Long journalId, @PathVariable Long contributorId) {
+
+        service.removeContributor(journalId, contributorId);
+        return ResponseEntity.noContent().build();
+        // return
+        // ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
     }
 
     @DeleteMapping()

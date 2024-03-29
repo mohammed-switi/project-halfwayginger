@@ -16,12 +16,16 @@ import edu.bethlehem.scinexus.Article.Article;
 import edu.bethlehem.scinexus.Article.ArticleNotFoundException;
 import edu.bethlehem.scinexus.Article.ArticleRepository;
 import edu.bethlehem.scinexus.Article.ArticleRequestDTO;
+import edu.bethlehem.scinexus.Interaction.Interaction;
+import edu.bethlehem.scinexus.Interaction.InteractionRepository;
+import edu.bethlehem.scinexus.Opinion.OpinionRepository;
 import edu.bethlehem.scinexus.SecurityConfig.JwtService;
 import edu.bethlehem.scinexus.User.User;
 import edu.bethlehem.scinexus.User.UserNotFoundException;
 import edu.bethlehem.scinexus.User.UserRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -31,6 +35,8 @@ public class ArticleService {
     private final JwtService jwtService;
     private final UserRepository userRepository;
     private final ArticleRepository articleRepository;
+    private final OpinionRepository opinionRepository;
+    private final InteractionRepository interactionRepository;
     private final ArticleModelAssembler assembler;
 
     public Article convertArticleDtoToArticleEntity(Authentication authentication,
@@ -124,10 +130,18 @@ public class ArticleService {
 
     }
 
+    @Transactional
     public void deleteArticle(Long articleId) {
         Article article = articleRepository.findById(articleId)
                 .orElseThrow(
                         () -> new ArticleNotFoundException(articleId, HttpStatus.UNPROCESSABLE_ENTITY));
+
+        // i had to add these lines to delete the opinions and interactions of the
+        // article
+        // cuz the cascading didn't work
+        article.getOpinions().forEach(opinion -> opinionRepository.delete(opinion));
+        article.getInteractions().forEach(interaction -> interactionRepository.delete(interaction));
+
         articleRepository.delete(article);
     }
 

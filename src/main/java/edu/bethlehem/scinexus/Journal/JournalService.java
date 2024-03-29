@@ -73,23 +73,24 @@ public class JournalService {
                 .collect(Collectors.toList()));
 
     }
+
     @Transactional
     public EntityModel<Journal> addContributor(ContributionDTO contributionDTO) {
-        Long contributorId=contributionDTO.getUserId();
-        Long journalId= contributionDTO.getJournalId();
+        Long contributorId = contributionDTO.getUserId();
+        Long journalId = contributionDTO.getJournalId();
 
         User contributorUser = userRepository.findById(contributorId)
-                .orElseThrow(() -> new UserNotFoundException("User is not found with id: " + contributorId, HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new UserNotFoundException("User is not found with id: " + contributorId,
+                        HttpStatus.NOT_FOUND));
 
         Journal journal = journalRepository.findById(journalId)
                 .orElseThrow(() -> new JournalNotFoundException(journalId, HttpStatus.NOT_FOUND));
 
-        if (authorizationManager.isJournalOwner(journalId,contributorUser))
+        if (authorizationManager.isJournalOwner(journalId, contributorUser))
             throw new ContributionException("Journal Owner Can't be A Contributor");
 
         if (journal.getContributors().contains(contributorUser))
-          throw  new ContributionException("User is Already A Contributor");
-
+            throw new ContributionException("User is Already A Contributor");
 
         // Add contributor to the journal and save
         journal.getContributors().add(contributorUser);
@@ -104,10 +105,57 @@ public class JournalService {
         return entityModel;
     }
 
+    @Transactional
+    public EntityModel<Journal> addContributor(Long journalId, Long contributorId) {
+
+        User contributorUser = userRepository.findById(contributorId)
+                .orElseThrow(() -> new UserNotFoundException("User is not found with id: " + contributorId,
+                        HttpStatus.NOT_FOUND));
+
+        Journal journal = journalRepository.findById(journalId)
+                .orElseThrow(() -> new JournalNotFoundException(journalId, HttpStatus.NOT_FOUND));
+
+        if (authorizationManager.isJournalOwner(journalId, contributorUser))
+            throw new ContributionException("Journal Owner Can't be A Contributor");
+
+        if (journal.getContributors().contains(contributorUser))
+            throw new ContributionException("User is Already A Contributor");
+
+        // Add contributor to the journal and save
+        journal.getContributors().add(contributorUser);
+        journalRepository.save(journal);
+
+        // Add journal to the contributor's contributed journals and save
+        contributorUser.getContributedJournals().add(journal);
+        userRepository.save(contributorUser);
+
+        // Return response with created journal entity
+        EntityModel<Journal> entityModel = assembler.toModel(journal);
+        return entityModel;
+    }
 
     public void removeContributor(ContributionDTO contributionDTO) {
-        Long journalId=contributionDTO.getJournalId();
-        Long contributorId=contributionDTO.getUserId();
+        Long journalId = contributionDTO.getJournalId();
+        Long contributorId = contributionDTO.getUserId();
+
+        Journal journal = journalRepository.findById(
+                journalId)
+                .orElseThrow(() -> new JournalNotFoundException(journalId, HttpStatus.NOT_FOUND));
+
+        User contributor = userRepository.findById(contributorId)
+                .orElseThrow(
+                        () -> new UserNotFoundException(contributorId));
+        if (journal.getContributors().contains(contributor)) {
+            contributor.getContributedJournals().remove(journal);
+            journal.getContributors().remove(contributor);
+        } else {
+            throw new ContributionException("The user is already not a contributor");
+        }
+        userRepository.save(contributor);
+
+    }
+
+    public void removeContributor(Long journalId, Long contributorId) {
 
         Journal journal = journalRepository.findById(
                 journalId)

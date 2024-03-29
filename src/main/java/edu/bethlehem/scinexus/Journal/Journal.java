@@ -6,7 +6,9 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.io.Serializable;
 import java.util.HashSet;
@@ -22,7 +24,8 @@ import edu.bethlehem.scinexus.Media.Media;
 import edu.bethlehem.scinexus.Opinion.Opinion;
 import edu.bethlehem.scinexus.User.User;
 
-@Data
+@Getter
+@Setter
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -59,14 +62,14 @@ public class Journal implements Serializable {
     @JsonManagedReference
     private User publisher;
 
-    //It was lazy
+    // It was lazy
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "journal")
     @JdbcTypeCode(SqlTypes.JSON)
     @JsonBackReference
     private Set<Interaction> interactions;
 
-    @OneToMany(fetch = FetchType.EAGER)
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "journal")
     @JdbcTypeCode(SqlTypes.JSON)
     @JsonBackReference
@@ -83,10 +86,10 @@ public class Journal implements Serializable {
     @JdbcTypeCode(SqlTypes.JSON)
     private Journal reShare;
 
-//    @ManyToMany(mappedBy = "contributors", fetch = FetchType.EAGER)
-//    @JdbcTypeCode(SqlTypes.JSON)
-//    // @JsonIgnore
-//    private Set<User> contributors;
+    // @ManyToMany(mappedBy = "contributors", fetch = FetchType.EAGER)
+    // @JdbcTypeCode(SqlTypes.JSON)
+    // // @JsonIgnore
+    // private Set<User> contributors;
 
     @ManyToMany(mappedBy = "contributedJournals", fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
     @JsonManagedReference
@@ -118,6 +121,10 @@ public class Journal implements Serializable {
 
     public void addOpinion() {
         opinionsCount++;
+    }
+
+    public void setOpinions() {
+
     }
 
 }

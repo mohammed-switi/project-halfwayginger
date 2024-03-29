@@ -1,6 +1,5 @@
 package edu.bethlehem.scinexus.SecurityConfig;
 
-
 import edu.bethlehem.scinexus.Authorization.AuthorizationManager;
 
 import jakarta.servlet.DispatcherType;
@@ -16,13 +15,10 @@ import org.springframework.security.config.annotation.web.configurers.AbstractAu
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 
-
 import org.springframework.security.web.SecurityFilterChain;
 
 import org.springframework.security.web.access.AccessDeniedHandlerImpl;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
-
 
 @EnableWebSecurity
 @Configuration
@@ -31,49 +27,47 @@ public class SecurityConfig {
 
         private final JwtAuthenticationFilter jwtAuthFilter;
         private final AuthenticationProvider authenticationProvider;
-  private final AuthorizationManager authorizationManager;
+        private final AuthorizationManager authorizationManager;
 
+        @Bean
+        public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+                httpSecurity
+                                .csrf(AbstractHttpConfigurer::disable)
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity
-                .csrf(AbstractHttpConfigurer::disable)
+                                .authorizeHttpRequests(authorizeRequests -> authorizeRequests
+                                                .requestMatchers("/api/v1/auth/**").permitAll()
 
-                .authorizeHttpRequests(authorizeRequests ->
-                        authorizeRequests
-                                .requestMatchers("/api/v1/auth/**").permitAll()
+                                                .requestMatchers(HttpMethod.GET, "/articles/{journalId}")
+                                                .access(authorizationManager.readJournals())
 
-//                                .requestMatchers(HttpMethod.GET, "/articles/{journalId}")
-//                                .access(authorizationManager.readJournals())
-//
-//                                .requestMatchers(HttpMethod.PUT, "/articles/{journalId}")
-//                                .access(authorizationManager.journalOwnerContributors())
-//
-//                                .requestMatchers(HttpMethod.PATCH, "/articles/{journalId}")
-//                                .access(authorizationManager.journalOwnerContributors())
-//
-//                                .requestMatchers(HttpMethod.DELETE, "/articles/{journalId}")
-//                                .access(authorizationManager.journalOwner())
-//
-//                                .requestMatchers(HttpMethod.POST,"/journals/**")
-//                                .access(authorizationManager.journalOwner())
+                                                .requestMatchers(HttpMethod.PUT, "/articles/{journalId}")
+                                                .access(authorizationManager.journalOwnerContributors())
 
-                                .anyRequest().authenticated()
-                )
+                                                .requestMatchers(HttpMethod.PATCH, "/articles/{journalId}")
+                                                .access(authorizationManager.journalOwnerContributors())
 
-//                .formLogin(Customizer.withDefaults())
-//                .oauth2Login(Customizer.withDefaults())
-                .sessionManagement(sessionConfigurer ->
-                        sessionConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                )
-                .authenticationProvider(authenticationProvider)
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+                                                .requestMatchers(HttpMethod.DELETE, "/articles/{journalId}")
+                                                .access(authorizationManager.journalOwner())
 
+                                                .requestMatchers(HttpMethod.POST, "/journals/**")
+                                                .access(authorizationManager.journalOwner())
+                                                .requestMatchers(HttpMethod.PATCH,
+                                                                "/journals/{journalId}/contributors/{contributorId}")
+                                                .access(authorizationManager.journalOwnerNew())
+                                                .requestMatchers(HttpMethod.DELETE,
+                                                                "/journals/{journalId}/contributors/{contributorId}")
+                                                .access(authorizationManager.journalOwnerNew())
 
-        return httpSecurity.build();
-    }
+                                                .anyRequest().authenticated())
 
+                                // .formLogin(Customizer.withDefaults())
+                                // .oauth2Login(Customizer.withDefaults())
+                                .sessionManagement(sessionConfigurer -> sessionConfigurer
+                                                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                                .authenticationProvider(authenticationProvider)
+                                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
-
+                return httpSecurity.build();
+        }
 
 }

@@ -14,6 +14,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
+import edu.bethlehem.scinexus.Interaction.InteractionRepository;
+import edu.bethlehem.scinexus.Opinion.OpinionRepository;
 import edu.bethlehem.scinexus.Organization.OrganizationNotFoundException;
 import edu.bethlehem.scinexus.ResearchPaper.ResearchPaper;
 import edu.bethlehem.scinexus.ResearchPaper.ResearchPaperNotFoundException;
@@ -34,6 +36,8 @@ public class ResearchPaperService {
     private final JwtService jwtService;
     private final ResearchPaperRepository researchPaperRepository;
     private final UserRepository userRepository;
+    private final InteractionRepository interactionRepository;
+    private final OpinionRepository opinionRepository;
     private final ResearchPaperModelAssembler assembler;
 
     public ResearchPaper convertResearchPaperDtoToResearchPaperEntity(Authentication authentication,
@@ -136,6 +140,10 @@ public class ResearchPaperService {
         ResearchPaper researchPaper = researchPaperRepository.findById(researchPaperId)
                 .orElseThrow(
                         () -> new ResearchPaperNotFoundException(researchPaperId, HttpStatus.UNPROCESSABLE_ENTITY));
+        // I had to add these lines to delete the opinions and interactions
+        // of the article cuz the cascading didn't work
+        researchPaper.getInteractions().forEach(interaction -> interactionRepository.delete(interaction));
+        researchPaper.getOpinions().forEach(opinion -> opinionRepository.delete(opinion));
         researchPaperRepository.delete(researchPaper);
     }
 
@@ -145,6 +153,7 @@ public class ResearchPaperService {
                         () -> new ResearchPaperNotFoundException(researchPaperId, HttpStatus.UNPROCESSABLE_ENTITY));
         User organization = userRepository.findById(jwtService.extractId(authentication))
                 .orElseThrow(() -> new OrganizationNotFoundException("Organization Not Found", HttpStatus.NOT_FOUND));
+
         researchPaper.getValidatedBy().add(organization);
         organization.getValidated().add(researchPaper);
 
