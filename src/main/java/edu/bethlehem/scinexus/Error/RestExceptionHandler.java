@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.io.IOException;
 import java.rmi.AccessException;
@@ -91,18 +92,38 @@ public class RestExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
+//    @ExceptionHandler(ConstraintViolationException.class)
+//    public ResponseEntity<?> constraintViolationException(ConstraintViolationException ex, WebRequest request) {
+//        List<String> errors = new ArrayList<>();
+//
+//        ex.getConstraintViolations().forEach(cv -> errors.add(cv.getMessage()));
+//
+//        Map<String, List<String>> result = new HashMap<>();
+//
+//        result.put("errors", errors);
+//
+//        return new ResponseEntity<>(result, HttpStatus.BAD_REQUEST);
+//    }
+
     @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<?> constraintViolationException(ConstraintViolationException ex, WebRequest request) {
+    public ResponseEntity<?> constraintViolationException(ConstraintViolationException ex) {
         List<String> errors = new ArrayList<>();
+
 
         ex.getConstraintViolations().forEach(cv -> errors.add(cv.getMessage()));
 
         Map<String, List<String>> result = new HashMap<>();
-
         result.put("errors", errors);
 
-        return new ResponseEntity<>(result, HttpStatus.BAD_REQUEST);
+        GeneralErrorResponse errorResponse=GeneralErrorResponse.builder()
+                .message(ex.getMessage())
+                .status(HttpStatus.BAD_REQUEST.value())
+                .timestamp(new Date(System.currentTimeMillis()))
+                .validationError((Map<String, String>) errors).build();
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
+
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<Object> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
@@ -128,22 +149,24 @@ public class RestExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<Object> handleAll(Exception ex) {
-        // Customize your response here, for example:
-        GeneralErrorResponse errorResponse = GeneralErrorResponse.builder()
-                .message("An error occurred while processing the request. " + ex.getMessage() + "  "
+    public ResponseEntity<Object> handleAll(Exception ex) throws Exception {
+
+                GeneralErrorResponse errorResponse = GeneralErrorResponse.builder()
+                .message("This handling from Handle all : An error occurred while processing the request. " + ex.getMessage() + "  "
                         + Arrays.toString(ex.getStackTrace()))
                 .status(500)
                 .timestamp(new Date(System.currentTimeMillis()))
                 .build();
+
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+
     }
 
     @ExceptionHandler(TransactionSystemException.class)
     public ResponseEntity<Object> handleTransactionException(TransactionSystemException ex) {
         // Customize your response here, for example:
         GeneralErrorResponse errorResponse = GeneralErrorResponse.builder()
-                .message("An error occurred while processing the request. " + ex.getMostSpecificCause().getMessage()
+                .message("This is happened from transitionSystem Exception An error occurred while processing the request. " + ex.getMostSpecificCause().getMessage()
                         + "  "
                         + ex.getStackTrace().toString())
                 .status(500)
@@ -155,14 +178,30 @@ public class RestExceptionHandler {
     @ExceptionHandler(HttpMessageConversionException.class)
     public ResponseEntity<Object> handleHttpMessageConversionException(HttpMessageConversionException ex) {
         // Customize your response here, for example:
+
+
         GeneralErrorResponse errorResponse = GeneralErrorResponse.builder()
-                .message("An error occurred while processing the request. " + ex.getMostSpecificCause().getMessage()
+                .message(" This is happeend form httpMessageConversion An error occurred while processing the request. " + ex.getMostSpecificCause().getMessage()
                         + "  "
                         + Arrays.toString(ex.getStackTrace()))
                 .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
                 .timestamp(new Date(System.currentTimeMillis()))
                 .build();
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+
+
+
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<Object> handleResourceNotFoundException(NoResourceFoundException ex) {
+
+        GeneralErrorResponse errorResponse=GeneralErrorResponse.builder()
+                .status(HttpStatus.NOT_FOUND.value())
+                .timestamp(new Date(System.currentTimeMillis()))
+                .message(ex.getMessage() +" " + ex.getBody().toString())
+                .build();
+        return new ResponseEntity<>(errorResponse,HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(value = AccessDeniedException.class)
@@ -182,5 +221,7 @@ public class RestExceptionHandler {
                 .build();
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+
 
 }

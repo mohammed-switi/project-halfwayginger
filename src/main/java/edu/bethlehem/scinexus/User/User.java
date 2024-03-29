@@ -3,7 +3,6 @@ package edu.bethlehem.scinexus.User;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.databind.util.JSONPObject;
 import jakarta.persistence.*;
 
@@ -11,17 +10,13 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 import edu.bethlehem.scinexus.SecurityConfig.UserDetailsImpl;
 import edu.bethlehem.scinexus.Conditional.Conditional;
 import edu.bethlehem.scinexus.Journal.Journal;
 import edu.bethlehem.scinexus.Media.Media;
 import edu.bethlehem.scinexus.Notification.Notification;
 import edu.bethlehem.scinexus.ResearchPaper.ResearchPaper;
-import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
@@ -38,16 +33,18 @@ import java.util.Set;
 // @Entity
 // @Table(name = "_user")
 
-@Data
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 @JsonSerialize
 @Builder
+@Getter
+@Setter
 @Conditional(selected = "role", values = { "ACADEMIC" }, required = {
         "education", "badge", "position" })
-@Conditional(selected = "role", values = { "ORGANIATION" }, required = {
+@Conditional(selected = "role", values = { "ORGANIZATION" }, required = {
         "type" })
 public class User implements UserDetailsImpl {
 
@@ -90,14 +87,17 @@ public class User implements UserDetailsImpl {
      */
     @NotNull(message = "Password is Mandatory")
     @NotBlank(message = "Password is Mandatory")
+    @JsonIgnore
     private String password;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "profile_picture_id")
+    @JsonIgnore
     private Media profilePicture;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "profile_cover_id")
+    @JsonIgnore
     private Media profileCover;
 
     @Size(min = 0, max = 220, message = "The bio should be in maximum 220 characters")
@@ -140,16 +140,16 @@ public class User implements UserDetailsImpl {
     @JsonIgnore
     private List<Notification> notifications;
 
-//    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
-//    @JoinTable(name = "journal_user_contributors", joinColumns = @JoinColumn(name = "contributs"), inverseJoinColumns = @JoinColumn(name = "contributors"))
-//    @JdbcTypeCode(SqlTypes.JSON)
-//    @JsonIgnore
-//    private Set<Journal> contributs = new HashSet<Journal>();
-@ManyToMany(fetch = FetchType.EAGER)
-@JoinTable(name = "journal_user_contributors", joinColumns = @JoinColumn(name = "contributs"), inverseJoinColumns = @JoinColumn(name = "contributors"))
-@JdbcTypeCode(SqlTypes.JSON)
-@JsonIgnore
-private Set<Journal> contributs = new HashSet<Journal>();
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "journal_user_contributors",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "journal_id")
+    )
+    @JsonBackReference
+    private Set<Journal> contributedJournals = new HashSet<>();
+
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_link_user", joinColumns = @JoinColumn(name = "linkFrom"), inverseJoinColumns = @JoinColumn(name = "LinkTo"))
@@ -218,21 +218,25 @@ private Set<Journal> contributs = new HashSet<Journal>();
     }
 
     @Override
+    @JsonIgnore
     public boolean isAccountNonExpired() {
         return true;
     }
 
     @Override
+    @JsonIgnore
     public boolean isAccountNonLocked() {
         return true;
     }
 
     @Override
+    @JsonIgnore
     public boolean isCredentialsNonExpired() {
         return true;
     }
 
     @Override
+    @JsonIgnore
     public boolean isEnabled() {
         return true;
     }
@@ -242,20 +246,5 @@ private Set<Journal> contributs = new HashSet<Journal>();
         return id;
     }
 
-    @Override
-    public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", username='" + username + '\'' +
-                ", email='" + email + '\'' +
-                ", bio='" + bio + '\'' +
-                ", phoneNumber='" + phoneNumber + '\'' +
-                ", fieldOfWork='" + fieldOfWork + '\'' +
-                ", role=" + role +
-                // Include other relevant fields here
-                '}';
-    }
 
 }

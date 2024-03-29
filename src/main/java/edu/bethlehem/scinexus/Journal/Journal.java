@@ -1,19 +1,14 @@
 package edu.bethlehem.scinexus.Journal;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Builder.Default;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -21,9 +16,6 @@ import java.util.Set;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
-import org.springframework.transaction.annotation.Transactional;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import edu.bethlehem.scinexus.Interaction.Interaction;
 import edu.bethlehem.scinexus.Media.Media;
@@ -67,9 +59,11 @@ public class Journal implements Serializable {
     @JsonManagedReference
     private User publisher;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    //It was lazy
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "journal")
     @JdbcTypeCode(SqlTypes.JSON)
+    @JsonBackReference
     private Set<Interaction> interactions;
 
     @OneToMany(fetch = FetchType.EAGER)
@@ -81,6 +75,7 @@ public class Journal implements Serializable {
     @OneToMany(fetch = FetchType.EAGER)
     @JdbcTypeCode(SqlTypes.JSON)
     @JoinColumn(name = "journal")
+    @JsonBackReference
     private List<Media> medias;
 
     @ManyToOne(fetch = FetchType.EAGER)
@@ -88,10 +83,14 @@ public class Journal implements Serializable {
     @JdbcTypeCode(SqlTypes.JSON)
     private Journal reShare;
 
-    @ManyToMany(mappedBy = "contributs", fetch = FetchType.EAGER)
-    @JdbcTypeCode(SqlTypes.JSON)
-    // @JsonIgnore
-    private Set<User> contributors;
+//    @ManyToMany(mappedBy = "contributors", fetch = FetchType.EAGER)
+//    @JdbcTypeCode(SqlTypes.JSON)
+//    // @JsonIgnore
+//    private Set<User> contributors;
+
+    @ManyToMany(mappedBy = "contributedJournals", fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
+    @JsonManagedReference
+    private Set<User> contributors = new HashSet<>();
 
     public void setPublisher(User publisher) {
         this.publisher = publisher;

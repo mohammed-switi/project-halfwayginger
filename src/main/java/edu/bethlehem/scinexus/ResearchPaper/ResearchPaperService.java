@@ -77,6 +77,7 @@ public class ResearchPaperService {
     }
 
     public ResearchPaper saveResearchPaper(ResearchPaper researchPaper) {
+        System.out.println("SAVEED RESEARCH PAPER");
         return researchPaperRepository.save(researchPaper);
     }
 

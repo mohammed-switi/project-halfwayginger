@@ -1,6 +1,8 @@
 package edu.bethlehem.scinexus.Auth;
 
 
+import edu.bethlehem.scinexus.User.OrganizationType;
+import edu.bethlehem.scinexus.User.Position;
 import edu.bethlehem.scinexus.User.Role;
 import jakarta.persistence.Column;
 import jakarta.persistence.EnumType;
@@ -92,5 +94,14 @@ public class RegisterRequest {
     @NotNull
     @Enumerated(EnumType.STRING)
     private Role role;
+
+
+    @Enumerated(EnumType.STRING)
+    private OrganizationType type;
+
+    private String education;
+    private String badge;
+    @Enumerated(EnumType.STRING)
+    private Position position;
 
 }

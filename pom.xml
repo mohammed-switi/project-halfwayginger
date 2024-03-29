@@ -34,7 +34,7 @@
 		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-oauth2-jose</artifactId>
-			<version>5.5.0</version> <!-- Adjust version as needed -->
+			<version>5.5.0</version>
 		</dependency>
 
 		<dependency>
@@ -42,11 +42,12 @@
 			<artifactId>spring-security-oauth2-client</artifactId>
 			<version>6.2.3</version>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-mail -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-thymeleaf</artifactId>
+			<artifactId>spring-boot-starter-mail</artifactId>
+			<version>3.2.4</version>
 		</dependency>
-
 
 		<dependency>
 			<groupId>com.github.javafaker</groupId>
@@ -185,7 +186,16 @@
 			<artifactId>spring-beans</artifactId>
 			<version>6.1.4</version>
 		</dependency>
-	</dependencies>
+		<dependency>
+			<groupId>jakarta.validation</groupId>
+			<artifactId>jakarta.validation-api</artifactId>
+			<version>3.0.2</version>
+		</dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+    </dependencies>
 
 	<build>
 		<plugins>

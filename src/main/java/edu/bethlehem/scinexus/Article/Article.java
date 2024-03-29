@@ -17,7 +17,6 @@ import lombok.experimental.SuperBuilder;
 @DiscriminatorValue("article")
 public class Article extends Journal {
 
-    private @Id @GeneratedValue Long id;
 
     @NotNull(message = "The Article Subject Shouldn't Be Null")
     @NotBlank(message = "The Article Subject Shouldn't Be Empty")

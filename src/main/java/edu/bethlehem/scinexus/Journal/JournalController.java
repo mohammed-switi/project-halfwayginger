@@ -1,23 +1,13 @@
 package edu.bethlehem.scinexus.Journal;
 
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.*;
-import org.springframework.security.core.Authentication;
 import org.springframework.hateoas.*;
 import org.springframework.web.bind.annotation.*;
 
-import edu.bethlehem.scinexus.Article.Article;
-import edu.bethlehem.scinexus.SecurityConfig.JwtService;
-import edu.bethlehem.scinexus.Interaction.Interaction;
 import edu.bethlehem.scinexus.Interaction.InteractionRepository;
-import edu.bethlehem.scinexus.User.User;
-import edu.bethlehem.scinexus.User.UserNotFoundException;
 import edu.bethlehem.scinexus.User.UserRepository;
 
 @RestController
@@ -43,19 +33,18 @@ public class JournalController {
         return service.findAllJournals();
     }
 
-    @PostMapping("/{journalId}/contributors/{contributorId}")
-    public ResponseEntity<?> addContributor(
-            @PathVariable(value = "journalId") Long journalId,
-            @PathVariable Long contributorId) {
+    @PostMapping()
+    public ResponseEntity<?> addContributor(@RequestBody @Valid
+                                            ContributionDTO contributionDTO) {
 
-        return service.addContributor(journalId, contributorId);
+        EntityModel<Journal> entityModel=service.addContributor(contributionDTO);
+        return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
     }
 
-    @DeleteMapping("/{journalId}/contributors/{contributorId}")
-    public ResponseEntity<?> removeContributor(@PathVariable(value = "journalId") Long journalId,
-            @PathVariable Long contributorId) {
-
-        return service.removeContributor(journalId, contributorId);
+    @DeleteMapping()
+    public ResponseEntity<?> removeContributor(@RequestBody @Valid ContributionDTO contributionDTO) {
+        service.removeContributor(contributionDTO);
+        return ResponseEntity.noContent().build();
     }
 
 }

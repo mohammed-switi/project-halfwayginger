@@ -1,5 +1,6 @@
 package edu.bethlehem.scinexus.Interaction;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import edu.bethlehem.scinexus.Journal.Journal;
 import edu.bethlehem.scinexus.Opinion.Opinion;
 import edu.bethlehem.scinexus.User.User;
@@ -28,15 +29,18 @@ public class Interaction {
     @ManyToOne
     @JoinColumn(name = "opinion")
     @JsonIgnore
+    @JsonManagedReference
     private Opinion opinion;
 
     @ManyToOne
     @JoinColumn(name = "journal")
     @JsonIgnore
+    @JsonManagedReference
     private Journal journal;
 
     @ManyToOne
     @JoinColumn(name = "user")
+    @JsonManagedReference
     private User interactorUser;
 
     // This constructor Should be removed

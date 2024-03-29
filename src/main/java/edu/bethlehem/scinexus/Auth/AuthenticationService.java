@@ -33,12 +33,16 @@ public class AuthenticationService {
                         user = User.builder()
                                         .firstName(request.getFirstName())
                                         .lastName(request.getLastName())
+                                        .username(request.getUsername())
                                         .email(request.getEmail())
-                                        .phoneNumber(passwordEncoder.encode(request.getPassword()))
+                                        .phoneNumber(request.getPhoneNumber())
                                         .password(request.getPassword())
                                         .role(request.getRole())
                                         .bio(request.getBio())
                                         .fieldOfWork(request.getFieldOfWork())
+                                        .education(request.getEducation())
+                                        .badge(request.getBadge())
+                                        .position(request.getPosition())
                                         .build();
 
                 } else {
@@ -52,11 +56,12 @@ public class AuthenticationService {
                                         .role(request.getRole())
                                         .bio(request.getBio())
                                         .fieldOfWork(request.getFieldOfWork())
+                                         .type(request.getType())
                                         .build();
                 }
 
                 userRepository.save(user);
-
+                // Remember to Delete the following Lines, because the JWT Token Must Be Returned When Authenticating
                 var jwtToken = service.generateToken(user);
                 return AuthenticationResponse.builder()
                                 .token(jwtToken)
@@ -71,8 +76,7 @@ public class AuthenticationService {
                                                 request.getEmail(),
                                                 request.getPassword()));
                 var user = userRepository.findByEmail(request.getEmail())
-                                .orElseThrow(() -> new UserNotFoundException("User Not Found Exception",
-                                                HttpStatus.NOT_FOUND));
+                                .orElseThrow(() -> new UserNotFoundException("User Not Found Exception", HttpStatus.NOT_FOUND));
                 var jwtToken = service.generateToken(user);
                 return AuthenticationResponse.builder()
                                 .token(jwtToken)

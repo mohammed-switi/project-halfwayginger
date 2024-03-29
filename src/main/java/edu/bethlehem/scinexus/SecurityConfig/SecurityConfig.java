@@ -31,39 +31,43 @@ public class SecurityConfig {
 
         private final JwtAuthenticationFilter jwtAuthFilter;
         private final AuthenticationProvider authenticationProvider;
-        private final AuthorizationManager authorizationManager;
+  private final AuthorizationManager authorizationManager;
 
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
                 .csrf(AbstractHttpConfigurer::disable)
+
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
                                 .requestMatchers("/api/v1/auth/**").permitAll()
 
-                                .requestMatchers(HttpMethod.GET, "/articles/{journalId}")
-                                .access(authorizationManager.readJournals())
-                                .requestMatchers(HttpMethod.PUT, "/articles/{journalId}")
-                                .access(authorizationManager.journalOwnerContributors())
-                                .requestMatchers(HttpMethod.PATCH, "/articles/{journalId}")
-                                .access(authorizationManager.journalOwnerContributors())
-
-                                .requestMatchers(HttpMethod.DELETE, "/articles/{journalId}")
-                                .access(authorizationManager.journalOwner())
-
-                                .requestMatchers("/journals/{journalId}/contributors/{contributorId}")
-                                .access(authorizationManager.journalOwner())
+//                                .requestMatchers(HttpMethod.GET, "/articles/{journalId}")
+//                                .access(authorizationManager.readJournals())
+//
+//                                .requestMatchers(HttpMethod.PUT, "/articles/{journalId}")
+//                                .access(authorizationManager.journalOwnerContributors())
+//
+//                                .requestMatchers(HttpMethod.PATCH, "/articles/{journalId}")
+//                                .access(authorizationManager.journalOwnerContributors())
+//
+//                                .requestMatchers(HttpMethod.DELETE, "/articles/{journalId}")
+//                                .access(authorizationManager.journalOwner())
+//
+//                                .requestMatchers(HttpMethod.POST,"/journals/**")
+//                                .access(authorizationManager.journalOwner())
 
                                 .anyRequest().authenticated()
                 )
-                .authenticationProvider(authenticationProvider)
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
-                .formLogin(Customizer.withDefaults())
-                .oauth2Login(Customizer.withDefaults())
+
+//                .formLogin(Customizer.withDefaults())
+//                .oauth2Login(Customizer.withDefaults())
                 .sessionManagement(sessionConfigurer ->
                         sessionConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                );
+                )
+                .authenticationProvider(authenticationProvider)
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
 
         return httpSecurity.build();

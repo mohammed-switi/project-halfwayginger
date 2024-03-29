@@ -14,6 +14,7 @@ import edu.bethlehem.scinexus.User.User;
 
 import java.util.List;
 
+import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
@@ -24,7 +25,6 @@ import org.hibernate.type.SqlTypes;
 @EqualsAndHashCode(callSuper = false)
 @DiscriminatorValue("research_paper")
 public class ResearchPaper extends Journal {
-    private @Id @GeneratedValue Long id;
 
     @Enumerated(EnumType.STRING)
     @NotNull(message = "The Research Paper Language Can't Be Null")
@@ -45,12 +45,12 @@ public class ResearchPaper extends Journal {
     // @NotNull(message = "The Research Paper Number Of Pages Can't Be Null")
     private Integer noOfPages = 0;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "research_paper_access_request_academics", joinColumns = @JoinColumn(name = "requestsForAccess"), inverseJoinColumns = @JoinColumn(name = "requestsResearchPapers"))
     @JdbcTypeCode(SqlTypes.JSON)
     private List<User> requestsForAccess;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "research_paper_validated_by_organization", joinColumns = @JoinColumn(name = "validated"), inverseJoinColumns = @JoinColumn(name = "validated_research_papers"))
     private List<User> validatedBy;
 
@@ -62,4 +62,16 @@ public class ResearchPaper extends Journal {
 
     }
 
+//    @Override
+//    public String toString() {
+//        return "ResearchPaper{" +
+//                "language=" + language +
+//                ", description='" + description + '\'' +
+//                ", title='" + title + '\'' +
+//                ", subject='" + subject + '\'' +
+//                ", noOfPages=" + noOfPages +
+//                ", requestsForAccess=" + requestsForAccess +
+//                ", validatedBy=" + validatedBy +
+//                '}';
+//    }
 }

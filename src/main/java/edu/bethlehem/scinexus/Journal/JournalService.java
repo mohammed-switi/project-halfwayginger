@@ -1,13 +1,11 @@
 package edu.bethlehem.scinexus.Journal;
 
-import edu.bethlehem.scinexus.Auth.UserNotAuthorizedException;
-import edu.bethlehem.scinexus.Journal.Visibility;
+import edu.bethlehem.scinexus.Authorization.AuthorizationManager;
 import edu.bethlehem.scinexus.User.UserService;
 import edu.bethlehem.scinexus.SecurityConfig.JwtService;
 import edu.bethlehem.scinexus.User.User;
 import edu.bethlehem.scinexus.User.UserNotFoundException;
 import edu.bethlehem.scinexus.User.UserRepository;
-import edu.bethlehem.scinexus.User.UserRequestDTO;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
@@ -18,11 +16,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.lang.reflect.Method;
-import java.util.Collection;
-import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -36,6 +31,7 @@ public class JournalService {
     private final JournalModelAssembler assembler;
     private final JwtService jwtService;
     private final UserService userService;
+    private final AuthorizationManager authorizationManager;
 
     public Journal convertJournalDtoToJournalEntity(Authentication authentication,
             JournalRequestDTO journalRequestDTO) {
@@ -77,51 +73,56 @@ public class JournalService {
                 .collect(Collectors.toList()));
 
     }
-
-    public ResponseEntity<?> addContributor(Long journalId, Long contributorId) {
+    @Transactional
+    public EntityModel<Journal> addContributor(ContributionDTO contributionDTO) {
+        Long contributorId=contributionDTO.getUserId();
+        Long journalId= contributionDTO.getJournalId();
 
         User contributorUser = userRepository.findById(contributorId)
-                .orElseThrow(() -> new UserNotFoundException("User is not found with id: " + contributorId,
-                        HttpStatus.NOT_FOUND));
-        Journal journal = journalRepository.findById(
-                journalId)
+                .orElseThrow(() -> new UserNotFoundException("User is not found with id: " + contributorId, HttpStatus.NOT_FOUND));
+
+        Journal journal = journalRepository.findById(journalId)
                 .orElseThrow(() -> new JournalNotFoundException(journalId, HttpStatus.NOT_FOUND));
 
-        if (journal.getContributors().stream().anyMatch(u -> u.getId() == contributorId)) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("The user is already a contributor");
-        }
+        if (authorizationManager.isJournalOwner(journalId,contributorUser))
+            throw new ContributionException("Journal Owner Can't be A Contributor");
 
+        if (journal.getContributors().contains(contributorUser))
+          throw  new ContributionException("User is Already A Contributor");
+
+
+        // Add contributor to the journal and save
         journal.getContributors().add(contributorUser);
         journalRepository.save(journal);
 
-        contributorUser.getContributs().add(journal);
+        // Add journal to the contributor's contributed journals and save
+        contributorUser.getContributedJournals().add(journal);
         userRepository.save(contributorUser);
 
+        // Return response with created journal entity
         EntityModel<Journal> entityModel = assembler.toModel(journal);
-        return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
-
+        return entityModel;
     }
 
-    public ResponseEntity<?> removeContributor(Long journalId,
-            Long contributorId) {
+
+    public void removeContributor(ContributionDTO contributionDTO) {
+        Long journalId=contributionDTO.getJournalId();
+        Long contributorId=contributionDTO.getUserId();
+
         Journal journal = journalRepository.findById(
                 journalId)
                 .orElseThrow(() -> new JournalNotFoundException(journalId, HttpStatus.NOT_FOUND));
 
         User contributor = userRepository.findById(contributorId)
                 .orElseThrow(
-                        () -> new UserNotFoundException("Contributor is not found with id: " + contributorId,
-                                HttpStatus.NOT_FOUND));
-        if (journal.getContributors().stream().anyMatch(u -> u.getId() == contributorId)) {
-            contributor.getContributs().remove(journal);
+                        () -> new UserNotFoundException(contributorId));
+        if (journal.getContributors().contains(contributor)) {
+            contributor.getContributedJournals().remove(journal);
             journal.getContributors().remove(contributor);
         } else {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("The user is already not a contributor");
+            throw new ContributionException("The user is already not a contributor");
         }
         userRepository.save(contributor);
-        EntityModel<Journal> entityModel = assembler.toModel(journalRepository.save(journal));
-        return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri())
-                .body(entityModel);
 
     }
 

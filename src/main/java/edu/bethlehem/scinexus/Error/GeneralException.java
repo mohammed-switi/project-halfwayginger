@@ -12,6 +12,7 @@ public class GeneralException extends RuntimeException{
         this.httpStatus=httpStatus;
     }
     public GeneralException(String message){
+
         super(message);
     }
 
