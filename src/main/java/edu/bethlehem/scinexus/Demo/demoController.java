@@ -10,15 +10,20 @@ import org.springframework.web.bind.annotation.RestController;
 import java.security.SignatureException;
 
 @RestController
-@RequestMapping("api/v1/demo-controller")
+@RequestMapping()
 
 public class demoController {
 
-    @GetMapping
+    @GetMapping("/api/v1/demo-controller")
     public ResponseEntity<String> sayHello(){
-
-
 
         return ResponseEntity.ok("Hello from Sercured Endpoint");
     }
+
+
+//    @GetMapping()
+//    public ResponseEntity<String> FuckEndPoint(){
+//
+//        return ResponseEntity.ok("I SUCCSEEDED BITCH");
+//    }
 }

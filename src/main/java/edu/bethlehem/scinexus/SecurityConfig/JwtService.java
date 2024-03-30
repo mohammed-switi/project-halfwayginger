@@ -1,6 +1,5 @@
 package edu.bethlehem.scinexus.SecurityConfig;
 
-import edu.bethlehem.scinexus.SecurityConfig.UserDetailsImpl;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
@@ -11,16 +10,20 @@ import io.jsonwebtoken.security.SignatureException;
 import org.json.JSONObject;
 
 import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
+import java.time.Instant;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
 @Service
-public class JwtService {
+public class JwtService  {
 
     private static final String SECRET_KEY = "491ef82099212d650f7da939a3473c3ae12bb6ca0004a0b635245b9c04e4a94f";
 
@@ -28,11 +31,23 @@ public class JwtService {
     public String extractUsername(String jwtToken) {
         return extractClaim(jwtToken, Claims::getSubject);
     }
-
     public Long extractId(Authentication authentication){
         UserDetailsImpl userDetails=(UserDetailsImpl) authentication.getPrincipal();
         return userDetails.getId();
     }
+    public Instant extractIssuedAt(String jwtToken){return extractClaim(jwtToken,Claims::getIssuedAt).toInstant();}
+
+    public Instant extractExpiresAt(String token){return extractClaim(token,Claims::getExpiration).toInstant();}
+
+    public HashMap<String, Object> extractHeaders(String token){
+        Claims claims = extractAllClaims(token);
+        HashMap<String,Object> headers=new HashMap<>();
+        headers.put("typ",claims.get("typ"));
+        headers.put("alg",claims.get("alg"));
+        System.out.println(headers.toString() +" SLUT THIS IS Headers");
+        return headers;
+    }
+
     public Long extractId(String jwtToken) {
         Claims claim = extractClaim(jwtToken.substring(7), claims -> {
             return claims;
@@ -82,7 +97,7 @@ public class JwtService {
         return extractClaim(token, Claims::getExpiration);
     }
 
-    private Claims extractAllClaims(String token) throws SignatureException, MalformedJwtException {
+    Claims extractAllClaims(String token) throws SignatureException, MalformedJwtException {
 
         return Jwts
                 .parser()
@@ -98,5 +113,6 @@ public class JwtService {
         return Keys.hmacShaKeyFor(keyBytes);
 
     }
+
 
 }

@@ -14,7 +14,7 @@ public class GeneralErrorResponse {
 
     int status;
     String message;
-   // Throwable throwable;
+    Throwable throwable;
     Date timestamp;
 
     Map<String,String> validationError;

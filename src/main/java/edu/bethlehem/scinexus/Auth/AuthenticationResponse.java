@@ -14,7 +14,8 @@ import org.springframework.http.HttpStatus;
 
 public class AuthenticationResponse {
 
-    private String token;
+    private String jwtToken;
+    private String confirmationToken;
 
 
 }

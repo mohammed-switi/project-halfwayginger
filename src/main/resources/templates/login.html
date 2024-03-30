@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>Login</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            padding-top: 80px;
+        }
+        .form-signin {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+        .form-signin-heading {
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: bold;
+            color: #007bff;
+        }
+        .form-control {
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .btn-login {
+            width: 100%;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: #fff;
+            font-weight: bold;
+        }
+        .btn-login:hover {
+            background-color: #0056b3;
+        }
+        .oauth-links {
+            text-align: center;
+        }
+        .oauth-links a {
+            display: inline-block;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            padding: 10px 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            color: #007bff;
+            text-decoration: none;
+        }
+        .oauth-links a:hover {
+            background-color: #f0f0f0;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <form class="form-signin" th:action="@{/api/v1/auth/login}" method="post" th:object="${loginForm}">
+        <h2 class="form-signin-heading">Login</h2>
+        <div class="form-group">
+            <label for="inputEmail">Email address</label>
+            <input type="email" id="inputEmail" class="form-control" placeholder="Email address" required autofocus th:field="*{email}">
+        </div>
+        <div class="form-group">
+            <label for="inputPassword">Password</label>
+            <input type="password" id="inputPassword" class="form-control" placeholder="Password" required th:field="*{password}">
+        </div>
+        <button class="btn btn-lg btn-login" type="submit">Sign in</button>
+    </form>
+    <div class="oauth-links">
+        <a th:href="@{/oauth2/authorization/github}">Login with GitHub</a>
+        <a th:href="@{/oauth2/authorization/google}">Login with Google</a>
+    </div>
+</div>
+</body>
+</html>

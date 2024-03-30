@@ -2,6 +2,7 @@ package edu.bethlehem.scinexus.SecurityConfig;
 
 import edu.bethlehem.scinexus.User.UserRepository;
 import edu.bethlehem.scinexus.User.UserNotFoundException;
+import edu.bethlehem.scinexus.User.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,17 +20,18 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public class ApplicationConfig {
 
     private final UserRepository userRepository;
+    private final UserService userDetailsService;
 
-    @Bean
-    public UserDetailsService userDetailsService() {
-        return email -> userRepository.findByEmail(email)
-                .orElseThrow(() -> new UserNotFoundException("User Not Found", HttpStatus.NOT_FOUND));
-    }
+//    @Bean
+//    public UserDetailsService userDetailsService() {
+//        return email -> userRepository.findByEmail(email)
+//                .orElseThrow(() -> new UserNotFoundException("User Not Found", HttpStatus.NOT_FOUND));
+//    }
 
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
-        authenticationProvider.setUserDetailsService(userDetailsService());
+        authenticationProvider.setUserDetailsService(userDetailsService);
         authenticationProvider.setPasswordEncoder(passwordEncoder());
         return authenticationProvider;
     }
