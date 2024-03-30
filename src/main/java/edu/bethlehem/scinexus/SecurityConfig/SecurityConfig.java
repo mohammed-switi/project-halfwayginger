@@ -54,7 +54,13 @@ public class SecurityConfig  {
 
                                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
                                                 .requestMatchers("/api/v1/auth/**").permitAll()
-
+                                        .requestMatchers("/index.html").permitAll()
+                                        .requestMatchers("/css/**").permitAll()
+                                        .requestMatchers("/js/**").permitAll()
+                                        .requestMatchers("/ws/**").permitAll()
+                                        .requestMatchers("/topic/public").permitAll()
+                                        .requestMatchers("/app/**").permitAll()
+                                        .requestMatchers("/actuator/**").permitAll()
                                                 .requestMatchers(HttpMethod.GET, "/articles/{journalId}")
                                                 .access(authorizationManager.readJournals())
 

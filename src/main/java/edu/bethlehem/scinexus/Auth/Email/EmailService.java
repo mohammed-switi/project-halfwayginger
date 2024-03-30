@@ -22,11 +22,11 @@ public class EmailService  implements  EmailSender{
 
     }
 
-//    private final static Logger Logger= LoggerFactory.getLogger(EmailService.class);
-//
-//
+    private final static Logger Logger= LoggerFactory.getLogger(EmailService.class);
+
+
 //    private final JavaMailSender mailSender;
-//
+
 //    @Override
 //    @Async
 //    public void send(String to, String email) {

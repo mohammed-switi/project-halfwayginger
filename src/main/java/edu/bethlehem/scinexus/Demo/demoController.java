@@ -21,9 +21,9 @@ public class demoController {
     }
 
 
-    @GetMapping()
-    public ResponseEntity<String> FuckEndPoint(){
-
-        return ResponseEntity.ok("I SUCCSEEDED BITCH");
-    }
+//    @GetMapping()
+//    public ResponseEntity<String> FuckEndPoint(){
+//
+//        return ResponseEntity.ok("I SUCCSEEDED BITCH");
+//    }
 }

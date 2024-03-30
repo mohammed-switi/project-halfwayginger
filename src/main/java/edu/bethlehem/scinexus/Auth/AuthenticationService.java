@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -43,7 +44,7 @@ public class AuthenticationService {
                                         .username(request.getUsername())
                                         .email(request.getEmail())
                                         .phoneNumber(request.getPhoneNumber())
-                                        .password(request.getPassword())
+                                        .password(passwordEncoder.encode(request.getPassword()))
                                         .role(request.getRole())
                                         .bio(request.getBio())
                                         .fieldOfWork(request.getFieldOfWork())
@@ -84,7 +85,7 @@ public class AuthenticationService {
 //
 //                confirmationTokenService.saveConfirmationToken(confirmationToken);
 //                String link = "http://localhost:8080/api/v1/auth/confirm?token=" + token;
-
+//
 //                emailSender.send(request.getEmail(),
 //                        buildEmail(request.getFirstName(),link));
 
