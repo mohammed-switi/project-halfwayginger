@@ -4,6 +4,10 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
+
+node_modules/
+Uploads/
+*.log
 ### STS ###
 .apt_generated
 .classpath
