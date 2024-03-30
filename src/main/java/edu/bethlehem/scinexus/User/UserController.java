@@ -82,7 +82,13 @@ public class UserController {
 
     @PutMapping("/links/{userLinkTo}")
     ResponseEntity<?> linkUser(Authentication authentication, @PathVariable Long userLinkTo) {
-        return service.linkUser(authentication, userLinkTo);
+        return ResponseEntity.ok(service.linkUser(authentication, userLinkTo));
+    }
+
+    @DeleteMapping("/links/{userLinkTo}")
+    ResponseEntity<?> unlinkUser(Authentication authentication, @PathVariable Long userLinkTo) {
+        service.unlinkUser(authentication, userLinkTo);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/articles")

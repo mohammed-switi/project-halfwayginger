@@ -127,7 +127,7 @@ public class UserService implements UserDetailsService {
 
     }
 
-    ResponseEntity<?> linkUser(Authentication authentication, Long userLinkToId) {
+    EntityModel<User> linkUser(Authentication authentication, Long userLinkToId) {
         Long linkFromId = ((User) (authentication.getPrincipal())).getId();
         User userLinkTo = repository.findById(
                 userLinkToId).orElseThrow(
@@ -138,17 +138,35 @@ public class UserService implements UserDetailsService {
                         HttpStatus.NOT_FOUND));
 
         if (user.getLinks().contains(userLinkTo))
-            return ResponseEntity.badRequest().body("The user with id:" + linkFromId
-                    + " is already linked to the user with id:" + userLinkToId);
+            throw new UserNotFoundException("The user with id:" + linkFromId
+                    + " is already linked to the user with id:" + userLinkToId, HttpStatus.BAD_REQUEST);
         if (user.getId() == userLinkTo.getId())
-            return ResponseEntity.badRequest().body("The user with id:" + linkFromId
-                    + " cannot link to itself");
+            throw new UserNotFoundException("The user with id:" + linkFromId
+                    + " can't be linked to itself", HttpStatus.BAD_REQUEST);
         user.getLinks().add(userLinkTo);
 
         EntityModel<User> entityModel = assembler.toModel(repository.save(user));
-        return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri())
-                .body(entityModel);
+        return entityModel;
 
+    }
+
+    EntityModel<User> unlinkUser(Authentication authentication, Long userLinkToId) {
+        Long linkFromId = ((User) (authentication.getPrincipal())).getId();
+        User userLinkTo = repository.findById(userLinkToId)
+                .orElseThrow(() -> new UserNotFoundException("The user with id:" +
+                        userLinkToId + " is not found", HttpStatus.NOT_FOUND));
+        User user = repository.findById(linkFromId)
+                .orElseThrow(() -> new UserNotFoundException("The user with id:" + linkFromId + " is not found",
+                        HttpStatus.NOT_FOUND));
+
+        if (!user.getLinks().contains(userLinkTo))
+            throw new UserNotFoundException("The user with id:" + linkFromId
+                    + " is not linked to the user with id:" + userLinkToId, HttpStatus.BAD_REQUEST);
+
+        user.getLinks().remove(userLinkTo);
+
+        EntityModel<User> entityModel = assembler.toModel(repository.save(user));
+        return entityModel;
     }
 
     CollectionModel<EntityModel<Article>> getUserArticles(Authentication authentication) {

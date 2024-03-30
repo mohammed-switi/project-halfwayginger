@@ -80,19 +80,20 @@ public class SecurityConfig {
                     httpSecurityFormLoginConfigurer.successForwardUrl("/dashboard");
                 })
 
-                .oauth2ResourceServer((oauth2) -> oauth2.jwt((jwt) -> {
-                    jwt.decoder(jwtDecoder());
-                }))
+                // .oauth2ResourceServer((oauth2) -> oauth2.jwt((jwt) -> {
+                // jwt.decoder(jwtDecoder());
+                // }))
 
-                .oauth2Login(httpSecurityOAuth2LoginConfigurer -> {
-                    httpSecurityOAuth2LoginConfigurer.loginPage("/api/v1/auth/login").permitAll();
+                // .oauth2Login(httpSecurityOAuth2LoginConfigurer -> {
+                // httpSecurityOAuth2LoginConfigurer.loginPage("/api/v1/auth/login").permitAll();
 
-                    httpSecurityOAuth2LoginConfigurer
-                            .tokenEndpoint(tokenEndpointConfig -> tokenEndpointConfig.accessTokenResponseClient(
-                                    accessTokenResponseClient()));
+                // httpSecurityOAuth2LoginConfigurer
+                // .tokenEndpoint(tokenEndpointConfig ->
+                // tokenEndpointConfig.accessTokenResponseClient(
+                // accessTokenResponseClient()));
 
-                    httpSecurityOAuth2LoginConfigurer.defaultSuccessUrl("/dashboard", true);
-                })
+                // httpSecurityOAuth2LoginConfigurer.defaultSuccessUrl("/dashboard", true);
+                // })
                 .sessionManagement(sessionConfigurer -> sessionConfigurer
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider)
