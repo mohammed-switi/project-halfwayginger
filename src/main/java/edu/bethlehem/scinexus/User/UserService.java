@@ -153,7 +153,7 @@ public class UserService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return repository.findByEmail(username).orElseThrow(UserNotFoundException::new);
+        return repository.findByEmail(username).orElseThrow(() -> new UserNotFoundException("User with username "+ username +" is not found"));
     }
 
     public int enableUser(String email) {

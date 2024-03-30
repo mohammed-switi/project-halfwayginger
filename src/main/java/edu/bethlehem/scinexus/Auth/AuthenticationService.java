@@ -74,26 +74,26 @@ public class AuthenticationService {
 
                 userRepository.save(user);
 
-                String token = UUID.randomUUID().toString();
+//                String token = UUID.randomUUID().toString();
+//
+//                ConfirmationToken confirmationToken=ConfirmationToken.builder()
+//                        .token(token)
+//                        .createdAt(LocalDateTime.now())
+//                        .expiresAt(LocalDateTime.now().plusMinutes(15))
+//                        .user(user)
+//                        .build();
+//
+//                confirmationTokenService.saveConfirmationToken(confirmationToken);
+//                String link = "http://localhost:8080/api/v1/auth/confirm?token=" + token;
 
-                ConfirmationToken confirmationToken=ConfirmationToken.builder()
-                        .token(token)
-                        .createdAt(LocalDateTime.now())
-                        .expiresAt(LocalDateTime.now().plusMinutes(15))
-                        .user(user)
-                        .build();
-
-                confirmationTokenService.saveConfirmationToken(confirmationToken);
-                String link = "http://localhost:8080/api/v1/auth/confirm?token=" + token;
-
-                emailSender.send(request.getEmail(),
-                        buildEmail(request.getFirstName(),link));
+//                emailSender.send(request.getEmail(),
+//                        buildEmail(request.getFirstName(),link));
 
                 // Remember to Delete the following Lines, because the JWT Token Must Be Returned When Authenticating
                 var jwtToken = service.generateToken(user);
                 return AuthenticationResponse.builder()
                                 .jwtToken(jwtToken)
-                                .confirmationToken(token)
+                                .confirmationToken("token")
                                 .build();
 
         }
@@ -102,9 +102,9 @@ public class AuthenticationService {
 
                 authenticationManager.authenticate(
                                 new UsernamePasswordAuthenticationToken(
-                                                request.getEmail(),
+                                                request.getUsername(),
                                                 request.getPassword()));
-                var user = userRepository.findByEmail(request.getEmail())
+                var user = userRepository.findByEmail(request.getUsername())
                                 .orElseThrow(() -> new UserNotFoundException("User Not Found Exception", HttpStatus.NOT_FOUND));
 
                 var jwtToken = service.generateToken(user);

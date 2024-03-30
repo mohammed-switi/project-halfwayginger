@@ -230,7 +230,7 @@ public class User implements UserDetailsImpl {
     @Override
    // @JsonIgnore
     public boolean isAccountNonLocked() {
-        return !locked;
+        return true;
     }
 
     @Override
@@ -242,7 +242,7 @@ public class User implements UserDetailsImpl {
     @Override
    // @JsonIgnore
     public boolean isEnabled() {
-        return enabled;
+        return true;
     }
 
     @Override
