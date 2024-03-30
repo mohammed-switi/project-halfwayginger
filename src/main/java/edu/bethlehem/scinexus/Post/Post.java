@@ -14,14 +14,16 @@ import org.hibernate.type.SqlTypes;
 @Entity
 @EqualsAndHashCode(callSuper = false)
 @SuperBuilder
+@DiscriminatorValue("post")
+
 public class Post extends Journal {
-  //  private @Id @GeneratedValue Long id;
+  // private @Id @GeneratedValue Long id;
 
-    public Post(String content, User publisher) {
-        super(content, publisher);
+  public Post(String content, User publisher) {
+    super(content, publisher);
 
-    }
+  }
 
-    public Post() {
-    }
+  public Post() {
+  }
 }

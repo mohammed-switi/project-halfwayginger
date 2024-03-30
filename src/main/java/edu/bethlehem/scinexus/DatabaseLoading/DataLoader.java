@@ -8,6 +8,8 @@ import edu.bethlehem.scinexus.Journal.Journal;
 import edu.bethlehem.scinexus.Journal.JournalRepository;
 import edu.bethlehem.scinexus.Opinion.Opinion;
 import edu.bethlehem.scinexus.Opinion.OpinionRepository;
+import edu.bethlehem.scinexus.Post.Post;
+import edu.bethlehem.scinexus.Post.PostRepository;
 import edu.bethlehem.scinexus.User.UserRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
@@ -38,6 +40,7 @@ public class DataLoader implements CommandLineRunner {
     private final JournalRepository journalRepository;
     private final OpinionRepository opinionRepository;
     private final InteractionRepository interactionRepository;
+    private final PostRepository postRepository;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -56,6 +59,7 @@ public class DataLoader implements CommandLineRunner {
         generateArticles();
         generateOpinions();
         generateInteractions();
+        generatePosts();
 
         long endTime = System.currentTimeMillis();
         long totalTime = endTime - startTime;
@@ -224,13 +228,35 @@ public class DataLoader implements CommandLineRunner {
 
     }
 
+    private void generatePosts() {
+        List<User> users = userRepository.findAll();
+        List<Post> posts = new ArrayList<>();
+        Random random = new Random();
+        for (User user : users) {
+            for (int i = 0; i < 2; i++) {
+
+                Post post = new Post(dataGenerator.generateRandomUniversityName(), user);
+                System.out.println(user.getUsername());
+                post.setInteractionsCount(0);
+                post.setOpinionsCount(0);
+                post.setVisibility(dataGenerator.generateRandomVisibility());
+                user.addJournal(post);
+
+                posts.add(post);
+            }
+        }
+        // userRepository.saveAll(users);
+        postRepository.saveAll(posts);
+
+    }
+
     private void generateOpinions() {
         List<Journal> journals = journalRepository.findAll();
         List<User> users = userRepository.findAll();
         List<Opinion> opinions = new ArrayList<>();
         Random random = new Random();
         for (Journal journal : journals) {
-            for (int j = 0; j < random.nextInt(10); j++) {
+            for (int j = 0; j < random.nextInt(5); j++) {
                 Opinion opinion = new Opinion(dataGenerator.generateRandomWords(), journal,
                         users.get(random.nextInt(users.size())));
 
@@ -241,7 +267,7 @@ public class DataLoader implements CommandLineRunner {
         opinionRepository.saveAll(opinions);
         List<Opinion> opinions2 = opinionRepository.findAll();
         for (Opinion opinion : opinions) {
-            for (int j = 0; j < random.nextInt(10); j++) {
+            for (int j = 0; j < random.nextInt(5); j++) {
                 Opinion reOpinion = new Opinion(dataGenerator.generateRandomWords(), opinion.getJournal(),
                         users.get(random.nextInt(users.size())));
 
@@ -267,7 +293,7 @@ public class DataLoader implements CommandLineRunner {
         List<Interaction> interactions = new ArrayList<>();
         Random random = new Random();
         for (Journal journal : journals) {
-            for (int j = 0; j < random.nextInt(10); j++) {
+            for (int j = 0; j < random.nextInt(5); j++) {
 
                 Interaction interaction = new Interaction(
                         dataGenerator.generateRandomInteractionType(), users.get(random.nextInt(users.size())),
@@ -278,7 +304,7 @@ public class DataLoader implements CommandLineRunner {
         }
 
         for (Opinion opinion : opinions) {
-            for (int j = 0; j < random.nextInt(10); j++) {
+            for (int j = 0; j < random.nextInt(5); j++) {
 
                 Interaction interaction = new Interaction(
                         dataGenerator.generateRandomInteractionType(), users.get(random.nextInt(users.size())),
@@ -292,4 +318,5 @@ public class DataLoader implements CommandLineRunner {
         interactionRepository.saveAll(interactions);
 
     }
+
 }
