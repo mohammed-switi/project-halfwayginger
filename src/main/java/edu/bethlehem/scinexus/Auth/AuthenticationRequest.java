@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 public class AuthenticationRequest {
 
     @NotEmpty(message = "Email shoulldn't be empty")
-    private String username;
+    private String email;
 
     @NotEmpty(message = "Passwprd Should'nt Be empty")
      private String password;

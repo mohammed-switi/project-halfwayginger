@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -102,9 +101,9 @@ public class AuthenticationService {
 
                 authenticationManager.authenticate(
                                 new UsernamePasswordAuthenticationToken(
-                                                request.getUsername(),
+                                                request.getEmail(),
                                                 request.getPassword()));
-                var user = userRepository.findByEmail(request.getUsername())
+                var user = userRepository.findByEmail(request.getEmail())
                                 .orElseThrow(() -> new UserNotFoundException("User Not Found Exception", HttpStatus.NOT_FOUND));
 
                 var jwtToken = service.generateToken(user);

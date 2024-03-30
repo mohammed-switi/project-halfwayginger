@@ -83,6 +83,8 @@ public class SecurityConfig  {
                                          httpSecurityFormLoginConfigurer.loginPage("/api/v1/auth/login").permitAll();
                                          httpSecurityFormLoginConfigurer.loginProcessingUrl("/api/v1/auth/login").permitAll();
                                          httpSecurityFormLoginConfigurer.successForwardUrl("/dashboard");
+                                         httpSecurityFormLoginConfigurer.usernameParameter("email");
+                                         httpSecurityFormLoginConfigurer.passwordParameter("password");
                                  })
 
                         .oauth2ResourceServer((oauth2) -> oauth2.jwt((jwt) -> {jwt.decoder(jwtDecoder());}))
