@@ -1,6 +1,7 @@
 package edu.bethlehem.scinexus.Journal;
 
 import edu.bethlehem.scinexus.Authorization.AuthorizationManager;
+import edu.bethlehem.scinexus.DatabaseLoading.DataLoader;
 import edu.bethlehem.scinexus.User.UserService;
 import edu.bethlehem.scinexus.SecurityConfig.JwtService;
 import edu.bethlehem.scinexus.User.User;
@@ -9,6 +10,8 @@ import edu.bethlehem.scinexus.User.UserRepository;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.IanaLinkRelations;
@@ -32,6 +35,7 @@ public class JournalService {
     private final JwtService jwtService;
     private final UserService userService;
     private final AuthorizationManager authorizationManager;
+    Logger logger = LoggerFactory.getLogger(DataLoader.class);
 
     public Journal convertJournalDtoToJournalEntity(Authentication authentication,
             JournalRequestDTO journalRequestDTO) {
@@ -44,20 +48,21 @@ public class JournalService {
     }
 
     public User getUserByPublisherId(long id) {
-
+        logger.trace("Getting User by Publisher ID");
         return userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("User Not Found", HttpStatus.NOT_FOUND));
 
     }
 
     public User findUserById(Long userId) {
+        logger.trace("Finding User by ID");
         return (userRepository.findById(userId))
                 .orElseThrow(UserNotFoundException::new);
 
     }
 
     public EntityModel<Journal> findJournalById(Long journalId) {
-
+        logger.trace("Finding Journal by ID");
         Journal journal = journalRepository.findById(journalId)
                 .orElseThrow(() -> new JournalNotFoundException(journalId));
 
@@ -66,6 +71,7 @@ public class JournalService {
 
     // We Should Specify An Admin Authority To get All Journals
     public CollectionModel<EntityModel<Journal>> findAllJournals() {
+        logger.trace("Finding All Journals");
         return CollectionModel.of(journalRepository
                 .findAll()
                 .stream()
@@ -76,6 +82,7 @@ public class JournalService {
 
     @Transactional
     public EntityModel<Journal> addContributor(ContributionDTO contributionDTO) {
+        logger.trace("Adding Contributor");
         Long contributorId = contributionDTO.getUserId();
         Long journalId = contributionDTO.getJournalId();
 
@@ -107,7 +114,7 @@ public class JournalService {
 
     @Transactional
     public EntityModel<Journal> addContributor(Long journalId, Long contributorId) {
-
+        logger.trace("Adding Contributor");
         User contributorUser = userRepository.findById(contributorId)
                 .orElseThrow(() -> new UserNotFoundException("User is not found with id: " + contributorId,
                         HttpStatus.NOT_FOUND));
@@ -135,6 +142,7 @@ public class JournalService {
     }
 
     public void removeContributor(ContributionDTO contributionDTO) {
+        logger.trace("Removing Contributor");
         Long journalId = contributionDTO.getJournalId();
         Long contributorId = contributionDTO.getUserId();
 
@@ -156,7 +164,7 @@ public class JournalService {
     }
 
     public void removeContributor(Long journalId, Long contributorId) {
-
+        logger.trace("Removing Contributor");
         Journal journal = journalRepository.findById(
                 journalId)
                 .orElseThrow(() -> new JournalNotFoundException(journalId, HttpStatus.NOT_FOUND));

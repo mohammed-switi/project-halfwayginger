@@ -20,7 +20,7 @@ class PostModelAssembler implements RepresentationModelAssembler<Post, EntityMod
                                 post, //
                                 linkTo(methodOn(
                                                 PostController.class).one(
-                                                                post.getId(), authentication))
+                                                                post.getId()))
                                                 .withSelfRel(),
                                 linkTo(methodOn(PostController.class).all()).withRel(
                                                 "+posts"));

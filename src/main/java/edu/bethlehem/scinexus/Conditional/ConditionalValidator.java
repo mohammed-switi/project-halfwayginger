@@ -36,7 +36,6 @@ public class ConditionalValidator implements ConstraintValidator<Conditional, Ob
                 for (String propName : required) {
                     Object requiredValue = BeanUtils.getProperty(objectToValidate, propName);
                     valid = requiredValue != null && !ObjectUtils.isEmpty(requiredValue);
-                    System.out.println("value: " + "" + requiredValue);
                     if (!valid) {
                         context.disableDefaultConstraintViolation();
                         context.buildConstraintViolationWithTemplate(message + propName).addPropertyNode(propName)

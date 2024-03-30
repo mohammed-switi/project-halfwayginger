@@ -9,11 +9,14 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
+import edu.bethlehem.scinexus.DatabaseLoading.DataLoader;
 import edu.bethlehem.scinexus.Interaction.InteractionRepository;
 import edu.bethlehem.scinexus.Opinion.OpinionRepository;
 import edu.bethlehem.scinexus.Organization.OrganizationNotFoundException;
@@ -26,6 +29,7 @@ import edu.bethlehem.scinexus.User.User;
 import edu.bethlehem.scinexus.User.UserNotFoundException;
 import edu.bethlehem.scinexus.User.UserRepository;
 import edu.bethlehem.scinexus.User.UserRequestDTO;
+import edu.bethlehem.scinexus.User.UserRequestPatchDTO;
 
 @Service
 @RequiredArgsConstructor
@@ -39,6 +43,7 @@ public class ResearchPaperService {
     private final InteractionRepository interactionRepository;
     private final OpinionRepository opinionRepository;
     private final ResearchPaperModelAssembler assembler;
+    Logger logger = LoggerFactory.getLogger(ResearchPaperService.class);
 
     public ResearchPaper convertResearchPaperDtoToResearchPaperEntity(Authentication authentication,
             ResearchPaperRequestDTO ResearchPaperRequestDTO) {
@@ -72,7 +77,7 @@ public class ResearchPaperService {
 
     // We Should Specify An Admin Authority To get All ResearchPapers
     public List<EntityModel<ResearchPaper>> findAllResearchPapers() {
-
+        logger.trace("Fetching all research papers");
         return researchPaperRepository
                 .findAll()
                 .stream()
@@ -81,20 +86,21 @@ public class ResearchPaperService {
     }
 
     public ResearchPaper saveResearchPaper(ResearchPaper researchPaper) {
-        System.out.println("SAVEED RESEARCH PAPER");
         return researchPaperRepository.save(researchPaper);
     }
 
     public EntityModel<ResearchPaper> createResearchPaper(ResearchPaperRequestDTO newResearchPaperRequestDTO,
             Authentication authentication) {
+        logger.trace("Creating a new research paper");
         ResearchPaper researchPaper = convertResearchPaperDtoToResearchPaperEntity(authentication,
                 newResearchPaperRequestDTO);
+        logger.debug("Saving the research paper");
         return assembler.toModel(saveResearchPaper(researchPaper));
     }
 
     public EntityModel<ResearchPaper> updateResearchPaper(Long researchPaperId,
             ResearchPaperRequestDTO newResearchPaperRequestDTO) {
-
+        logger.trace("Updating the research paper");
         return researchPaperRepository.findById(
                 researchPaperId)
                 .map(researchPaper -> {
@@ -104,7 +110,7 @@ public class ResearchPaperService {
                     researchPaper.setTitle(newResearchPaperRequestDTO.getTitle());
                     researchPaper.setSubject(newResearchPaperRequestDTO.getSubject());
                     researchPaper.setDescription(newResearchPaperRequestDTO.getDescription());
-
+                    logger.debug("Saving the research paper");
                     return assembler.toModel(researchPaperRepository.save(researchPaper));
                 })
                 .orElseThrow(() -> new ResearchPaperNotFoundException(
@@ -113,7 +119,7 @@ public class ResearchPaperService {
 
     public EntityModel<ResearchPaper> updateResearchPaperPartially(Long researchPaperId,
             ResearchPaperRequestPatchDTO newResearchPaperRequestDTO) {
-
+        logger.trace("Partially updating the research paper");
         ResearchPaper researchPaper = researchPaperRepository.findById(researchPaperId)
                 .orElseThrow(
                         () -> new ResearchPaperNotFoundException(researchPaperId, HttpStatus.UNPROCESSABLE_ENTITY));
@@ -124,6 +130,9 @@ public class ResearchPaperService {
                     Object value = method.invoke(newResearchPaperRequestDTO);
                     if (value != null) {
                         String propertyName = method.getName().substring(3); // remove "get"
+                        logger.trace("Updating researchPaper property: " + propertyName);
+                        if (propertyName.equals("Class")) // Class is a reserved keyword in Java
+                            continue;
                         Method setter = ResearchPaper.class.getMethod("set" + propertyName, method.getReturnType());
                         setter.invoke(researchPaper, value);
                     }
@@ -132,32 +141,40 @@ public class ResearchPaperService {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        logger.debug("Saving the research paper");
         return assembler.toModel(researchPaperRepository.save(researchPaper));
 
     }
 
     public void deleteResearchPaper(Long researchPaperId) {
+        logger.trace("Deleting the research paper");
         ResearchPaper researchPaper = researchPaperRepository.findById(researchPaperId)
                 .orElseThrow(
                         () -> new ResearchPaperNotFoundException(researchPaperId, HttpStatus.UNPROCESSABLE_ENTITY));
         // I had to add these lines to delete the opinions and interactions
         // of the article cuz the cascading didn't work
+
         researchPaper.getInteractions().forEach(interaction -> interactionRepository.delete(interaction));
         researchPaper.getOpinions().forEach(opinion -> opinionRepository.delete(opinion));
+        logger.trace("Deleting the research paper's interactions and opinions");
         researchPaperRepository.delete(researchPaper);
+        logger.debug("Deleting the research paper");
     }
 
     public EntityModel<ResearchPaper> validate(Long researchPaperId, Authentication authentication) {
+        logger.trace("Validating the research paper");
         ResearchPaper researchPaper = researchPaperRepository.findById(researchPaperId)
                 .orElseThrow(
                         () -> new ResearchPaperNotFoundException(researchPaperId, HttpStatus.UNPROCESSABLE_ENTITY));
         User organization = userRepository.findById(jwtService.extractId(authentication))
                 .orElseThrow(() -> new OrganizationNotFoundException("Organization Not Found", HttpStatus.NOT_FOUND));
-
+        logger.trace("Adding the organization to the research paper's validatedBy list");
         researchPaper.getValidatedBy().add(organization);
         organization.getValidated().add(researchPaper);
 
         userRepository.save(organization);
+        logger.debug("Saving the organization");
+        logger.debug("Saving the research paper");
         return assembler.toModel(researchPaperRepository.save(researchPaper));
     }
 

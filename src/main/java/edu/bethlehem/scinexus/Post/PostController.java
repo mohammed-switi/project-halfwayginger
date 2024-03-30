@@ -23,9 +23,8 @@ public class PostController {
   private final PostService postService;
 
   @GetMapping("/{postId}")
-  public ResponseEntity<EntityModel<Post>> one(@PathVariable long postId,
-      Authentication authentication) {
-    return ResponseEntity.ok(postService.findPostById(postId, authentication));
+  public ResponseEntity<EntityModel<Post>> one(@PathVariable long postId) {
+    return ResponseEntity.ok(postService.findPostById(postId));
   }
 
   @GetMapping()
@@ -45,26 +44,25 @@ public class PostController {
 
   @PutMapping("/{id}")
   public ResponseEntity<?> editPost(@PathVariable @NotNull Long id,
-      Authentication authentication,
       @Valid @RequestBody @NotNull PostRequestDTO newPostRequestDTO) {
 
-    EntityModel<Post> entityModel = postService.updatePost(id, authentication, newPostRequestDTO);
+    EntityModel<Post> entityModel = postService.updatePost(id, newPostRequestDTO);
 
     return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
   }
 
   @PatchMapping("/{id}")
   public ResponseEntity<?> updatePostPartially(@PathVariable(value = "id") Long postId,
-      Authentication authentication,
+
       @RequestBody @NotNull PostRequestPatchDTO newPostRequestDTO) {
 
-    EntityModel<Post> entityModel = postService.updatePostPartially(postId, authentication, newPostRequestDTO);
+    EntityModel<Post> entityModel = postService.updatePostPartially(postId, newPostRequestDTO);
     return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
   }
 
   @DeleteMapping("/{id}")
-  ResponseEntity<?> deletePost(@PathVariable Long id, Authentication authentication) {
-    postService.deletePost(id, authentication);
+  ResponseEntity<?> deletePost(@PathVariable Long id) {
+    postService.deletePost(id);
 
     return ResponseEntity.noContent().build();
   }

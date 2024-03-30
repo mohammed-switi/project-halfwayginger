@@ -4,6 +4,8 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.IanaLinkRelations;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
 import edu.bethlehem.scinexus.Organization.OrganizationNotFoundException;
+import edu.bethlehem.scinexus.DatabaseLoading.DataLoader;
 import edu.bethlehem.scinexus.Interaction.Interaction;
 import edu.bethlehem.scinexus.Interaction.InteractionNotFoundException;
 import edu.bethlehem.scinexus.Interaction.InteractionRepository;
@@ -44,16 +47,17 @@ public class InteractionService {
         private final OpinionRepository opinionRepository;
         private final JournalRepository journalRepository;
         private final InteractionModelAssembler assembler;
+        Logger logger = LoggerFactory.getLogger(DataLoader.class);
 
         public User getUserId(long id) {
-
+                logger.trace("Getting User by ID");
                 return userRepository.findById(id)
                                 .orElseThrow(() -> new UserNotFoundException("User Not Found", HttpStatus.NOT_FOUND));
 
         }
 
         public EntityModel<Interaction> findInteractionById(Long InteractionId) {
-
+                logger.trace("Finding Interaction by ID");
                 Interaction interaction = interactionRepository.findById(
                                 InteractionId)
                                 .orElseThrow(() -> new InteractionNotFoundException(InteractionId,
@@ -64,7 +68,7 @@ public class InteractionService {
 
         // We Should Specify An Admin Authority To get All Interactions
         public CollectionModel<EntityModel<Interaction>> findAllInteractions() {
-
+                logger.trace("Finding All Interactions");
                 List<EntityModel<Interaction>> interactions = interactionRepository
                                 .findAll()
                                 .stream()
@@ -75,10 +79,12 @@ public class InteractionService {
         }
 
         public Interaction saveInteraction(Interaction interaction) {
+                logger.trace("Saving Interaction");
                 return interactionRepository.save(interaction);
         }
 
         public EntityModel<Interaction> createInteraction(InteractionType type, Authentication authentication) {
+                logger.trace("Creating Interaction");
                 User user = getUserId(jwtService.extractId(authentication));
                 Interaction interaction = new Interaction(type, user);
                 return assembler.toModel(saveInteraction(interaction));
@@ -86,7 +92,7 @@ public class InteractionService {
 
         public EntityModel<Interaction> updateInteraction(Long interactionId,
                         InteractionRequestDTO newInteractionRequestDTO) {
-
+                logger.trace("Updating Interaction");
                 return interactionRepository.findById(
                                 interactionId)
                                 .map(interaction -> {
@@ -101,6 +107,7 @@ public class InteractionService {
                         Long opinionId,
                         InteractionRequestDTO interactionDTO,
                         Authentication authentication) {
+                logger.trace("Adding Opinion Interaction");
 
                 User user = userRepository.findById(((User) authentication.getPrincipal()).getId())
                                 .orElseThrow(
@@ -130,6 +137,7 @@ public class InteractionService {
                         Long journalId,
                         InteractionRequestDTO interactionDTO,
                         Authentication authentication) {
+                logger.trace("Adding Journal Interaction");
 
                 User user = userRepository.findById(((User) authentication.getPrincipal()).getId())
                                 .orElseThrow(
@@ -158,6 +166,7 @@ public class InteractionService {
         }
 
         public void deleteInteraction(Long interactionId) {
+                logger.trace("Deleting Interaction");
                 Interaction interaction = interactionRepository.findById(interactionId)
                                 .orElseThrow(
                                                 () -> new InteractionNotFoundException(interactionId,

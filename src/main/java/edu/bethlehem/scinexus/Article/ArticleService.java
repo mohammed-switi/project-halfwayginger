@@ -4,6 +4,8 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
@@ -16,6 +18,7 @@ import edu.bethlehem.scinexus.Article.Article;
 import edu.bethlehem.scinexus.Article.ArticleNotFoundException;
 import edu.bethlehem.scinexus.Article.ArticleRepository;
 import edu.bethlehem.scinexus.Article.ArticleRequestDTO;
+import edu.bethlehem.scinexus.DatabaseLoading.DataLoader;
 import edu.bethlehem.scinexus.Interaction.Interaction;
 import edu.bethlehem.scinexus.Interaction.InteractionRepository;
 import edu.bethlehem.scinexus.Opinion.OpinionRepository;
@@ -38,6 +41,7 @@ public class ArticleService {
     private final OpinionRepository opinionRepository;
     private final InteractionRepository interactionRepository;
     private final ArticleModelAssembler assembler;
+    Logger logger = LoggerFactory.getLogger(DataLoader.class);
 
     public Article convertArticleDtoToArticleEntity(Authentication authentication,
             ArticleRequestDTO ArticleRequestDTO) {
@@ -52,14 +56,14 @@ public class ArticleService {
     }
 
     public User getUserId(long id) {
-
+        logger.trace("Getting User by ID");
         return userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("User Not Found", HttpStatus.NOT_FOUND));
 
     }
 
     public EntityModel<Article> findArticleById(Long ArticleId) {
-
+        logger.trace("Finding Article by ID");
         Article article = articleRepository.findById(
                 ArticleId)
                 .orElseThrow(() -> new ArticleNotFoundException(ArticleId, HttpStatus.NOT_FOUND));
@@ -69,7 +73,7 @@ public class ArticleService {
 
     // We Should Specify An Admin Authority To get All Articles
     public CollectionModel<EntityModel<Article>> findAllArticles() {
-
+        logger.trace("Finding All Articles");
         List<EntityModel<Article>> articles = articleRepository
                 .findAll()
                 .stream()
@@ -79,11 +83,13 @@ public class ArticleService {
     }
 
     public Article saveArticle(Article article) {
+        logger.trace("Saving Article");
         return articleRepository.save(article);
     }
 
     public EntityModel<Article> createArticle(ArticleRequestDTO newArticleRequestDTO,
             Authentication authentication) {
+        logger.trace("Creating Article");
         Article article = convertArticleDtoToArticleEntity(authentication,
                 newArticleRequestDTO);
         return assembler.toModel(saveArticle(article));
@@ -91,7 +97,7 @@ public class ArticleService {
 
     public EntityModel<Article> updateArticle(Long articleId,
             ArticleRequestDTO newArticleRequestDTO) {
-
+        logger.trace("Updating Article");
         return articleRepository.findById(
                 articleId)
                 .map(article -> {
@@ -107,7 +113,7 @@ public class ArticleService {
 
     public EntityModel<Article> updateArticlePartially(Long articleId,
             ArtilceRequestPatchDTO newArticleRequestDTO) {
-
+        logger.trace("Partially Updating Article");
         Article article = articleRepository.findById(articleId)
                 .orElseThrow(
                         () -> new ArticleNotFoundException(articleId, HttpStatus.UNPROCESSABLE_ENTITY));
@@ -132,6 +138,7 @@ public class ArticleService {
 
     @Transactional
     public void deleteArticle(Long articleId) {
+        logger.trace("Deleting Article");
         Article article = articleRepository.findById(articleId)
                 .orElseThrow(
                         () -> new ArticleNotFoundException(articleId, HttpStatus.UNPROCESSABLE_ENTITY));

@@ -6,6 +6,8 @@ import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.ConstraintViolationException;
+
+import org.hibernate.tool.schema.spi.CommandAcceptanceException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageConversionException;
@@ -30,198 +32,211 @@ import java.util.*;
 @ControllerAdvice
 public class RestExceptionHandler {
 
-    @ExceptionHandler(GeneralException.class)
-    ResponseEntity<GeneralErrorResponse> restExceptionHandler(GeneralException ex) {
+        @ExceptionHandler(GeneralException.class)
+        ResponseEntity<GeneralErrorResponse> restExceptionHandler(GeneralException ex) {
 
-        GeneralErrorResponse errorResponse = GeneralErrorResponse
-                .builder()
-                .status(ex.getHttpStatus().value())
-                .message(ex.getMessage())
-                .timestamp(new Date(System.currentTimeMillis()))
-                .build();
+                GeneralErrorResponse errorResponse = GeneralErrorResponse
+                                .builder()
+                                .status(ex.getHttpStatus().value())
+                                .message(ex.getMessage())
+                                .timestamp(new Date(System.currentTimeMillis()))
+                                .build();
 
-        return new ResponseEntity<>(errorResponse, ex.getHttpStatus());
+                return new ResponseEntity<>(errorResponse, ex.getHttpStatus());
 
-    }
-
-    @ExceptionHandler(UserNotFoundException.class)
-    public final ResponseEntity<Object> handleUserNotFoundException(UserNotFoundException ex) {
-        GeneralErrorResponse errorResponse = GeneralErrorResponse
-                .builder()
-                .status(ex.getHttpStatus().value())
-                .message(ex.getMessage())
-                .timestamp(new Date(System.currentTimeMillis()))
-                .build();
-        return new ResponseEntity<>(errorResponse, ex.getHttpStatus());
-
-    }
-
-    @ExceptionHandler(SignatureException.class)
-    public ResponseEntity<String> handleSignatureException(SignatureException e) {
-        Throwable cause = e.getCause();
-        if (cause instanceof UnsupportedJwtException || cause instanceof MalformedJwtException) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Invalid JWT Token: " + cause.getMessage());
-        } else {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Internal Server Error: " + cause.getMessage());
         }
-    }
 
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<GeneralErrorResponse> handleValidationExceptions(MethodArgumentNotValidException ex) {
-        Map<String, String> errors = new HashMap<>();
+        @ExceptionHandler(UserNotFoundException.class)
+        public final ResponseEntity<Object> handleUserNotFoundException(UserNotFoundException ex) {
+                GeneralErrorResponse errorResponse = GeneralErrorResponse
+                                .builder()
+                                .status(ex.getHttpStatus().value())
+                                .message(ex.getMessage())
+                                .timestamp(new Date(System.currentTimeMillis()))
+                                .build();
+                return new ResponseEntity<>(errorResponse, ex.getHttpStatus());
 
-        ex
-                .getBindingResult()
-                .getAllErrors()
-                .forEach((error) -> {
-                    String fieldName = ((FieldError) error).getField();
-                    String errorMessage = error.getDefaultMessage();
-                    errors.put(fieldName, errorMessage);
-                });
-        GeneralErrorResponse errorResponse = GeneralErrorResponse
-                .builder()
-                .message("Vaildation Constraint Violation")
-                .status(HttpStatus.BAD_REQUEST.value())
-                .timestamp(new Date(System.currentTimeMillis()))
-                .validationError(errors)
-                .build();
+        }
 
-        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
-    }
+        @ExceptionHandler(SignatureException.class)
+        public ResponseEntity<String> handleSignatureException(SignatureException e) {
+                Throwable cause = e.getCause();
+                if (cause instanceof UnsupportedJwtException || cause instanceof MalformedJwtException) {
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                                        .body("Invalid JWT Token: " + cause.getMessage());
+                } else {
+                        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                        .body("Internal Server Error: " + cause.getMessage());
+                }
+        }
 
-//    @ExceptionHandler(ConstraintViolationException.class)
-//    public ResponseEntity<?> constraintViolationException(ConstraintViolationException ex, WebRequest request) {
-//        List<String> errors = new ArrayList<>();
-//
-//        ex.getConstraintViolations().forEach(cv -> errors.add(cv.getMessage()));
-//
-//        Map<String, List<String>> result = new HashMap<>();
-//
-//        result.put("errors", errors);
-//
-//        return new ResponseEntity<>(result, HttpStatus.BAD_REQUEST);
-//    }
+        @ResponseStatus(HttpStatus.BAD_REQUEST)
+        @ExceptionHandler(MethodArgumentNotValidException.class)
+        public ResponseEntity<GeneralErrorResponse> handleValidationExceptions(MethodArgumentNotValidException ex) {
+                Map<String, String> errors = new HashMap<>();
 
-    @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<?> constraintViolationException(ConstraintViolationException ex) {
-        List<String> errors = new ArrayList<>();
+                ex
+                                .getBindingResult()
+                                .getAllErrors()
+                                .forEach((error) -> {
+                                        String fieldName = ((FieldError) error).getField();
+                                        String errorMessage = error.getDefaultMessage();
+                                        errors.put(fieldName, errorMessage);
+                                });
+                GeneralErrorResponse errorResponse = GeneralErrorResponse
+                                .builder()
+                                .message("Vaildation Constraint Violation")
+                                .status(HttpStatus.BAD_REQUEST.value())
+                                .timestamp(new Date(System.currentTimeMillis()))
+                                .validationError(errors)
+                                .build();
 
+                return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+        }
 
-        ex.getConstraintViolations().forEach(cv -> errors.add(cv.getMessage()));
+        // @ExceptionHandler(ConstraintViolationException.class)
+        // public ResponseEntity<?>
+        // constraintViolationException(ConstraintViolationException ex, WebRequest
+        // request) {
+        // List<String> errors = new ArrayList<>();
+        //
+        // ex.getConstraintViolations().forEach(cv -> errors.add(cv.getMessage()));
+        //
+        // Map<String, List<String>> result = new HashMap<>();
+        //
+        // result.put("errors", errors);
+        //
+        // return new ResponseEntity<>(result, HttpStatus.BAD_REQUEST);
+        // }
 
-        Map<String, List<String>> result = new HashMap<>();
-        result.put("errors", errors);
+        @ExceptionHandler(ConstraintViolationException.class)
+        public ResponseEntity<?> constraintViolationException(ConstraintViolationException ex) {
+                List<String> errors = new ArrayList<>();
 
-        GeneralErrorResponse errorResponse=GeneralErrorResponse.builder()
-                .message(ex.getMessage())
-                .status(HttpStatus.BAD_REQUEST.value())
-                .timestamp(new Date(System.currentTimeMillis()))
-                .validationError((Map<String, String>) errors).build();
+                ex.getConstraintViolations().forEach(cv -> errors.add(cv.getMessage()));
 
-        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
-    }
-
-
-    @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<Object> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
-        // You can customize the response entity as per your requirements
-        GeneralErrorResponse errorResponse = GeneralErrorResponse.builder()
-                .message("The request body is invalid or unreadable." + "" + ex.getMessage() + " "
-                        + ex.getMostSpecificCause().toString())
-                .status(400)
-                .timestamp(new Date(System.currentTimeMillis()))
-                .build();
-        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
-    public ResponseEntity<Object> handleHttpRequestMethodNotSupportedException(
-            HttpRequestMethodNotSupportedException ex) {
-        GeneralErrorResponse errorResponse = GeneralErrorResponse.builder()
-                .message("Http Request Method Not Supported. " + ex.getMessage() +" " + Arrays.toString(ex.getStackTrace()))
-                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
-                .timestamp(new Date(System.currentTimeMillis()))
-                .build();
-        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<Object> handleAll(Exception ex) throws Exception {
+                Map<String, List<String>> result = new HashMap<>();
+                result.put("errors", errors);
 
                 GeneralErrorResponse errorResponse = GeneralErrorResponse.builder()
-                .message("This handling from Handle all : An error occurred while processing the request. " + ex.getMessage() + "  "
-                        + Arrays.toString(ex.getStackTrace()))
-                .status(500)
-                .timestamp(new Date(System.currentTimeMillis()))
-                .build();
+                                .message(ex.getMessage())
+                                .status(HttpStatus.BAD_REQUEST.value())
+                                .timestamp(new Date(System.currentTimeMillis()))
+                                .validationError((Map<String, String>) errors).build();
 
-        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+                return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+        }
 
-    }
+        @ExceptionHandler(HttpMessageNotReadableException.class)
+        public ResponseEntity<Object> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
+                // You can customize the response entity as per your requirements
+                GeneralErrorResponse errorResponse = GeneralErrorResponse.builder()
+                                .message("The request body is invalid or unreadable." + "" + ex.getMessage() + " "
+                                                + ex.getMostSpecificCause().toString())
+                                .status(400)
+                                .timestamp(new Date(System.currentTimeMillis()))
+                                .build();
+                return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+        }
 
-    @ExceptionHandler(TransactionSystemException.class)
-    public ResponseEntity<Object> handleTransactionException(TransactionSystemException ex) {
-        // Customize your response here, for example:
-        GeneralErrorResponse errorResponse = GeneralErrorResponse.builder()
-                .message("This is happened from transitionSystem Exception An error occurred while processing the request. " + ex.getMostSpecificCause().getMessage()
-                        + "  "
-                        + ex.getStackTrace().toString())
-                .status(500)
-                .timestamp(new Date(System.currentTimeMillis()))
-                .build();
-        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+        @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+        public ResponseEntity<Object> handleHttpRequestMethodNotSupportedException(
+                        HttpRequestMethodNotSupportedException ex) {
+                GeneralErrorResponse errorResponse = GeneralErrorResponse.builder()
+                                .message("Http Request Method Not Supported. " + ex.getMessage() + " "
+                                                + Arrays.toString(ex.getStackTrace()))
+                                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                                .timestamp(new Date(System.currentTimeMillis()))
+                                .build();
+                return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
 
-    @ExceptionHandler(HttpMessageConversionException.class)
-    public ResponseEntity<Object> handleHttpMessageConversionException(HttpMessageConversionException ex) {
-        // Customize your response here, for example:
+        @ExceptionHandler(Exception.class)
+        public ResponseEntity<Object> handleAll(Exception ex) throws Exception {
 
+                GeneralErrorResponse errorResponse = GeneralErrorResponse.builder()
+                                .message("This handling from Handle all : An error occurred while processing the request. "
+                                                + ex.getMessage() + "  "
+                                                + Arrays.toString(ex.getStackTrace()))
+                                .status(500)
+                                .timestamp(new Date(System.currentTimeMillis()))
+                                .build();
 
-        GeneralErrorResponse errorResponse = GeneralErrorResponse.builder()
-                .message(" This is happeend form httpMessageConversion An error occurred while processing the request. " + ex.getMostSpecificCause().getMessage()
-                        + "  "
-                        + Arrays.toString(ex.getStackTrace()))
-                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
-                .timestamp(new Date(System.currentTimeMillis()))
-                .build();
-        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+                return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
 
+        }
 
+        @ExceptionHandler(TransactionSystemException.class)
+        public ResponseEntity<Object> handleTransactionException(TransactionSystemException ex) {
+                // Customize your response here, for example:
+                GeneralErrorResponse errorResponse = GeneralErrorResponse.builder()
+                                .message("This is happened from transitionSystem Exception An error occurred while processing the request. "
+                                                + ex.getMostSpecificCause().getMessage()
+                                                + "  "
+                                                + ex.getStackTrace().toString())
+                                .status(500)
+                                .timestamp(new Date(System.currentTimeMillis()))
+                                .build();
+                return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
 
-    }
+        @ExceptionHandler(HttpMessageConversionException.class)
+        public ResponseEntity<Object> handleHttpMessageConversionException(HttpMessageConversionException ex) {
+                // Customize your response here, for example:
 
-    @ExceptionHandler(NoResourceFoundException.class)
-    public ResponseEntity<Object> handleResourceNotFoundException(NoResourceFoundException ex) {
+                GeneralErrorResponse errorResponse = GeneralErrorResponse.builder()
+                                .message(" This is happeend form httpMessageConversion An error occurred while processing the request. "
+                                                + ex.getMostSpecificCause().getMessage()
+                                                + "  "
+                                                + Arrays.toString(ex.getStackTrace()))
+                                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                                .timestamp(new Date(System.currentTimeMillis()))
+                                .build();
+                return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
 
-        GeneralErrorResponse errorResponse=GeneralErrorResponse.builder()
-                .status(HttpStatus.NOT_FOUND.value())
-                .timestamp(new Date(System.currentTimeMillis()))
-                .message(ex.getMessage() +" " + ex.getBody().toString())
-                .build();
-        return new ResponseEntity<>(errorResponse,HttpStatus.NOT_FOUND);
-    }
+        }
 
-    @ExceptionHandler(value = AccessDeniedException.class)
-    public void handleConflict(HttpServletResponse response) throws IOException {
-        response.sendError(403, "Your Message");
-    }
+        @ExceptionHandler(NoResourceFoundException.class)
+        public ResponseEntity<Object> handleResourceNotFoundException(NoResourceFoundException ex) {
 
-    @ExceptionHandler(InternalAuthenticationServiceException.class)
-    public ResponseEntity<Object> handleInternalAuthenticationServiceException(InternalAuthenticationServiceException ex) {
-        // Log the exception for troubleshooting
+                GeneralErrorResponse errorResponse = GeneralErrorResponse.builder()
+                                .status(HttpStatus.NOT_FOUND.value())
+                                .timestamp(new Date(System.currentTimeMillis()))
+                                .message(ex.getMessage() + " " + ex.getBody().toString())
+                                .build();
+                return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+        }
 
-        // Customize your response here
-        GeneralErrorResponse errorResponse = GeneralErrorResponse.builder()
-                .message("Internal authentication service error. " + ex.getMessage())
-                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
-                .timestamp(new Date(System.currentTimeMillis()))
-                .build();
-        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+        @ExceptionHandler(value = AccessDeniedException.class)
+        public void handleConflict(HttpServletResponse response) throws IOException {
+                response.sendError(403, "Your Message");
+        }
 
+        @ExceptionHandler(InternalAuthenticationServiceException.class)
+        public ResponseEntity<Object> handleInternalAuthenticationServiceException(
+                        InternalAuthenticationServiceException ex) {
+                // Log the exception for troubleshooting
 
+                // Customize your response here
+                GeneralErrorResponse errorResponse = GeneralErrorResponse.builder()
+                                .message("Internal authentication service error. " + ex.getMessage())
+                                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                                .timestamp(new Date(System.currentTimeMillis()))
+                                .build();
+                return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        @ExceptionHandler(CommandAcceptanceException.class)
+        public ResponseEntity<Object> handleCommandAcceptanceException(CommandAcceptanceException ex) {
+                // Log the exception for troubleshooting
+
+                // Customize your response here
+                GeneralErrorResponse errorResponse = GeneralErrorResponse.builder()
+                                .message("Internal authentication service error. " + ex.getMessage())
+                                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                                .timestamp(new Date(System.currentTimeMillis()))
+                                .build();
+                return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
 
 }

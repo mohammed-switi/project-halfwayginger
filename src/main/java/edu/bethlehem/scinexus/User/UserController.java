@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import edu.bethlehem.scinexus.Article.Article;
 import edu.bethlehem.scinexus.Article.ArticleRepository;
+import edu.bethlehem.scinexus.ResearchPaper.ResearchPaper;
 import edu.bethlehem.scinexus.Article.ArticleModelAssembler;
 import edu.bethlehem.scinexus.SecurityConfig.JwtService;
 import edu.bethlehem.scinexus.User.UserRepository;
@@ -89,6 +90,25 @@ public class UserController {
     CollectionModel<EntityModel<Article>> getUserArticles(Authentication authentication)
             throws UserNotFoundException {
         return service.getUserArticles(authentication);
+    }
+
+    @GetMapping("/articles/{articleId}")
+    EntityModel<Article> getUserArticles(@PathVariable Long articleId, Authentication authentication)
+            throws UserNotFoundException {
+        return service.getUserArticle(articleId, authentication);
+    }
+
+    @GetMapping("/researchpapers")
+    CollectionModel<EntityModel<ResearchPaper>> getUserResearchPapers(Authentication authentication)
+            throws UserNotFoundException {
+        return service.getUserResearchPapers(authentication);
+    }
+
+    @GetMapping("/researchpapers/{researchPaperId}")
+    EntityModel<ResearchPaper> getUserResearchPaper(@PathVariable Long researchPaperId,
+            Authentication authentication)
+            throws UserNotFoundException {
+        return service.getUserResearchPaper(researchPaperId, authentication);
     }
 
     @DeleteMapping("/{id}")

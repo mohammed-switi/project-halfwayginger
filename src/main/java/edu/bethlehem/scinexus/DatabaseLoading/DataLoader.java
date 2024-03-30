@@ -1,5 +1,6 @@
 package edu.bethlehem.scinexus.DatabaseLoading;
 
+import edu.bethlehem.scinexus.LoggingController;
 import edu.bethlehem.scinexus.Article.Article;
 import edu.bethlehem.scinexus.Article.ArticleRepository;
 import edu.bethlehem.scinexus.Interaction.Interaction;
@@ -23,6 +24,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+// [...]
 
 import java.util.*;
 
@@ -38,6 +42,7 @@ public class DataLoader implements CommandLineRunner {
     private final JournalRepository journalRepository;
     private final OpinionRepository opinionRepository;
     private final InteractionRepository interactionRepository;
+    Logger logger = LoggerFactory.getLogger(DataLoader.class);
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -47,8 +52,8 @@ public class DataLoader implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
+        logger.trace("Starting Random Data Generation: \n\n");
         long startTime = System.currentTimeMillis();
-
         generateUser();
         generateRandomUsers(3);
         generateLinks();
@@ -59,10 +64,11 @@ public class DataLoader implements CommandLineRunner {
 
         long endTime = System.currentTimeMillis();
         long totalTime = endTime - startTime;
-        System.out.println("Total execution time: " + totalTime + " milliseconds");
+        logger.info("Random Data Generation Completed with time of " + totalTime + " milliseconds");
     }
 
     private void generateUser() {
+        logger.debug("Generating base User and base Article: \n\n");
         User user = new User();
         user.setFirstName("Mohammed");
         user.setLastName("Switi");
@@ -73,20 +79,22 @@ public class DataLoader implements CommandLineRunner {
         user.setRole(Role.ORGANIZATION);
         user.setType(OrganizationType.BUSINESS);
 
+        logger.debug("Generating Base User with " + user.toString());
         user = userRepository.save(user);
         Article article = new Article(dataGenerator.generateRandomUniversityName(),
                 dataGenerator.generateRandomWords(), dataGenerator.generateRandomFieldOfWork(), user);
-        System.out.println(user.getUsername());
         article.setInteractionsCount(0);
         article.setOpinionsCount(0);
         article.setVisibility(dataGenerator.generateRandomVisibility());
         article = articleRepository.save(article);
         user.addJournal(article);
+        logger.debug("Generating Base Article with " + article.toString());
 
         userRepository.save(user);
     }
 
     private void generateLinks() {
+        logger.debug("Generating Random Users' links: \n\n");
         // Code Does not work.......
         // it works nvm
 
@@ -94,6 +102,7 @@ public class DataLoader implements CommandLineRunner {
 
         Random random = new Random();
 
+        logger.trace("Generating Random Users' links for " + users.size() + " users");
         for (User user : users) {
             for (int i = 0; i < 3; i++) {
                 User linkTo = users.get(random.nextInt(users.size()));
@@ -107,13 +116,16 @@ public class DataLoader implements CommandLineRunner {
             }
         }
         userRepository.saveAll(users);
+        logger.debug("Saved Users' links for " + users.size() + " users");
 
     }
 
     private void generateRandomUsers(int count) {
+        logger.debug("Generating Random Users: \n\n");
         List<User> users = new ArrayList<>();
         Set<String> usedUsernames = new HashSet<>();
 
+        logger.trace("Generating Random User:" + count + " users will be generated");
         for (int i = 0; i < count; i++) {
             String username = generateUniqueUsername(usedUsernames);
             String firstName = dataGenerator.generateRandomFirstName();
@@ -161,6 +173,7 @@ public class DataLoader implements CommandLineRunner {
                 users.add(organization);
             }
             users = userRepository.saveAll(users);
+            logger.debug("Saved " + users.size() + " reandom users");
 
         }
     }
@@ -177,12 +190,11 @@ public class DataLoader implements CommandLineRunner {
     private void generateArticles() {
         List<User> users = userRepository.findAll();
         List<Article> articles = new ArrayList<>();
-        Random random = new Random();
+        logger.trace("generating two Articles for " + users.size() + " users each");
         for (User user : users) {
             for (int i = 0; i < 2; i++) {
                 Article article = new Article(dataGenerator.generateRandomUniversityName(),
                         dataGenerator.generateRandomWords(), dataGenerator.generateRandomFieldOfWork(), user);
-                System.out.println(user.getUsername());
                 article.setInteractionsCount(0);
                 article.setOpinionsCount(0);
                 article.setVisibility(dataGenerator.generateRandomVisibility());
@@ -191,15 +203,19 @@ public class DataLoader implements CommandLineRunner {
                 articles.add(article);
 
             }
-            userRepository.saveAll(users);
-            articleRepository.saveAll(articles);
         }
+
+        // userRepository.saveAll(users);
+
+        articleRepository.saveAll(articles);
+        logger.debug(articles.size() + " Articles generated and saved successfully");
 
     }
 
     private void generateResearchPapers() {
         List<User> users = userRepository.findAll();
         List<ResearchPaper> researchPapers = new ArrayList<>();
+        logger.trace("generating two Research Papers for " + users.size() + " users each");
         Random random = new Random();
         for (User user : users) {
             for (int i = 0; i < 2; i++) {
@@ -207,7 +223,6 @@ public class DataLoader implements CommandLineRunner {
                 ResearchPaper researchPaper = new ResearchPaper(dataGenerator.generateRandomUniversityName(),
                         dataGenerator.generateRandomWords(), dataGenerator.generateRandomBio(),
                         dataGenerator.generateRandomFieldOfWork(), user);
-                System.out.println(user.getUsername());
                 researchPaper.setLanguage(ResearchLanguage.ENGLISH);
                 researchPaper.setNoOfPages(random.nextInt(500));
                 researchPaper.setInteractionsCount(0);
@@ -219,12 +234,16 @@ public class DataLoader implements CommandLineRunner {
                 researchPapers.add(researchPaper);
             }
         }
+        logger.trace(researchPapers.size() + " Research Papers generated");
         // userRepository.saveAll(users);
         researchPaperRepository.saveAll(researchPapers);
+        logger.debug(researchPapers.size() + " Research Papers saved");
 
     }
 
     private void generateOpinions() {
+        logger.debug("Starting to generate Opinions: \n\n");
+
         List<Journal> journals = journalRepository.findAll();
         List<User> users = userRepository.findAll();
         List<Opinion> opinions = new ArrayList<>();
@@ -238,6 +257,9 @@ public class DataLoader implements CommandLineRunner {
                 opinions.add(opinion);
             }
         }
+
+        logger.trace(opinions.size() + " Opinion were generated for journals");
+
         opinionRepository.saveAll(opinions);
         List<Opinion> opinions2 = opinionRepository.findAll();
         for (Opinion opinion : opinions) {
@@ -252,13 +274,17 @@ public class DataLoader implements CommandLineRunner {
                 opinions2.add(reOpinion);
             }
         }
+        logger.trace(opinions2.size() + " Opinion were generated for other Opinions");
         journalRepository.saveAll(journals);
-        opinionRepository.saveAll(opinions2);
+        logger.debug(journals.size() + " Journal saved successfully");
         opinionRepository.saveAll(opinions);
-
+        logger.debug(opinions.size() + " Opinion generated and saved successfully");
+        opinionRepository.saveAll(opinions2);
+        logger.debug(opinions2.size() + " Opinion generated and saved successfully for another Opinion");
     }
 
     private void generateInteractions() {
+        logger.debug("Starting to generate Interactions: \n\n");
 
         List<Journal> journals = journalRepository.findAll();
         List<Opinion> opinions = opinionRepository.findAll();
@@ -276,6 +302,7 @@ public class DataLoader implements CommandLineRunner {
                 interactions.add(interaction);
             }
         }
+        logger.trace("generaterd " + interactions.size() + " Interactions for Journals");
 
         for (Opinion opinion : opinions) {
             for (int j = 0; j < random.nextInt(10); j++) {
@@ -287,9 +314,13 @@ public class DataLoader implements CommandLineRunner {
                 interactions.add(interaction);
             }
         }
-        journalRepository.saveAll(journals);
-        opinionRepository.saveAll(opinions);
-        interactionRepository.saveAll(interactions);
+        logger.trace("generaterd " + interactions.size() + " Interactions for Opinions");
 
+        journalRepository.saveAll(journals);
+        logger.debug(journals.size() + " journals saved successfully");
+        opinionRepository.saveAll(opinions);
+        logger.debug(opinions.size() + " opinions saved successfully");
+        interactionRepository.saveAll(interactions);
+        logger.debug(interactions.size() + " Interactions generated and saved successfully");
     }
 }

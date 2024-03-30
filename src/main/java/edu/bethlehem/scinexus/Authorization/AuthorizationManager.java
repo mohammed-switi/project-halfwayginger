@@ -146,10 +146,6 @@ public class AuthorizationManager {
             try {
                 Long requestBody = Long.parseLong(
                         mapper.readValue(context.getRequest().getInputStream(), Map.class).get("journalId").toString());
-                System.out.println("journalOwnerFIRST");
-                System.out.println("this is request Body " + requestBody);
-                System.out.println("THIs is the GOal : " + requestBody);
-
                 Journal journal = journalRepository.findById(
                         requestBody)
                         .orElseThrow(() -> new JournalNotFoundException(String.valueOf(
@@ -158,11 +154,8 @@ public class AuthorizationManager {
                 User user = (User) authentication.get().getPrincipal();
                 // check if the user is the publisher journal
 
-                System.out
-                        .println("this is journalOwnerDecision" + journal.getPublisher().getId().equals(user.getId()));
                 if (journal.getPublisher().getId().equals(user.getId())) {
 
-                    System.out.println(journal.getPublisher().getId());
                     return new AuthorizationDecision(true);
                 }
 
@@ -186,11 +179,7 @@ public class AuthorizationManager {
             User user = (User) authentication.get().getPrincipal();
             // check if the user is the publisher journal
 
-            System.out
-                    .println("this is journalOwnerDecision" + journal.getPublisher().getId().equals(user.getId()));
             if (journal.getPublisher().getId().equals(user.getId())) {
-
-                System.out.println(journal.getPublisher().getId());
                 return new AuthorizationDecision(true);
             }
 
