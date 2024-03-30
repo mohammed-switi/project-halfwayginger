@@ -52,21 +52,4 @@ public class ApplicationConfig {
         return new BCryptPasswordEncoder();
     }
 
-    @Configuration
-    @EnableAsync
-    public class AsyncConfig {
-
-        @Bean
-        public Executor taskExecutor() {
-
-            final ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-            executor.setCorePoolSize(10);
-            executor.setMaxPoolSize(10);
-            executor.setQueueCapacity(500);
-            executor.setThreadNamePrefix("AsyncFileUploader - ");
-            executor.initialize();
-            return executor;
-        }
-    }
-
 }

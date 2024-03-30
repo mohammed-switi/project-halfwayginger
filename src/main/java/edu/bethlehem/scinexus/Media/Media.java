@@ -14,7 +14,7 @@ import lombok.Data;
 @Table(name = "media")
 public class Media {
     @Column()
-    private @Id @GeneratedValue Long mediaId;
+    private @Id @GeneratedValue Long id;
 
     @NotNull(message = "The Media Type Shouldn't Be Null")
     @NotBlank(message = "The Media Type Shouldn't Be Empty")

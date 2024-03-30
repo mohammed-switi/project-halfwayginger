@@ -34,7 +34,7 @@ public class ResearchPaperController {
   }
 
   @GetMapping()
-  CollectionModel<EntityModel<ResearchPaper>> all() {
+  public CollectionModel<EntityModel<ResearchPaper>> all() {
 
     List<EntityModel<ResearchPaper>> researchpapers = service.findAllResearchPapers();
 

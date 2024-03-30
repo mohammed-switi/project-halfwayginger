@@ -25,6 +25,13 @@ import com.mysql.cj.x.protobuf.MysqlxCrud.Collection;
 import edu.bethlehem.scinexus.Article.Article;
 import edu.bethlehem.scinexus.Article.ArticleModelAssembler;
 import edu.bethlehem.scinexus.Article.ArticleRepository;
+import edu.bethlehem.scinexus.Media.Media;
+import edu.bethlehem.scinexus.Media.MediaNotFoundException;
+import edu.bethlehem.scinexus.Media.MediaRepository;
+import edu.bethlehem.scinexus.ResearchPaper.ResearchPaper;
+import edu.bethlehem.scinexus.ResearchPaper.ResearchPaperController;
+import edu.bethlehem.scinexus.ResearchPaper.ResearchPaperModelAssembler;
+import edu.bethlehem.scinexus.ResearchPaper.ResearchPaperRepository;
 import edu.bethlehem.scinexus.SecurityConfig.JwtService;
 
 @Service
@@ -35,8 +42,11 @@ public class UserService implements UserDetailsService {
     private EntityManager entityManager;
     private final UserRepository repository;
     private final ArticleRepository articleRepository;
+    private final ResearchPaperRepository researchPaperRepository;
+    private final MediaRepository mediaRepository;
     private final UserModelAssembler assembler;
     private final ArticleModelAssembler articleAssembler;
+    private final ResearchPaperModelAssembler researchPaperAssembler;
     private final JwtService jwtService;
 
     // USING Java Persistence Query Language (JPQL), (Tested: Works Well!)
@@ -72,12 +82,23 @@ public class UserService implements UserDetailsService {
         // User Properties
 
         try {
-            for (Method method : UserRequestDTO.class.getMethods()) {
+            for (Method method : UserRequestPatchDTO.class.getMethods()) {
                 if (method.getName().startsWith("get") && method.getParameterCount() == 0) {
                     Object value = method.invoke(editUser);
+
                     if (value != null) {
                         String propertyName = method.getName().substring(3); // remove "get"
-                        Method setter = User.class.getMethod("set" + propertyName, method.getReturnType());
+                        Method setter;
+                        if (method.getReturnType().equals(Long.class)) {
+                            Media media = mediaRepository.findById((Long) value)
+                                    .orElseThrow(() -> new MediaNotFoundException(
+                                            "The media with id:" + value + " is not found",
+                                            HttpStatus.NOT_FOUND));
+                            setter = User.class.getMethod("set" + propertyName, Media.class);
+                            setter.invoke(user, media);
+
+                        }
+                        setter = User.class.getMethod("set" + propertyName, method.getReturnType());
                         setter.invoke(user, value);
                     }
                 }
@@ -140,6 +161,17 @@ public class UserService implements UserDetailsService {
 
     }
 
+    CollectionModel<EntityModel<ResearchPaper>> getUserResearchPapers(Authentication authentication) {
+        Long userId = ((User) (authentication.getPrincipal())).getId();
+
+        List<EntityModel<ResearchPaper>> researchPapers = researchPaperRepository.findByPublisherId(userId).stream()
+                .map(researchPaper -> researchPaperAssembler.toModel(
+                        researchPaper))
+                .collect(Collectors.toList());
+        return CollectionModel.of(researchPapers, linkTo(methodOn(ResearchPaperController.class).all()).withSelfRel());
+
+    }
+
     ResponseEntity<?> deleteUser(Long userId) {
         User user = repository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("The user with id:" + userId + " is not found",
@@ -153,26 +185,30 @@ public class UserService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return repository.findByEmail(username).orElseThrow(() -> new UserNotFoundException("User with username "+ username +" is not found"));
+        return repository.findByEmail(username)
+                .orElseThrow(() -> new UserNotFoundException("User with username " + username + " is not found"));
     }
 
     public int enableUser(String email) {
         return repository.enableAppUser(email);
     }
 
-//    @Override
-//    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-//       String userName = null, password=null;
-//       List<GrantedAuthority> authorities=null;
-//       User user=repository.findByEmail(username).orElseThrow(() -> new UserNotFoundException());
-//
-//       userName=user.getEmail();
-//       password=user.getPassword();
-//       authorities=new ArrayList<>();
-//       authorities.add(new SimpleGrantedAuthority(user.getRole().toString()));
-//
-//        return  new org.springframework.security.core.userdetails.User(username,password,authorities);
-//    }
+    // @Override
+    // public UserDetails loadUserByUsername(String username) throws
+    // UsernameNotFoundException {
+    // String userName = null, password=null;
+    // List<GrantedAuthority> authorities=null;
+    // User user=repository.findByEmail(username).orElseThrow(() -> new
+    // UserNotFoundException());
+    //
+    // userName=user.getEmail();
+    // password=user.getPassword();
+    // authorities=new ArrayList<>();
+    // authorities.add(new SimpleGrantedAuthority(user.getRole().toString()));
+    //
+    // return new
+    // org.springframework.security.core.userdetails.User(username,password,authorities);
+    // }
 
     // if (editUser.getUsername() != null)
     // user.setUsername(editUser.getUsername());

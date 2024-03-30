@@ -9,10 +9,15 @@ import java.util.stream.Collectors;
 
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import edu.bethlehem.scinexus.Journal.Journal;
+import edu.bethlehem.scinexus.Journal.JournalModelAssembler;
+import edu.bethlehem.scinexus.Journal.JournalNotFoundException;
+import edu.bethlehem.scinexus.Journal.JournalRepository;
 import edu.bethlehem.scinexus.Media.Media;
 import edu.bethlehem.scinexus.Media.MediaModelAssembler;
 import edu.bethlehem.scinexus.Media.MediaRepository;
@@ -21,10 +26,12 @@ import lombok.SneakyThrows;
 
 @Service
 @AllArgsConstructor
-class FileStorageService {
+public class FileStorageService {
 
     private final MediaRepository mediaRepository;
+    private final JournalRepository journalRepository;
     private final MediaModelAssembler mediaAssembler;
+    private final JournalModelAssembler journalAssembler;
 
     public EntityModel<Media> save(MultipartFile file) {
         Long time = System.currentTimeMillis();
@@ -84,6 +91,47 @@ class FileStorageService {
             mediaList.add(media);
         }
 
+        return CollectionModel.of(mediaRepository.saveAll(mediaList)
+                .stream()
+                .map(mediaAssembler::toModel)
+                .collect(Collectors.toList()));
+
+    }
+
+    public CollectionModel<EntityModel<Media>> saveAlltoJournal(MultipartFile[] files, Long journalId) {
+
+        List<Media> mediaList = new ArrayList<Media>();
+        Journal journal = journalRepository.findById(journalId)
+                .orElseThrow(() -> new JournalNotFoundException(journalId, HttpStatus.NOT_FOUND));
+        for (MultipartFile file : files) {
+            Long time = System.currentTimeMillis();
+
+            String filePath = System.getProperty("user.dir") + "/Uploads" + File.separator + time + " "
+                    + file.getOriginalFilename();
+            try {
+
+                // Creating an object of FileOutputStream class
+                FileOutputStream fout = new FileOutputStream(filePath);
+                fout.write(file.getBytes());
+
+                // Closing the connection
+                fout.close();
+
+            }
+
+            // Catch block to handle exceptions
+            catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            Media media = new Media();
+            media.setPath(filePath);
+            media.setFileName(time + " " + file.getOriginalFilename());
+            media.setType(file.getContentType());
+            mediaList.add(media);
+            journal.getMedias().add(media);
+        }
+        journalRepository.save(journal);
         return CollectionModel.of(mediaRepository.saveAll(mediaList)
                 .stream()
                 .map(mediaAssembler::toModel)

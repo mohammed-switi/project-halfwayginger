@@ -6,6 +6,10 @@ import org.springframework.http.HttpStatus;
 public class MediaNotFoundException extends GeneralException {
 
   public MediaNotFoundException(long id, HttpStatus httpStatus) {
-    super("Media With Id : "+ id + ", is Not Found", httpStatus);
+    super("Media With Id : " + id + ", is Not Found", httpStatus);
+  }
+
+  public MediaNotFoundException(String message, HttpStatus httpStatus) {
+    super(message, httpStatus);
   }
 }

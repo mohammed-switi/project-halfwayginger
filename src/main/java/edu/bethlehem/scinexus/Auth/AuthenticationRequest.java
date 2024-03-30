@@ -1,6 +1,5 @@
 package edu.bethlehem.scinexus.Auth;
 
-
 import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,7 +15,7 @@ public class AuthenticationRequest {
     @NotEmpty(message = "Email shoulldn't be empty")
     private String username;
 
-    @NotEmpty(message = "Passwprd Should'nt Be empty")
-     private String password;
+    @NotEmpty(message = "Password Should'nt Be empty")
+    private String password;
 
 }

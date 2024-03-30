@@ -19,7 +19,6 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.annotation.web.configurers.CorsConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 
-
 import org.springframework.security.oauth2.client.endpoint.DefaultAuthorizationCodeTokenResponseClient;
 import org.springframework.security.oauth2.client.endpoint.OAuth2AccessTokenResponseClient;
 import org.springframework.security.oauth2.client.endpoint.OAuth2AuthorizationCodeGrantRequest;
@@ -35,78 +34,72 @@ import org.springframework.web.filter.CorsFilter;
 @EnableWebSecurity
 @Configuration
 @RequiredArgsConstructor
-public class SecurityConfig  {
+public class SecurityConfig {
 
     private static final Logger log = LoggerFactory.getLogger(SecurityConfig.class);
 
-
     private final JwtAuthenticationFilter jwtAuthFilter;
-        private final AuthenticationProvider authenticationProvider;
-        private final AuthorizationManager authorizationManager;
-        private final CustomJwtDecoder customJwtDecoder;
+    private final AuthenticationProvider authenticationProvider;
+    private final AuthorizationManager authorizationManager;
+    private final CustomJwtDecoder customJwtDecoder;
 
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+        httpSecurity
+                .csrf(AbstractHttpConfigurer::disable)
 
+                .authorizeHttpRequests(authorizeRequests -> authorizeRequests
+                        .requestMatchers("/api/v1/auth/**").permitAll()
 
-        @Bean
-        public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-                httpSecurity
-                                .csrf(AbstractHttpConfigurer::disable)
+                        // .requestMatchers(HttpMethod.GET, "/articles/{journalId}")
+                        // .access(authorizationManager.readJournals())
 
-                                .authorizeHttpRequests(authorizeRequests -> authorizeRequests
-                                                .requestMatchers("/api/v1/auth/**").permitAll()
+                        // .requestMatchers(HttpMethod.PUT, "/articles/{journalId}")
+                        // .access(authorizationManager.journalOwnerContributors())
 
-                                                .requestMatchers(HttpMethod.GET, "/articles/{journalId}")
-                                                .access(authorizationManager.readJournals())
+                        // .requestMatchers(HttpMethod.PATCH, "/articles/{journalId}")
+                        // .access(authorizationManager.journalOwnerContributors())
 
-                                                .requestMatchers(HttpMethod.PUT, "/articles/{journalId}")
-                                                .access(authorizationManager.journalOwnerContributors())
+                        // .requestMatchers(HttpMethod.DELETE, "/articles/{journalId}")
+                        // .access(authorizationManager.journalOwner())
 
-                                                .requestMatchers(HttpMethod.PATCH, "/articles/{journalId}")
-                                                .access(authorizationManager.journalOwnerContributors())
+                        // .requestMatchers(HttpMethod.POST, "/journals/**")
+                        // .access(authorizationManager.journalOwner())
+                        // .requestMatchers(HttpMethod.PATCH,
+                        // "/journals/{journalId}/contributors/{contributorId}")
+                        // .access(authorizationManager.journalOwnerNew())
+                        // .requestMatchers(HttpMethod.DELETE,
+                        // "/journals/{journalId}/contributors/{contributorId}")
+                        // .access(authorizationManager.journalOwnerNew())
 
-                                                .requestMatchers(HttpMethod.DELETE, "/articles/{journalId}")
-                                                .access(authorizationManager.journalOwner())
+                        .anyRequest().authenticated())
 
-                                                .requestMatchers(HttpMethod.POST, "/journals/**")
-                                                .access(authorizationManager.journalOwner())
-                                                .requestMatchers(HttpMethod.PATCH,
-                                                                "/journals/{journalId}/contributors/{contributorId}")
-                                                .access(authorizationManager.journalOwnerNew())
-                                                .requestMatchers(HttpMethod.DELETE,
-                                                                "/journals/{journalId}/contributors/{contributorId}")
-                                                .access(authorizationManager.journalOwnerNew())
+                .formLogin(httpSecurityFormLoginConfigurer -> {
+                    httpSecurityFormLoginConfigurer.loginPage("/api/v1/auth/login").permitAll();
+                    httpSecurityFormLoginConfigurer.loginProcessingUrl("/api/v1/auth/login").permitAll();
+                    httpSecurityFormLoginConfigurer.successForwardUrl("/dashboard");
+                })
 
+                .oauth2ResourceServer((oauth2) -> oauth2.jwt((jwt) -> {
+                    jwt.decoder(jwtDecoder());
+                }))
 
-                                                .anyRequest().authenticated())
+                .oauth2Login(httpSecurityOAuth2LoginConfigurer -> {
+                    httpSecurityOAuth2LoginConfigurer.loginPage("/api/v1/auth/login").permitAll();
 
-                                 .formLogin(httpSecurityFormLoginConfigurer -> {
-                                         httpSecurityFormLoginConfigurer.loginPage("/api/v1/auth/login").permitAll();
-                                         httpSecurityFormLoginConfigurer.loginProcessingUrl("/api/v1/auth/login").permitAll();
-                                         httpSecurityFormLoginConfigurer.successForwardUrl("/dashboard");
-                                 })
+                    httpSecurityOAuth2LoginConfigurer
+                            .tokenEndpoint(tokenEndpointConfig -> tokenEndpointConfig.accessTokenResponseClient(
+                                    accessTokenResponseClient()));
 
-                        .oauth2ResourceServer((oauth2) -> oauth2.jwt((jwt) -> {jwt.decoder(jwtDecoder());}))
+                    httpSecurityOAuth2LoginConfigurer.defaultSuccessUrl("/dashboard", true);
+                })
+                .sessionManagement(sessionConfigurer -> sessionConfigurer
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authenticationProvider(authenticationProvider)
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
-                        .oauth2Login(httpSecurityOAuth2LoginConfigurer -> {
-                                         httpSecurityOAuth2LoginConfigurer.loginPage("/api/v1/auth/login").permitAll();
-
-
-                                    httpSecurityOAuth2LoginConfigurer.tokenEndpoint(tokenEndpointConfig -> tokenEndpointConfig.accessTokenResponseClient(
-                                            accessTokenResponseClient()
-                                    ));
-
-
-                                         httpSecurityOAuth2LoginConfigurer.defaultSuccessUrl("/dashboard",true);
-                                 }
-                                 )
-                                .sessionManagement(sessionConfigurer -> sessionConfigurer
-                                                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                                .authenticationProvider(authenticationProvider)
-                                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
-
-                return httpSecurity.build();
-        }
-
+        return httpSecurity.build();
+    }
 
     @Bean
     public JwtDecoder jwtDecoder() {
@@ -123,16 +116,17 @@ public class SecurityConfig  {
         return new RestTemplateBuilder().build();
     }
 
-//    @Bean
-//    public Customizer<CorsConfigurer<HttpSecurity>> corsFilter() {
-//        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-//        CorsConfiguration config = new CorsConfiguration();
-//        config.setAllowCredentials(true);
-//        config.addAllowedOrigin("*"); // Allow all origins
-//        config.addAllowedHeader("*"); // Allow all headers
-//        config.addAllowedMethod("*"); // Allow all methods
-//        source.registerCorsConfiguration("/**", config);
-//        return (Customizer<CorsConfigurer<HttpSecurity>>) new CorsFilter(source);
-//    }
+    // @Bean
+    // public Customizer<CorsConfigurer<HttpSecurity>> corsFilter() {
+    // UrlBasedCorsConfigurationSource source = new
+    // UrlBasedCorsConfigurationSource();
+    // CorsConfiguration config = new CorsConfiguration();
+    // config.setAllowCredentials(true);
+    // config.addAllowedOrigin("*"); // Allow all origins
+    // config.addAllowedHeader("*"); // Allow all headers
+    // config.addAllowedMethod("*"); // Allow all methods
+    // source.registerCorsConfiguration("/**", config);
+    // return (Customizer<CorsConfigurer<HttpSecurity>>) new CorsFilter(source);
+    // }
 
 }
