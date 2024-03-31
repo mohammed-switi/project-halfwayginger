@@ -1,6 +1,7 @@
 package edu.bethlehem.scinexus.SecurityConfig;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.io.Decoders;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -39,12 +41,17 @@ public class JwtService  {
 
     public Instant extractExpiresAt(String token){return extractClaim(token,Claims::getExpiration).toInstant();}
 
-    public HashMap<String, Object> extractHeaders(String token){
-        Claims claims = extractAllClaims(token);
-        HashMap<String,Object> headers=new HashMap<>();
-        headers.put("typ",claims.get("typ"));
-        headers.put("alg",claims.get("alg"));
-        System.out.println(headers.toString() +" SLUT THIS IS Headers");
+    public Map<String, Object> extractHeaders(String token) {
+        // Parse the token and extract the headers
+        Jws<Claims> jws = Jwts.parser()
+                .setSigningKey(getSignInKey())
+                .build()
+                .parseClaimsJws(token);
+
+        // Extract the headers from the parsed token
+        Map<String, Object> headers = jws.getHeader();
+
+        // Return the extracted headers
         return headers;
     }
 
@@ -77,7 +84,7 @@ public class JwtService  {
                 .add(extraClaims)
                 .subject(userDetails.getUsername())
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + (1000* 60 * 60 * 24))) // The Jwt Expiry Date Will be 24 Hours After Creation
+                .expiration(new Date(System.currentTimeMillis() + (10000* 60 * 60 * 24))) // The Jwt Expiry Date Will be 24 Hours After Creation, Must Change to 15 minutes
                 .and()
                 .signWith(getSignInKey(), Jwts.SIG.HS256)
                 .compact();

@@ -132,17 +132,24 @@ public class UserService implements UserDetailsService {
     }
 
     ResponseEntity<?> linkUser(Authentication authentication, Long userLinkToId) {
+
         logger.debug("linking user with id: " + userLinkToId);
+
         Long linkFromId = ((User) (authentication.getPrincipal())).getId();
+
         logger.trace("Got user with id: " + linkFromId);
+
         User userLinkTo = repository.findById(
                 userLinkToId).orElseThrow(
                         () -> new UserNotFoundException("The user with id:" +
                                 userLinkToId + " is not found", HttpStatus.NOT_FOUND));
+
         logger.trace("Got user with id: " + userLinkToId);
+
         User user = repository.findById(linkFromId)
                 .orElseThrow(() -> new UserNotFoundException("The user with id:" + linkFromId + " is not found",
                         HttpStatus.NOT_FOUND));
+
         logger.trace("Got user with id: " + linkFromId);
 
         logger.trace("Checking if the users are already linked");
@@ -151,10 +158,13 @@ public class UserService implements UserDetailsService {
                     + " is already linked to the user with id:" + userLinkToId);
         logger.trace("Checking if the user is trying to link to itself");
         if (user.getId() == userLinkTo.getId())
+
             return ResponseEntity.badRequest().body("The user with id:" + linkFromId
                     + " cannot link to itself");
-        user.getLinks().add(userLinkTo);
 
+        user.getLinks().add(userLinkTo);
+        userLinkTo.getLinks().add(user);
+        repository.save(userLinkTo);
         logger.trace("Linked user with id: " + userLinkToId);
         EntityModel<User> entityModel = assembler.toModel(repository.save(user));
         logger.trace("returning linked user with id: " + userLinkToId);
