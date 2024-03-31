@@ -1,5 +1,7 @@
 package edu.bethlehem.scinexus.Media;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import edu.bethlehem.scinexus.Journal.Journal;
 
 import jakarta.persistence.*;
@@ -12,24 +14,28 @@ import lombok.Data;
 @Table(name = "media")
 public class Media {
     @Column()
-    private @Id @GeneratedValue Long mediaId;
+    private @Id @GeneratedValue Long id;
 
-    @Enumerated(EnumType.STRING)
     @NotNull(message = "The Media Type Shouldn't Be Null")
     @NotBlank(message = "The Media Type Shouldn't Be Empty")
-    private MediaType type;
+    private String type;
 
     @NotNull(message = "The Media Path Shouldn't Be Null")
     @NotBlank(message = "The Media Path Shouldn't Be Empty")
+    @JsonIgnore
     private String path;
+
+    @NotNull(message = "The Media fileName Shouldn't Be Null")
+    @NotBlank(message = "The Media fileName Shouldn't Be Empty")
+    private String fileName;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "journal")
-    @NotNull(message = "The Media Owner Shouldn't Be Null")
-    @NotBlank(message = "The Media Owner Shouldn't Be Empty")
+    // @NotNull(message = "The Media Owner Shouldn't Be Null")
+    // @NotBlank(message = "The Media Owner Shouldn't Be Empty")
     private Journal ownerJournal;
 
-    public Media(MediaType type, String path) {
+    public Media(String type, String path) {
         this.type = type;
         this.path = path;
     }

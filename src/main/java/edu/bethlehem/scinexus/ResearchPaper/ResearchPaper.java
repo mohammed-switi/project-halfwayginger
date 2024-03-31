@@ -20,6 +20,8 @@ import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Data
 @Entity
 @NoArgsConstructor
@@ -49,6 +51,7 @@ public class ResearchPaper extends Journal {
 
     @OneToMany
     @JoinColumn(name = "research_paper_id")
+    @JsonIgnore
     private Set<UserResearchPaperRequest> requestsForAccess;
 
     @ManyToMany(fetch = FetchType.LAZY)

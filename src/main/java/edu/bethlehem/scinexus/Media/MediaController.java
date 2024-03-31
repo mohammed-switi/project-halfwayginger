@@ -24,7 +24,7 @@ public class MediaController {
   EntityModel<Media> one(@PathVariable Long mediaId) {
 
     Media media = repository.findById(mediaId)
-        .orElseThrow(() -> new MediaNotFoundException(mediaId,HttpStatus.NOT_FOUND));
+        .orElseThrow(() -> new MediaNotFoundException(mediaId, HttpStatus.NOT_FOUND));
 
     return assembler.toModel(media);
   }
@@ -50,14 +50,14 @@ public class MediaController {
 
     return repository.findById(id)
         .map(media -> {
-          media.setMediaId(newMedia.getMediaId());
+          media.setId(newMedia.getId());
           media.setType(newMedia.getType());
           media.setPath(newMedia.getPath());
           EntityModel<Media> entityModel = assembler.toModel(repository.save(media));
           return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
         })
         .orElseGet(() -> {
-          newMedia.setMediaId(id);
+          newMedia.setId(id);
           EntityModel<Media> entityModel = assembler.toModel(repository.save(newMedia));
           return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
         });
@@ -67,9 +67,9 @@ public class MediaController {
   public ResponseEntity<?> updateUserPartially(@PathVariable(value = "id") Long mediaId,
       @RequestBody Media newMedia) {
     Media media = repository.findById(mediaId)
-        .orElseThrow(() -> new MediaNotFoundException(mediaId,HttpStatus.NOT_FOUND));
-    if (newMedia.getMediaId() != null)
-      media.setMediaId(newMedia.getMediaId());
+        .orElseThrow(() -> new MediaNotFoundException(mediaId, HttpStatus.NOT_FOUND));
+    if (newMedia.getId() != null)
+      media.setId(newMedia.getId());
     if (newMedia.getType() != null)
       media.setType(newMedia.getType());
     if (newMedia.getPath() != null)
@@ -82,7 +82,7 @@ public class MediaController {
   @DeleteMapping("/medias/{id}")
   ResponseEntity<?> deleteMedia(@PathVariable Long id) {
 
-    Media media = repository.findById(id).orElseThrow(() -> new MediaNotFoundException(id,HttpStatus.NOT_FOUND));
+    Media media = repository.findById(id).orElseThrow(() -> new MediaNotFoundException(id, HttpStatus.NOT_FOUND));
 
     repository.delete(media);
 

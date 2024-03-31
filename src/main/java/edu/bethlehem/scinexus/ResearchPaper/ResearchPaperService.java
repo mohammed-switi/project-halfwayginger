@@ -165,7 +165,7 @@ public class ResearchPaperService {
         logger.debug("Deleting the research paper");
     }
 
-    EntityModel<UserResearchPaperRequest> requestAccessToResearchPaper(Long researchPaperId,
+    EntityModel<ResearchPaper> requestAccessToResearchPaper(Long researchPaperId,
             Authentication authentication) {
         logger.debug("requesting access to ResearchPaper with id: " + researchPaperId);
         Long userId = ((User) (authentication.getPrincipal())).getId();
@@ -177,14 +177,38 @@ public class ResearchPaperService {
                 .orElseThrow(() -> new ResearchPaperNotFoundException(
                         "The ResearchPaper with id:" + researchPaperId + " is not found",
                         HttpStatus.NOT_FOUND));
-
+        UserResearchPaperRequest urpr = userResearchPaperRequestRepository.findByUserAndResearchPaper(user,
+                researchPaper);
+        if (urpr != null)
+            throw new UserNotFoundException("A request is already has been made", HttpStatus.CONFLICT);
         UserResearchPaperRequest userResearchPaperRequest = new UserResearchPaperRequest();
         userResearchPaperRequest.setId(new ResearchPaperRequestKey(userId, researchPaperId));
         userResearchPaperRequest.setUser(user);
         userResearchPaperRequest.setResearchPaper(researchPaper);
         userResearchPaperRequest.setAccepted(false);
+        userResearchPaperRequestRepository.save(userResearchPaperRequest);
+        return assembler.toModel(researchPaper);
 
-        return EntityModel.of(userResearchPaperRequestRepository.save(userResearchPaperRequest));
+    }
+
+    EntityModel<ResearchPaper> respondToRequest(Boolean answer, Long researchPaperId, Long userId) {
+        ResearchPaper researchPaper = researchPaperRepository.findById(researchPaperId)
+                .orElseThrow(() -> new ResearchPaperNotFoundException(researchPaperId));
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
+        UserResearchPaperRequest urpr = userResearchPaperRequestRepository.findByUserAndResearchPaper(user,
+                researchPaper);
+        if (urpr == null)
+            throw new ResearchPaperNotFoundException("Requset is not foung for user with id: " + userId
+                    + " and researchpaper with id: " + researchPaperId, HttpStatus.NOT_FOUND);
+        if (answer == false)
+            userResearchPaperRequestRepository.delete(urpr);
+
+        else {
+            urpr.setAccepted(true);
+            userResearchPaperRequestRepository.save(urpr);
+
+        }
+        return assembler.toModel(researchPaper);
     }
 
     public EntityModel<ResearchPaper> validate(Long researchPaperId, Authentication authentication) {

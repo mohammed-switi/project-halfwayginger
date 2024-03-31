@@ -2,7 +2,11 @@ package edu.bethlehem.scinexus.ResearchPaper;
 
 import java.util.List;
 
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
+
+import edu.bethlehem.scinexus.Article.Article;
 
 import edu.bethlehem.scinexus.Article.Article;
 

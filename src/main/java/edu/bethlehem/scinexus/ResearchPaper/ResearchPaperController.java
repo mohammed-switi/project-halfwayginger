@@ -35,7 +35,7 @@ public class ResearchPaperController {
   }
 
   @GetMapping()
-  CollectionModel<EntityModel<ResearchPaper>> all() {
+  public CollectionModel<EntityModel<ResearchPaper>> all() {
 
     List<EntityModel<ResearchPaper>> researchpapers = service.findAllResearchPapers();
 
@@ -66,8 +66,17 @@ public class ResearchPaperController {
   @PostMapping("{researchPaperId}/access")
   public ResponseEntity<?> requestResearchPaperAccess(@PathVariable @NotNull Long researchPaperId,
       Authentication authentication) {
-    EntityModel<UserResearchPaperRequest> entityModel = service.requestAccessToResearchPaper(researchPaperId,
+    EntityModel<ResearchPaper> entityModel = service.requestAccessToResearchPaper(researchPaperId,
         authentication);
+    return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF)
+        .toUri()).body(entityModel);
+  }
+
+  @PostMapping("{researchPaperId}/access/{userId}")
+  public ResponseEntity<?> respondToRequestResearchPaperAccess(@PathVariable @NotNull Long researchPaperId,
+      @PathVariable Long userId, @RequestBody Boolean answer) {
+    EntityModel<ResearchPaper> entityModel = service.respondToRequest(answer, researchPaperId,
+        userId);
     return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF)
         .toUri()).body(entityModel);
   }

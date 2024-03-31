@@ -103,7 +103,7 @@ public class InteractionService {
                                                 interactionId, HttpStatus.UNPROCESSABLE_ENTITY));
         }
 
-        public ResponseEntity<?> addOpinionInteraction(
+        public EntityModel<Interaction> addOpinionInteraction(
                         Long opinionId,
                         InteractionRequestDTO interactionDTO,
                         Authentication authentication) {
@@ -125,15 +125,13 @@ public class InteractionService {
                 interaction = interactionRepository.save(interaction);
 
                 opinion.addInteraction();
-
                 opinionRepository.save(opinion);
-                EntityModel<Interaction> entityModel = assembler.toModel(interaction);
-                return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri())
-                                .body(entityModel);
+
+                return assembler.toModel(interaction);
 
         }
 
-        public ResponseEntity<?> addJournalInteraction(
+        public EntityModel<Interaction> addJournalInteraction(
                         Long journalId,
                         InteractionRequestDTO interactionDTO,
                         Authentication authentication) {
@@ -154,23 +152,25 @@ public class InteractionService {
                 interaction.setJournal(journal);
                 interaction.setInteractorUser(user);
 
-                interaction = interactionRepository.save(interaction);
-
-                // journal.addInteraction(interaction);
-
+                journal.addInteraction();
                 journalRepository.save(journal);
-                EntityModel<Interaction> entityModel = assembler.toModel(interaction);
-                return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri())
-                                .body(entityModel);
+                return assembler.toModel(interactionRepository.save(interaction));
 
         }
 
-        public void deleteInteraction(Long interactionId) {
+        public void deleteInteraction(Long interactionId, Authentication authentication) {
                 logger.trace("Deleting Interaction");
-                Interaction interaction = interactionRepository.findById(interactionId)
+                User user = userRepository.findById(((User) authentication.getPrincipal()).getId())
                                 .orElseThrow(
-                                                () -> new InteractionNotFoundException(interactionId,
-                                                                HttpStatus.UNPROCESSABLE_ENTITY));
+                                                () -> new UserNotFoundException(
+                                                                "User is not found with username: "
+                                                                                + authentication.getName(),
+                                                                HttpStatus.NOT_FOUND));
+                Interaction interaction = interactionRepository.findByIdAndInteractorUser(interactionId, user);
+                if (interaction == null)
+
+                        throw new InteractionNotFoundException("Interaction with id: " + interactionId
+                                        + " for user with Id: " + user.getId() + " is not Found", HttpStatus.NOT_FOUND);
 
                 if (interaction.getJournal() != null)
                         interaction.getJournal().removeInteraction();

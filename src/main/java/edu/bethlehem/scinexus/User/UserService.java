@@ -33,6 +33,13 @@ import edu.bethlehem.scinexus.ResearchPaper.ResearchPaper;
 import edu.bethlehem.scinexus.ResearchPaper.ResearchPaperModelAssembler;
 import edu.bethlehem.scinexus.ResearchPaper.ResearchPaperNotFoundException;
 import edu.bethlehem.scinexus.ResearchPaper.ResearchPaperRepository;
+import edu.bethlehem.scinexus.Media.Media;
+import edu.bethlehem.scinexus.Media.MediaNotFoundException;
+import edu.bethlehem.scinexus.Media.MediaRepository;
+import edu.bethlehem.scinexus.ResearchPaper.ResearchPaper;
+import edu.bethlehem.scinexus.ResearchPaper.ResearchPaperController;
+import edu.bethlehem.scinexus.ResearchPaper.ResearchPaperModelAssembler;
+import edu.bethlehem.scinexus.ResearchPaper.ResearchPaperRepository;
 import edu.bethlehem.scinexus.SecurityConfig.JwtService;
 import edu.bethlehem.scinexus.UserResearchPaper.ResearchPaperRequestKey;
 import edu.bethlehem.scinexus.UserResearchPaper.UserResearchPaperRequest;
@@ -46,6 +53,8 @@ public class UserService implements UserDetailsService {
     private EntityManager entityManager;
     private final UserRepository repository;
     private final ArticleRepository articleRepository;
+    private final ResearchPaperRepository researchPaperRepository;
+    private final MediaRepository mediaRepository;
     private final ResearchPaperRepository researchPapersRepository;
     private final ResearchPaperModelAssembler researchPapersAssembler;
     private final UserModelAssembler assembler;
@@ -56,18 +65,18 @@ public class UserService implements UserDetailsService {
     Logger logger = LoggerFactory.getLogger(UserService.class);
 
     // USING Java Persistence Query Language (JPQL), (Tested: Works Well!)
-    public boolean areUsersLinked(User user1, User user2) {
-        logger.debug("Checking if the users are linked");
-        Long count = entityManager.createQuery(
-                "SELECT COUNT(u) FROM User u JOIN u.links l " +
-                        "WHERE u.id = :userId1 AND l.id = :userId2",
-                Long.class)
-                .setParameter("userId1", user1.getId())
-                .setParameter("userId2", user2.getId())
-                .getSingleResult();
+    // public boolean areUsersLinked(User user1, User user2) {
+    // logger.debug("Checking if the users are linked");
+    // Long count = entityManager.createQuery(
+    // "SELECT COUNT(u) FROM User u JOIN u.links l " +
+    // "WHERE u.id = :userId1 AND l.id = :userId2",
+    // Long.class)
+    // .setParameter("userId1", user1.getId())
+    // .setParameter("userId2", user2.getId())
+    // .getSingleResult();
 
-        return count > 0;
-    }
+    // return count > 0;
+    // }
 
     CollectionModel<EntityModel<User>> all() {
         List<EntityModel<User>> users = repository.findAll().stream()
@@ -97,12 +106,23 @@ public class UserService implements UserDetailsService {
             for (Method method : UserRequestPatchDTO.class.getMethods()) {
                 if (method.getName().startsWith("get") && method.getParameterCount() == 0) {
                     Object value = method.invoke(editUser);
+
                     if (value != null) {
                         String propertyName = method.getName().substring(3); // remove "get"
                         logger.trace("Updating user property: " + propertyName);
                         if (propertyName.equals("Class")) // Class is a reserved keyword in Java
                             continue;
-                        Method setter = User.class.getMethod("set" + propertyName, method.getReturnType());
+                        Method setter;
+                        if (method.getReturnType().equals(Long.class)) {
+                            Media media = mediaRepository.findById((Long) value)
+                                    .orElseThrow(() -> new MediaNotFoundException(
+                                            "The media with id:" + value + " is not found",
+                                            HttpStatus.NOT_FOUND));
+                            setter = User.class.getMethod("set" + propertyName, Media.class);
+                            setter.invoke(user, media);
+
+                        }
+                        setter = User.class.getMethod("set" + propertyName, method.getReturnType());
                         setter.invoke(user, value);
                     }
                 }
@@ -117,56 +137,81 @@ public class UserService implements UserDetailsService {
 
     }
 
-    CollectionModel<EntityModel<User>> getLinks(Authentication authentication) {
-        logger.debug("returning user links");
-        Long userId = ((User) (authentication.getPrincipal())).getId();
+    // CollectionModel<EntityModel<User>> getLinks(Authentication authentication) {
+    // logger.debug("returning user links");
+    // Long userId = ((User) (authentication.getPrincipal())).getId();
 
-        User user = repository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("The user with id:" + userId + " is not found",
-                        HttpStatus.NOT_FOUND));
-        logger.trace("Got user with id: " + userId);
+    // User user = repository.findById(userId)
+    // .orElseThrow(() -> new UserNotFoundException("The user with id:" + userId + "
+    // is not found",
+    // HttpStatus.NOT_FOUND));
+    // logger.trace("Got user with id: " + userId);
 
-        List<EntityModel<User>> links = user.getLinks().stream()
-                .map(userLinked -> assembler.toModel(
-                        userLinked))
-                .collect(Collectors.toList());
-        logger.trace("Got user links");
-        logger.trace("returning user links");
-        return CollectionModel.of(links, linkTo(methodOn(UserController.class).all()).withSelfRel());
+    // List<EntityModel<User>> links = user.getLinks().stream()
+    // .map(userLinked -> assembler.toModel(
+    // userLinked))
+    // .collect(Collectors.toList());
+    // logger.trace("Got user links");
+    // logger.trace("returning user links");
+    // return CollectionModel.of(links,
+    // linkTo(methodOn(UserController.class).all()).withSelfRel());
 
-    }
+    // }
 
-    ResponseEntity<?> linkUser(Authentication authentication, Long userLinkToId) {
-        logger.debug("linking user with id: " + userLinkToId);
-        Long linkFromId = ((User) (authentication.getPrincipal())).getId();
-        logger.trace("Got user with id: " + linkFromId);
-        User userLinkTo = repository.findById(
-                userLinkToId).orElseThrow(
-                        () -> new UserNotFoundException("The user with id:" +
-                                userLinkToId + " is not found", HttpStatus.NOT_FOUND));
-        logger.trace("Got user with id: " + userLinkToId);
-        User user = repository.findById(linkFromId)
-                .orElseThrow(() -> new UserNotFoundException("The user with id:" + linkFromId + " is not found",
-                        HttpStatus.NOT_FOUND));
-        logger.trace("Got user with id: " + linkFromId);
+    // EntityModel<User> linkUser(Authentication authentication, Long userLinkToId)
+    // {
+    // logger.debug("linking user with id: " + userLinkToId);
+    // Long linkFromId = ((User) (authentication.getPrincipal())).getId();
+    // logger.trace("Got user with id: " + linkFromId);
+    // User userLinkTo = repository.findById(
+    // userLinkToId).orElseThrow(
+    // () -> new UserNotFoundException("The user with id:" +
+    // userLinkToId + " is not found", HttpStatus.NOT_FOUND));
+    // logger.trace("Got user with id: " + userLinkToId);
+    // User user = repository.findById(linkFromId)
+    // .orElseThrow(() -> new UserNotFoundException("The user with id:" + linkFromId
+    // + " is not found",
+    // HttpStatus.NOT_FOUND));
+    // logger.trace("Got user with id: " + linkFromId);
 
-        logger.trace("Checking if the users are already linked");
-        if (user.getLinks().contains(userLinkTo))
-            return ResponseEntity.badRequest().body("The user with id:" + linkFromId
-                    + " is already linked to the user with id:" + userLinkToId);
-        logger.trace("Checking if the user is trying to link to itself");
-        if (user.getId() == userLinkTo.getId())
-            return ResponseEntity.badRequest().body("The user with id:" + linkFromId
-                    + " cannot link to itself");
-        user.getLinks().add(userLinkTo);
+    // logger.trace("Checking if the users are already linked");
+    // if (user.getLinks().contains(userLinkTo))
+    // throw new UserNotFoundException("The user with id:" + linkFromId
+    // + " is already linked to the user with id:" + userLinkToId,
+    // HttpStatus.BAD_REQUEST);
+    // if (user.getId() == userLinkTo.getId())
+    // throw new UserNotFoundException("The user with id:" + linkFromId
+    // + " can't be linked to itself", HttpStatus.BAD_REQUEST);
+    // user.getLinks().add(userLinkTo);
 
-        logger.trace("Linked user with id: " + userLinkToId);
-        EntityModel<User> entityModel = assembler.toModel(repository.save(user));
-        logger.trace("returning linked user with id: " + userLinkToId);
-        return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri())
-                .body(entityModel);
+    // logger.trace("Linked user with id: " + userLinkToId);
+    // EntityModel<User> entityModel = assembler.toModel(repository.save(user));
+    // logger.trace("returning linked user with id: " + userLinkToId);
+    // return entityModel;
 
-    }
+    // }
+
+    // EntityModel<User> unlinkUser(Authentication authentication, Long
+    // userLinkToId) {
+    // Long linkFromId = ((User) (authentication.getPrincipal())).getId();
+    // User userLinkTo = repository.findById(userLinkToId)
+    // .orElseThrow(() -> new UserNotFoundException("The user with id:" +
+    // userLinkToId + " is not found", HttpStatus.NOT_FOUND));
+    // User user = repository.findById(linkFromId)
+    // .orElseThrow(() -> new UserNotFoundException("The user with id:" + linkFromId
+    // + " is not found",
+    // HttpStatus.NOT_FOUND));
+
+    // if (!user.getLinks().contains(userLinkTo))
+    // throw new UserNotFoundException("The user with id:" + linkFromId
+    // + " is not linked to the user with id:" + userLinkToId,
+    // HttpStatus.BAD_REQUEST);
+
+    // user.getLinks().remove(userLinkTo);
+
+    // EntityModel<User> entityModel = assembler.toModel(repository.save(user));
+    // return entityModel;
+    // }
 
     CollectionModel<EntityModel<Article>> getUserArticles(Authentication authentication) {
         logger.debug("returning user articles");
@@ -240,6 +285,22 @@ public class UserService implements UserDetailsService {
         return repository.enableAppUser(email);
     }
 
+    // @Override
+    // public UserDetails loadUserByUsername(String username) throws
+    // UsernameNotFoundException {
+    // String userName = null, password=null;
+    // List<GrantedAuthority> authorities=null;
+    // User user=repository.findByEmail(username).orElseThrow(() -> new
+    // UserNotFoundException());
+    //
+    // userName=user.getEmail();
+    // password=user.getPassword();
+    // authorities=new ArrayList<>();
+    // authorities.add(new SimpleGrantedAuthority(user.getRole().toString()));
+    //
+    // return new
+    // org.springframework.security.core.userdetails.User(username,password,authorities);
+    // }
     // @Override
     // public UserDetails loadUserByUsername(String username) throws
     // UsernameNotFoundException {

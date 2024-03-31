@@ -12,6 +12,7 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import edu.bethlehem.scinexus.SecurityConfig.UserDetailsImpl;
+import edu.bethlehem.scinexus.UserLinks.UserLinks;
 import edu.bethlehem.scinexus.UserResearchPaper.UserResearchPaperRequest;
 import edu.bethlehem.scinexus.Conditional.Conditional;
 import edu.bethlehem.scinexus.Journal.Journal;
@@ -147,12 +148,6 @@ public class User implements UserDetailsImpl {
     @JsonBackReference
     private Set<Journal> contributedJournals = new HashSet<>();
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "user_link_user", joinColumns = @JoinColumn(name = "linkFrom"), inverseJoinColumns = @JoinColumn(name = "LinkTo"))
-    @JdbcTypeCode(SqlTypes.JSON)
-    @JsonIgnore
-    private List<User> links;
-
     // Academic Specific Fields
     private String badge;
 
@@ -169,6 +164,7 @@ public class User implements UserDetailsImpl {
     private User organization;
 
     @OneToMany(mappedBy = "user")
+    @JsonIgnore
     List<UserResearchPaperRequest> requestsResearchPapers;
 
     // Organization Specific Fields

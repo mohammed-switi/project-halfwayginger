@@ -7,7 +7,7 @@ import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.stereotype.Component;
 
 @Component
-class JournalModelAssembler implements RepresentationModelAssembler<Journal, EntityModel<Journal>> {
+public class JournalModelAssembler implements RepresentationModelAssembler<Journal, EntityModel<Journal>> {
 
         @Override
         public EntityModel<Journal> toModel(Journal journal) {

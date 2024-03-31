@@ -65,10 +65,22 @@ public class SecurityConfig {
 
                         // .requestMatchers(HttpMethod.PATCH, "/articles/{journalId}")
                         // .access(authorizationManager.journalOwnerContributors())
+                        // .requestMatchers(HttpMethod.PATCH, "/articles/{journalId}")
+                        // .access(authorizationManager.journalOwnerContributors())
 
                         // .requestMatchers(HttpMethod.DELETE, "/articles/{journalId}")
                         // .access(authorizationManager.journalOwner())
+                        // .requestMatchers(HttpMethod.DELETE, "/articles/{journalId}")
+                        // .access(authorizationManager.journalOwner())
 
+                        // .requestMatchers(HttpMethod.POST, "/journals/**")
+                        // .access(authorizationManager.journalOwner())
+                        // .requestMatchers(HttpMethod.PATCH,
+                        // "/journals/{journalId}/contributors/{contributorId}")
+                        // .access(authorizationManager.journalOwnerNew())
+                        // .requestMatchers(HttpMethod.DELETE,
+                        // "/journals/{journalId}/contributors/{contributorId}")
+                        // .access(authorizationManager.journalOwnerNew())
                         // .requestMatchers(HttpMethod.POST, "/journals/**")
                         // .access(authorizationManager.journalOwner())
                         // .requestMatchers(HttpMethod.PATCH,
@@ -125,6 +137,18 @@ public class SecurityConfig {
         return new RestTemplateBuilder().build();
     }
 
+    // @Bean
+    // public Customizer<CorsConfigurer<HttpSecurity>> corsFilter() {
+    // UrlBasedCorsConfigurationSource source = new
+    // UrlBasedCorsConfigurationSource();
+    // CorsConfiguration config = new CorsConfiguration();
+    // config.setAllowCredentials(true);
+    // config.addAllowedOrigin("*"); // Allow all origins
+    // config.addAllowedHeader("*"); // Allow all headers
+    // config.addAllowedMethod("*"); // Allow all methods
+    // source.registerCorsConfiguration("/**", config);
+    // return (Customizer<CorsConfigurer<HttpSecurity>>) new CorsFilter(source);
+    // }
     // @Bean
     // public Customizer<CorsConfigurer<HttpSecurity>> corsFilter() {
     // UrlBasedCorsConfigurationSource source = new

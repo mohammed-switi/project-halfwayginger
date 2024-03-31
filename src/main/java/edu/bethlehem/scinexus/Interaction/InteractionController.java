@@ -52,15 +52,15 @@ public class InteractionController {
   }
 
   @DeleteMapping("/{id}")
-  ResponseEntity<?> deleteInteraction(@PathVariable Long id) {
-    repository.deleteById(id);
+  ResponseEntity<?> deleteInteraction(@PathVariable Long id, Authentication authentication) {
+    service.deleteInteraction(id, authentication);
     return ResponseEntity.noContent().build();
 
   }
 
   @PostMapping("/opinion/{opinionId}")
   public ResponseEntity<?> addOpinionInteraction(
-      @PathVariable(value = "journalId") Long opinionId,
+      @PathVariable(value = "opinionId") Long opinionId,
       @RequestBody InteractionRequestDTO interaction,
       Authentication authentication) {
 
@@ -74,4 +74,5 @@ public class InteractionController {
       Authentication authentication) {
     return ResponseEntity.ok(service.addJournalInteraction(journalId, interaction, authentication));
   }
+
 }

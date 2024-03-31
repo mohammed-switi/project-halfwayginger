@@ -7,7 +7,7 @@ import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.stereotype.Component;
 
 @Component
-class MediaModelAssembler implements RepresentationModelAssembler<Media, EntityModel<Media>> {
+public class MediaModelAssembler implements RepresentationModelAssembler<Media, EntityModel<Media>> {
 
         @Override
         public EntityModel<Media> toModel(Media media) {
@@ -16,7 +16,7 @@ class MediaModelAssembler implements RepresentationModelAssembler<Media, EntityM
                                 media, //
                                 linkTo(methodOn(
                                                 MediaController.class).one(
-                                                                media.getMediaId()))
+                                                                media.getId()))
                                                 .withSelfRel(),
                                 linkTo(methodOn(MediaController.class).all()).withRel(
                                                 "+medias"));

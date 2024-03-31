@@ -15,6 +15,7 @@ import edu.bethlehem.scinexus.ResearchPaper.ResearchPaper;
 import edu.bethlehem.scinexus.Article.ArticleModelAssembler;
 import edu.bethlehem.scinexus.SecurityConfig.JwtService;
 import edu.bethlehem.scinexus.User.UserRepository;
+import edu.bethlehem.scinexus.UserLinks.UserLinksService;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -28,6 +29,7 @@ public class UserController {
     private final ArticleModelAssembler articleAssembler;
     private final JwtService jwtService;
     private final UserService service;
+    private final UserLinksService ulService;
 
     @GetMapping()
     CollectionModel<EntityModel<User>> all() {
@@ -75,15 +77,28 @@ public class UserController {
     // });
     // }
 
-    @GetMapping("/links")
-    CollectionModel<EntityModel<User>> getUserLinks(Authentication authentication)
-            throws UserNotFoundException {
-        return service.getLinks(authentication);
-    }
+    // @GetMapping("/links")
+    // CollectionModel<EntityModel<User>> getUserLinks(Authentication
+    // authentication)
+    // throws UserNotFoundException {
+    // return service.getLinks(authentication);
+    // }
 
     @PutMapping("/links/{userLinkTo}")
     ResponseEntity<?> linkUser(Authentication authentication, @PathVariable Long userLinkTo) {
-        return service.linkUser(authentication, userLinkTo);
+        return ResponseEntity.ok(ulService.linkUser(authentication, userLinkTo));
+    }
+
+    @PutMapping("/links/{userLinkTo}/response")
+    ResponseEntity<?> respondToLinkage(Authentication authentication, @PathVariable Long userLinkTo,
+            @RequestBody Boolean answer) {
+        return ulService.acceptLink(authentication, userLinkTo, answer);
+    }
+
+    @DeleteMapping("/links/{userLinkTo}")
+    ResponseEntity<?> unlinkUser(Authentication authentication, @PathVariable Long userLinkTo) {
+        ulService.unLink(authentication, userLinkTo);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/articles")
