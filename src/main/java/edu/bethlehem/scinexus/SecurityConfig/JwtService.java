@@ -1,5 +1,6 @@
 package edu.bethlehem.scinexus.SecurityConfig;
 
+import edu.bethlehem.scinexus.Post.PostService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
@@ -10,10 +11,17 @@ import io.jsonwebtoken.security.SignatureException;
 
 import org.json.JSONObject;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtException;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
@@ -28,12 +36,27 @@ import java.util.function.Function;
 public class JwtService  {
 
     private static final String SECRET_KEY = "491ef82099212d650f7da939a3473c3ae12bb6ca0004a0b635245b9c04e4a94f";
+    Logger logger = LoggerFactory.getLogger(JwtService.class);
+
 
 
     public String extractUsername(String jwtToken) {
         return extractClaim(jwtToken, Claims::getSubject);
     }
     public Long extractId(Authentication authentication){
+        Map<String, Object> attributes;
+        if (authentication instanceof OAuth2AuthenticationToken) {
+            attributes = ((OAuth2AuthenticationToken) authentication).getPrincipal().getAttributes();
+            logger.trace("The Auth Token Type is From OAuth2AuthenticationToken, the User who tries to authenticate is " + attributes.toString());
+            return Long.parseLong( (String) attributes.get("id"));
+
+
+        } else if (authentication instanceof JwtAuthenticationToken) {
+            attributes = ((JwtAuthenticationToken) authentication).getTokenAttributes();
+            logger.trace("The Auth Token Type is From JwtAuthenticationToken, the User who tries to authenticate is " + attributes.toString());
+            return Long.parseLong( (String) attributes.get("id"));
+        }
+        logger.debug("IF THE TRACE REACHED HERE, I THINK AN ERROR WILL HAPPEN HERE");
         UserDetailsImpl userDetails=(UserDetailsImpl) authentication.getPrincipal();
         return userDetails.getId();
     }

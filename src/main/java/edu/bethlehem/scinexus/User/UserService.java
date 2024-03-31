@@ -1,5 +1,7 @@
 package edu.bethlehem.scinexus.User;
 
+import edu.bethlehem.scinexus.SecurityConfig.UserDetailsImpl;
+import io.jsonwebtoken.Jwt;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +26,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import com.mysql.cj.x.protobuf.MysqlxCrud.Collection;
 import edu.bethlehem.scinexus.Article.Article;
 import edu.bethlehem.scinexus.Article.ArticleModelAssembler;
 import edu.bethlehem.scinexus.Article.ArticleRepository;
@@ -237,7 +238,9 @@ public class UserService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        return repository.findByEmail(email).orElseThrow(() -> new UserNotFoundException("User with username "+ email +" is not found"));
+
+
+        return   repository.findByEmail(email).orElseThrow(() -> new UserNotFoundException("User with username "+ email +" is not found"));
     }
 
     public int enableUser(String email) {

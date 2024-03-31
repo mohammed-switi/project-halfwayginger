@@ -20,6 +20,7 @@ import edu.bethlehem.scinexus.ResearchPaper.ResearchPaper;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
@@ -34,6 +35,7 @@ import java.util.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@Document
 @Inheritance(strategy = InheritanceType.JOINED)
 @JsonSerialize
 @Builder

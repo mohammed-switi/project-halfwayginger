@@ -2,6 +2,8 @@ package edu.bethlehem.scinexus.SecurityConfig;
 
 import edu.bethlehem.scinexus.Authorization.AuthorizationManager;
 
+import edu.bethlehem.scinexus.User.User;
+import edu.bethlehem.scinexus.User.UserService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationProvider;
 
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -23,6 +26,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 
 
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.oauth2.client.JwtBearerOAuth2AuthorizedClientProvider;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientProvider;
 import org.springframework.security.oauth2.client.endpoint.DefaultAuthorizationCodeTokenResponseClient;
@@ -62,6 +66,7 @@ public class SecurityConfig  {
      //   private final WebClient userClientInfo;
 
         private final JwtDecoder jwtDecoder;
+        private final UserService userDetailsService;
 
 
 
@@ -146,6 +151,10 @@ public class SecurityConfig  {
         return new RestTemplateBuilder().build();
     }
 
+    @Autowired
+    public void configAuthentication(AuthenticationManagerBuilder auth) throws Exception {
+        auth.userDetailsService(userDetailsService);
+    }
 
 
 }
