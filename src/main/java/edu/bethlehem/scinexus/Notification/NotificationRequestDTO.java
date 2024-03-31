@@ -16,8 +16,4 @@ public class NotificationRequestDTO {
     @NotBlank(message = "The Notification Content Be Empty")
     private String content;
 
-    @Enumerated(EnumType.STRING)
-    // @NotNull(message = "The Notification Content Shouldn't Be Null")
-    @NotBlank(message = "The Notification Status Should Be Specified")
-    private Status status = Status.UNSEEN;
 }

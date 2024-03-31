@@ -33,22 +33,9 @@ public class NotificationController {
   }
 
   @PostMapping("/{userId}")
-  ResponseEntity<?> newNotification(@RequestBody NotificationRequestDTO newNotification, @PathVariable Long userId) {
+  ResponseEntity<?> newNotification(@RequestBody String content, @PathVariable Long userId) {
 
-    return ResponseEntity.ok(service.createNotification(newNotification, userId));
-  }
-
-  @PutMapping("/{notificationId}")
-  ResponseEntity<?> editNotification(@RequestBody NotificationRequestDTO newNotification,
-      @PathVariable Long notificationId) {
-
-    return ResponseEntity.ok(service.updateNotification(notificationId, newNotification));
-  }
-
-  @PatchMapping("/{notificationId}")
-  public ResponseEntity<?> updateUserPartially(@PathVariable(value = "notificationId") Long notificationId,
-      @RequestBody NotificationRequestDTO newNotification) {
-    return ResponseEntity.ok(service.updateNotificationPartially(notificationId, newNotification));
+    return ResponseEntity.ok(service.createNotification(content, userId));
   }
 
   @DeleteMapping("/{notificationId}")

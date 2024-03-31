@@ -25,9 +25,12 @@ import edu.bethlehem.scinexus.Interaction.InteractionNotFoundException;
 import edu.bethlehem.scinexus.Interaction.InteractionRepository;
 import edu.bethlehem.scinexus.Interaction.InteractionRequestDTO;
 import edu.bethlehem.scinexus.Journal.Journal;
+import edu.bethlehem.scinexus.Journal.JournalController;
 import edu.bethlehem.scinexus.Journal.JournalNotFoundException;
 import edu.bethlehem.scinexus.Journal.JournalRepository;
+import edu.bethlehem.scinexus.Notification.NotificationService;
 import edu.bethlehem.scinexus.Opinion.Opinion;
+import edu.bethlehem.scinexus.Opinion.OpinionController;
 import edu.bethlehem.scinexus.Opinion.OpinionRepository;
 import edu.bethlehem.scinexus.SecurityConfig.JwtService;
 import edu.bethlehem.scinexus.User.User;
@@ -46,6 +49,7 @@ public class InteractionService {
         private final InteractionRepository interactionRepository;
         private final OpinionRepository opinionRepository;
         private final JournalRepository journalRepository;
+        private final NotificationService notificationService;
         private final InteractionModelAssembler assembler;
         Logger logger = LoggerFactory.getLogger(DataLoader.class);
 
@@ -115,10 +119,17 @@ public class InteractionService {
                                                                 "User is not found with username: "
                                                                                 + authentication.getName(),
                                                                 HttpStatus.NOT_FOUND));
-
                 Opinion opinion = opinionRepository.findById(
                                 opinionId)
                                 .orElseThrow(() -> new JournalNotFoundException(opinionId, HttpStatus.NOT_FOUND));
+
+                notificationService.notifyUser(
+                                opinion.getOpinionOwner(),
+                                user.getFirstName() + " Interacted with your Opinoin: " + opinion.getContent(),
+                                linkTo(methodOn(
+                                                OpinionController.class).one(
+                                                                opinion.getId())));
+
                 Interaction interaction = new Interaction(interactionDTO.getType(), user);
                 interaction.setOpinion(opinion);
 
@@ -147,6 +158,14 @@ public class InteractionService {
                 Journal journal = journalRepository.findById(
                                 journalId)
                                 .orElseThrow(() -> new JournalNotFoundException(journalId, HttpStatus.NOT_FOUND));
+
+                notificationService.notifyUser(
+                                journal.getPublisher(),
+                                user.getFirstName() + " Interacted with your journal: " + journal.getId(),
+                                linkTo(methodOn(
+                                                JournalController.class).one(
+                                                                journal.getId())));
+
                 Interaction interaction = new Interaction(interactionDTO.getType(), user);
 
                 interaction.setJournal(journal);

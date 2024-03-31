@@ -137,11 +137,11 @@ public class User implements UserDetailsImpl {
     @JsonBackReference
     private Set<Journal> journals = new HashSet<Journal>();
 
-    @OneToMany(fetch = FetchType.EAGER)
-    @JoinColumn(name = "notifications")
-    @JdbcTypeCode(SqlTypes.JSON)
-    @JsonIgnore
-    private List<Notification> notifications;
+    // @OneToMany(fetch = FetchType.EAGER)
+    // @JoinColumn(name = "notifications")
+    // @JdbcTypeCode(SqlTypes.JSON)
+    // @JsonIgnore
+    // private List<Notification> notifications;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "journal_user_contributors", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "journal_id"))

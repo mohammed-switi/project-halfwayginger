@@ -21,26 +21,21 @@ public class OpinionController {
   private final OpinionRepository repository;
   private final OpinionModelAssembler assembler;
 
-
-
-
   @GetMapping("/{opinionId}")
-  EntityModel<Opinion> one(@PathVariable Long opinionId) {
+  public EntityModel<Opinion> one(@PathVariable Long opinionId) {
 
-   return opinionService.getOneOpinion(opinionId);
+    return opinionService.getOneOpinion(opinionId);
   }
 
   @GetMapping()
   CollectionModel<EntityModel<Opinion>> all() {
 
     return CollectionModel.of(opinionService.getAllOpinions(),
-                            linkTo(methodOn(OpinionController.class).all()).withSelfRel());
+        linkTo(methodOn(OpinionController.class).all()).withSelfRel());
   }
 
   @PostMapping()
-  ResponseEntity<?> newOpinion(@RequestBody
-                               @Valid
-                               OpinionDTO newOpinion) {
+  ResponseEntity<?> newOpinion(@RequestBody @Valid OpinionDTO newOpinion) {
 
     EntityModel<Opinion> entityModel = opinionService.postOpinion(newOpinion);
 
@@ -48,22 +43,18 @@ public class OpinionController {
   }
 
   @PutMapping("/{id}")
-  public ResponseEntity<?> editOpinion(@RequestBody
-                                @Valid
-                                OpinionDTO newOpinion,
-                                @PathVariable Long id) {
-      EntityModel<Opinion> entityModel = opinionService.updateOpinion(id,newOpinion);
+  public ResponseEntity<?> editOpinion(@RequestBody @Valid OpinionDTO newOpinion,
+      @PathVariable Long id) {
+    EntityModel<Opinion> entityModel = opinionService.updateOpinion(id, newOpinion);
     return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
 
   }
 
   @PatchMapping("{id}")
   public ResponseEntity<?> updateUserPartially(@PathVariable(value = "id") Long opinionId,
-      @RequestBody
-      @Valid
-      OpinionPatchDTO newOpinion) {
+      @RequestBody @Valid OpinionPatchDTO newOpinion) {
 
-   EntityModel<Opinion> entityModel= opinionService.updateOpinionPartially(opinionId,newOpinion);
+    EntityModel<Opinion> entityModel = opinionService.updateOpinionPartially(opinionId, newOpinion);
 
     return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
   }

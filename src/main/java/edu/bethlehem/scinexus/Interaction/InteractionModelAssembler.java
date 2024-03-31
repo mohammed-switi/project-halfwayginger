@@ -7,19 +7,19 @@ import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.stereotype.Component;
 
 @Component
-class InteractionModelAssembler implements RepresentationModelAssembler<Interaction, EntityModel<Interaction>> {
+public class InteractionModelAssembler implements RepresentationModelAssembler<Interaction, EntityModel<Interaction>> {
 
-    @Override
-    public EntityModel<Interaction> toModel(Interaction interaction) {
+        @Override
+        public EntityModel<Interaction> toModel(Interaction interaction) {
 
-        return EntityModel.of(
-                interaction, //
-                linkTo(methodOn(
-                        InteractionController.class).one(
-                                interaction.getId()))
-                        .withSelfRel(),
-                linkTo(methodOn(InteractionController.class).all()).withRel(
-                        "+interactions"));
-    }
+                return EntityModel.of(
+                                interaction, //
+                                linkTo(methodOn(
+                                                InteractionController.class).one(
+                                                                interaction.getId()))
+                                                .withSelfRel(),
+                                linkTo(methodOn(InteractionController.class).all()).withRel(
+                                                "+interactions"));
+        }
 
 }

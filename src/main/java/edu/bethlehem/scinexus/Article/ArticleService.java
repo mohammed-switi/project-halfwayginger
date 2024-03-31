@@ -21,9 +21,12 @@ import edu.bethlehem.scinexus.Article.ArticleRequestDTO;
 import edu.bethlehem.scinexus.DatabaseLoading.DataLoader;
 import edu.bethlehem.scinexus.Interaction.Interaction;
 import edu.bethlehem.scinexus.Interaction.InteractionRepository;
+import edu.bethlehem.scinexus.Notification.Notification;
+import edu.bethlehem.scinexus.Notification.NotificationService;
 import edu.bethlehem.scinexus.Opinion.OpinionRepository;
 import edu.bethlehem.scinexus.SecurityConfig.JwtService;
 import edu.bethlehem.scinexus.User.User;
+import edu.bethlehem.scinexus.User.UserController;
 import edu.bethlehem.scinexus.User.UserNotFoundException;
 import edu.bethlehem.scinexus.User.UserRepository;
 import jakarta.persistence.EntityManager;
@@ -41,6 +44,7 @@ public class ArticleService {
     private final OpinionRepository opinionRepository;
     private final InteractionRepository interactionRepository;
     private final ArticleModelAssembler assembler;
+    private final NotificationService notificationService;
     Logger logger = LoggerFactory.getLogger(DataLoader.class);
 
     public Article convertArticleDtoToArticleEntity(Authentication authentication,
@@ -92,7 +96,13 @@ public class ArticleService {
         logger.trace("Creating Article");
         Article article = convertArticleDtoToArticleEntity(authentication,
                 newArticleRequestDTO);
-        return assembler.toModel(saveArticle(article));
+        article = saveArticle(article);
+        notificationService.notifyLinks(
+                ((User) authentication.getPrincipal()).getId(),
+                "A new article from your links",
+                linkTo(methodOn(
+                        ArticleController.class).one(article.getId())));
+        return assembler.toModel(article);
     }
 
     public EntityModel<Article> updateArticle(Long articleId,

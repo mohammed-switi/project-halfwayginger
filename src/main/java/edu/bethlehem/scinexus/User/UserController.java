@@ -38,7 +38,7 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
-    EntityModel<User> one(@PathVariable Long userId) {
+    public EntityModel<User> one(@PathVariable Long userId) {
 
         return service.one(userId);
     }
@@ -90,7 +90,7 @@ public class UserController {
     }
 
     @PutMapping("/links/{userLinkTo}/response")
-    ResponseEntity<?> respondToLinkage(Authentication authentication, @PathVariable Long userLinkTo,
+    public ResponseEntity<?> respondToLinkage(Authentication authentication, @PathVariable Long userLinkTo,
             @RequestBody Boolean answer) {
         return ulService.acceptLink(authentication, userLinkTo, answer);
     }

@@ -5,6 +5,9 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,8 +19,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
+import edu.bethlehem.scinexus.Article.ArticleController;
 import edu.bethlehem.scinexus.DatabaseLoading.DataLoader;
 import edu.bethlehem.scinexus.Interaction.InteractionRepository;
+import edu.bethlehem.scinexus.Notification.NotificationService;
 import edu.bethlehem.scinexus.Opinion.OpinionRepository;
 import edu.bethlehem.scinexus.Organization.OrganizationNotFoundException;
 import edu.bethlehem.scinexus.ResearchPaper.ResearchPaper;
@@ -47,6 +52,7 @@ public class ResearchPaperService {
     private final InteractionRepository interactionRepository;
     private final OpinionRepository opinionRepository;
     private final ResearchPaperModelAssembler assembler;
+    private final NotificationService notificationService;
     Logger logger = LoggerFactory.getLogger(ResearchPaperService.class);
 
     public ResearchPaper convertResearchPaperDtoToResearchPaperEntity(Authentication authentication,
@@ -98,8 +104,15 @@ public class ResearchPaperService {
         logger.trace("Creating a new research paper");
         ResearchPaper researchPaper = convertResearchPaperDtoToResearchPaperEntity(authentication,
                 newResearchPaperRequestDTO);
+
+        researchPaper = saveResearchPaper(researchPaper);
+        notificationService.notifyLinks(
+                ((User) authentication.getPrincipal()).getId(),
+                "A new Research Paper from your links",
+                linkTo(methodOn(
+                        ResearchPaperController.class).one(researchPaper.getId())));
         logger.debug("Saving the research paper");
-        return assembler.toModel(saveResearchPaper(researchPaper));
+        return assembler.toModel(researchPaper);
     }
 
     public EntityModel<ResearchPaper> updateResearchPaper(Long researchPaperId,

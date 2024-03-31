@@ -24,7 +24,7 @@ public class JournalController {
     private final JournalService service;
 
     @GetMapping("/{journalId}")
-    EntityModel<Journal> one(@PathVariable Long journalId) {
+    public EntityModel<Journal> one(@PathVariable Long journalId) {
 
         return service.findJournalById(journalId);
     }
@@ -54,6 +54,18 @@ public class JournalController {
     public ResponseEntity<?> attachMedia(@PathVariable Long journalId, @RequestBody MediaIdDTO mediaIds)
             throws IOException {
         return ResponseEntity.ok(service.attachMedia(journalId, mediaIds));
+    }
+
+    @GetMapping("{journalId}/interactions")
+    public ResponseEntity<?> getJournalInteractions(@PathVariable Long journalId)
+            throws IOException {
+        return ResponseEntity.ok(service.getJournalInteractions(journalId));
+    }
+
+    @GetMapping("{journalId}/opinions")
+    public ResponseEntity<?> getJournalOpinions(@PathVariable Long journalId)
+            throws IOException {
+        return ResponseEntity.ok(service.getJournalOpinions(journalId));
     }
 
     @DeleteMapping("{journalId}/media")
