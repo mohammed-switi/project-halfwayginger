@@ -9,7 +9,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.*;
-
+import org.springframework.security.core.Authentication;
 import org.springframework.hateoas.*;
 import org.springframework.web.bind.annotation.*;
 
@@ -53,5 +53,18 @@ public class OrganizationController {
 
     return ResponseEntity.noContent().build();
 
+  }
+
+  @DeleteMapping("/{academicId}/organization")
+  ResponseEntity<?> removeUserFromOrganization(@PathVariable Long academicId) {
+    service.removeAcademic(academicId);
+    return ResponseEntity.noContent().build();
+
+  }
+
+  @PatchMapping("/{academicId}/organization")
+  ResponseEntity<?> addUserToOrganization(Authentication authentication, @PathVariable Long academicId) {
+
+    return ResponseEntity.ok(service.addAcademic(authentication, academicId));
   }
 }

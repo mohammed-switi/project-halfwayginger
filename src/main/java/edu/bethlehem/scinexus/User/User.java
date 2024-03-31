@@ -156,9 +156,9 @@ public class User implements UserDetailsImpl {
     @Enumerated(EnumType.STRING)
     private Position position;
 
-    @OneToOne
+    @ManyToOne
     @JdbcTypeCode(SqlTypes.JSON)
-    @JoinColumn(name = "id")
+    @JoinColumn(name = "organizationId")
     @Nullable
     @JsonIgnore
     private User organization;
