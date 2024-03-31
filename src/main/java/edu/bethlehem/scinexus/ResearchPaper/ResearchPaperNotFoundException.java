@@ -9,6 +9,10 @@ public class ResearchPaperNotFoundException extends GeneralException {
     super("Research Paper With Id : " + id + ", is Not Found", httpStatus);
   }
 
+  public ResearchPaperNotFoundException(String message, HttpStatus httpStatus) {
+    super(message, httpStatus);
+  }
+
   public ResearchPaperNotFoundException(long id) {
     super("Research Paper With Id : " + id + ", is Not Found", HttpStatus.NOT_FOUND);
   }

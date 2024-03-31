@@ -12,6 +12,7 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import edu.bethlehem.scinexus.SecurityConfig.UserDetailsImpl;
+import edu.bethlehem.scinexus.UserResearchPaper.UserResearchPaperRequest;
 import edu.bethlehem.scinexus.Conditional.Conditional;
 import edu.bethlehem.scinexus.Journal.Journal;
 import edu.bethlehem.scinexus.Media.Media;
@@ -29,7 +30,6 @@ import java.util.*;
 
 // @Entity
 // @Table(name = "_user")
-
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -117,9 +117,9 @@ public class User implements UserDetailsImpl {
     @Size(max = 320)
     private String fieldOfWork;
 
-//    @NotNull
+    // @NotNull
     private Boolean locked;
-//    @NotNull
+    // @NotNull
     private Boolean enabled;
 
     @JdbcTypeCode(SqlTypes.JSON)
@@ -142,16 +142,10 @@ public class User implements UserDetailsImpl {
     @JsonIgnore
     private List<Notification> notifications;
 
-
     @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-            name = "journal_user_contributors",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "journal_id")
-    )
+    @JoinTable(name = "journal_user_contributors", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "journal_id"))
     @JsonBackReference
     private Set<Journal> contributedJournals = new HashSet<>();
-
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_link_user", joinColumns = @JoinColumn(name = "linkFrom"), inverseJoinColumns = @JoinColumn(name = "LinkTo"))
@@ -174,8 +168,8 @@ public class User implements UserDetailsImpl {
     @JsonIgnore
     private User organization;
 
-    @ManyToMany(mappedBy = "requestsForAccess")
-    List<ResearchPaper> requestsResearchPapers;
+    @OneToMany(mappedBy = "user")
+    List<UserResearchPaperRequest> requestsResearchPapers;
 
     // Organization Specific Fields
     @Enumerated(EnumType.STRING)
@@ -190,13 +184,13 @@ public class User implements UserDetailsImpl {
     @ManyToMany(mappedBy = "validatedBy")
     List<ResearchPaper> validated;
 
-    public User(String firstName, String username, String password, String email,Boolean locked, Boolean enabled) {
+    public User(String firstName, String username, String password, String email, Boolean locked, Boolean enabled) {
         this.firstName = firstName;
         this.username = username;
         this.password = password;
         this.email = email;
-        this.locked=locked;
-        this.enabled=enabled;
+        this.locked = locked;
+        this.enabled = enabled;
 
     }
 
@@ -228,7 +222,7 @@ public class User implements UserDetailsImpl {
     }
 
     @Override
-   // @JsonIgnore
+    // @JsonIgnore
     public boolean isAccountNonLocked() {
         return true;
     }
@@ -240,7 +234,7 @@ public class User implements UserDetailsImpl {
     }
 
     @Override
-   // @JsonIgnore
+    // @JsonIgnore
     public boolean isEnabled() {
         return true;
     }
@@ -249,6 +243,5 @@ public class User implements UserDetailsImpl {
     public Long getId() {
         return id;
     }
-
 
 }

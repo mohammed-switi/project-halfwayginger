@@ -15,6 +15,7 @@ import edu.bethlehem.scinexus.Post.Post;
 import edu.bethlehem.scinexus.User.User;
 import edu.bethlehem.scinexus.User.UserNotFoundException;
 import edu.bethlehem.scinexus.User.UserRepository;
+import edu.bethlehem.scinexus.UserResearchPaper.UserResearchPaperRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -60,6 +61,15 @@ public class ResearchPaperController {
         authentication);
 
     return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
+  }
+
+  @PostMapping("{researchPaperId}/access")
+  public ResponseEntity<?> requestResearchPaperAccess(@PathVariable @NotNull Long researchPaperId,
+      Authentication authentication) {
+    EntityModel<UserResearchPaperRequest> entityModel = service.requestAccessToResearchPaper(researchPaperId,
+        authentication);
+    return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF)
+        .toUri()).body(entityModel);
   }
 
   @PutMapping("/{id}")

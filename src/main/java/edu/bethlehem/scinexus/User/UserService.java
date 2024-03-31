@@ -34,6 +34,9 @@ import edu.bethlehem.scinexus.ResearchPaper.ResearchPaperModelAssembler;
 import edu.bethlehem.scinexus.ResearchPaper.ResearchPaperNotFoundException;
 import edu.bethlehem.scinexus.ResearchPaper.ResearchPaperRepository;
 import edu.bethlehem.scinexus.SecurityConfig.JwtService;
+import edu.bethlehem.scinexus.UserResearchPaper.ResearchPaperRequestKey;
+import edu.bethlehem.scinexus.UserResearchPaper.UserResearchPaperRequest;
+import edu.bethlehem.scinexus.UserResearchPaper.UserResearchPaperRequestRepository;
 
 @Service
 @RequiredArgsConstructor
@@ -47,6 +50,8 @@ public class UserService implements UserDetailsService {
     private final ResearchPaperModelAssembler researchPapersAssembler;
     private final UserModelAssembler assembler;
     private final ArticleModelAssembler articleAssembler;
+    private final UserResearchPaperRequestRepository userResearchPaperRequestRepository;
+
     private final JwtService jwtService;
     Logger logger = LoggerFactory.getLogger(UserService.class);
 
@@ -227,26 +232,30 @@ public class UserService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        return repository.findByEmail(email).orElseThrow(() -> new UserNotFoundException("User with username "+ email +" is not found"));
+        return repository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("User with username " + email + " is not found"));
     }
 
     public int enableUser(String email) {
         return repository.enableAppUser(email);
     }
 
-//    @Override
-//    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-//       String userName = null, password=null;
-//       List<GrantedAuthority> authorities=null;
-//       User user=repository.findByEmail(username).orElseThrow(() -> new UserNotFoundException());
-//
-//       userName=user.getEmail();
-//       password=user.getPassword();
-//       authorities=new ArrayList<>();
-//       authorities.add(new SimpleGrantedAuthority(user.getRole().toString()));
-//
-//        return  new org.springframework.security.core.userdetails.User(username,password,authorities);
-//    }
+    // @Override
+    // public UserDetails loadUserByUsername(String username) throws
+    // UsernameNotFoundException {
+    // String userName = null, password=null;
+    // List<GrantedAuthority> authorities=null;
+    // User user=repository.findByEmail(username).orElseThrow(() -> new
+    // UserNotFoundException());
+    //
+    // userName=user.getEmail();
+    // password=user.getPassword();
+    // authorities=new ArrayList<>();
+    // authorities.add(new SimpleGrantedAuthority(user.getRole().toString()));
+    //
+    // return new
+    // org.springframework.security.core.userdetails.User(username,password,authorities);
+    // }
 
     // if (editUser.getUsername() != null)
     // user.setUsername(editUser.getUsername());

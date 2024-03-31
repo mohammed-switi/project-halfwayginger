@@ -30,6 +30,9 @@ import edu.bethlehem.scinexus.User.UserNotFoundException;
 import edu.bethlehem.scinexus.User.UserRepository;
 import edu.bethlehem.scinexus.User.UserRequestDTO;
 import edu.bethlehem.scinexus.User.UserRequestPatchDTO;
+import edu.bethlehem.scinexus.UserResearchPaper.ResearchPaperRequestKey;
+import edu.bethlehem.scinexus.UserResearchPaper.UserResearchPaperRequest;
+import edu.bethlehem.scinexus.UserResearchPaper.UserResearchPaperRequestRepository;
 
 @Service
 @RequiredArgsConstructor
@@ -39,6 +42,7 @@ public class ResearchPaperService {
     private EntityManager entityManager;
     private final JwtService jwtService;
     private final ResearchPaperRepository researchPaperRepository;
+    private final UserResearchPaperRequestRepository userResearchPaperRequestRepository;
     private final UserRepository userRepository;
     private final InteractionRepository interactionRepository;
     private final OpinionRepository opinionRepository;
@@ -159,6 +163,28 @@ public class ResearchPaperService {
         logger.trace("Deleting the research paper's interactions and opinions");
         researchPaperRepository.delete(researchPaper);
         logger.debug("Deleting the research paper");
+    }
+
+    EntityModel<UserResearchPaperRequest> requestAccessToResearchPaper(Long researchPaperId,
+            Authentication authentication) {
+        logger.debug("requesting access to ResearchPaper with id: " + researchPaperId);
+        Long userId = ((User) (authentication.getPrincipal())).getId();
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("The user with id:" + userId + " is not found",
+                        HttpStatus.NOT_FOUND));
+        logger.trace("Got user with id: " + userId);
+        ResearchPaper researchPaper = researchPaperRepository.findById(researchPaperId)
+                .orElseThrow(() -> new ResearchPaperNotFoundException(
+                        "The ResearchPaper with id:" + researchPaperId + " is not found",
+                        HttpStatus.NOT_FOUND));
+
+        UserResearchPaperRequest userResearchPaperRequest = new UserResearchPaperRequest();
+        userResearchPaperRequest.setId(new ResearchPaperRequestKey(userId, researchPaperId));
+        userResearchPaperRequest.setUser(user);
+        userResearchPaperRequest.setResearchPaper(researchPaper);
+        userResearchPaperRequest.setAccepted(false);
+
+        return EntityModel.of(userResearchPaperRequestRepository.save(userResearchPaperRequest));
     }
 
     public EntityModel<ResearchPaper> validate(Long researchPaperId, Authentication authentication) {
