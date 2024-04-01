@@ -45,39 +45,46 @@ public class MediaController {
     return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
   }
 
-  @PutMapping("/medias/{id}")
-  ResponseEntity<?> editMedia(@RequestBody Media newMedia, @PathVariable Long id) {
+  // @PutMapping("/medias/{id}")
+  // ResponseEntity<?> editMedia(@RequestBody Media newMedia, @PathVariable Long
+  // id) {
 
-    return repository.findById(id)
-        .map(media -> {
-          media.setId(newMedia.getId());
-          media.setType(newMedia.getType());
-          media.setPath(newMedia.getPath());
-          EntityModel<Media> entityModel = assembler.toModel(repository.save(media));
-          return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
-        })
-        .orElseGet(() -> {
-          newMedia.setId(id);
-          EntityModel<Media> entityModel = assembler.toModel(repository.save(newMedia));
-          return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
-        });
-  }
+  // return repository.findById(id)
+  // .map(media -> {
+  // media.setId(newMedia.getId());
+  // media.setType(newMedia.getType());
+  // media.setPath(newMedia.getPath());
+  // EntityModel<Media> entityModel = assembler.toModel(repository.save(media));
+  // return
+  // ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
+  // })
+  // .orElseGet(() -> {
+  // newMedia.setId(id);
+  // EntityModel<Media> entityModel =
+  // assembler.toModel(repository.save(newMedia));
+  // return
+  // ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
+  // });
+  // }
 
-  @PatchMapping("/medias/{id}")
-  public ResponseEntity<?> updateUserPartially(@PathVariable(value = "id") Long mediaId,
-      @RequestBody Media newMedia) {
-    Media media = repository.findById(mediaId)
-        .orElseThrow(() -> new MediaNotFoundException(mediaId, HttpStatus.NOT_FOUND));
-    if (newMedia.getId() != null)
-      media.setId(newMedia.getId());
-    if (newMedia.getType() != null)
-      media.setType(newMedia.getType());
-    if (newMedia.getPath() != null)
-      media.setPath(newMedia.getPath());
+  // @PatchMapping("/medias/{id}")
+  // public ResponseEntity<?> updateUserPartially(@PathVariable(value = "id") Long
+  // mediaId,
+  // @RequestBody Media newMedia) {
+  // Media media = repository.findById(mediaId)
+  // .orElseThrow(() -> new MediaNotFoundException(mediaId,
+  // HttpStatus.NOT_FOUND));
+  // if (newMedia.getId() != null)
+  // media.setId(newMedia.getId());
+  // if (newMedia.getType() != null)
+  // media.setType(newMedia.getType());
+  // if (newMedia.getPath() != null)
+  // media.setPath(newMedia.getPath());
 
-    EntityModel<Media> entityModel = assembler.toModel(repository.save(media));
-    return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
-  }
+  // EntityModel<Media> entityModel = assembler.toModel(repository.save(media));
+  // return
+  // ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
+  // }
 
   @DeleteMapping("/medias/{id}")
   ResponseEntity<?> deleteMedia(@PathVariable Long id) {

@@ -126,11 +126,12 @@ public class UserController {
         return service.getUserResearchPaper(researchPaperId, authentication);
     }
 
-    @DeleteMapping("/{id}")
-    ResponseEntity<?> deleteUser(@PathVariable Long id) throws UserNotFoundException {
+    // @DeleteMapping("/{id}")
+    // ResponseEntity<?> deleteUser(@PathVariable Long id) throws
+    // UserNotFoundException {
 
-        return service.deleteUser(id);
+    // return service.deleteUser(id);
 
-    }
+    // }
 
 }

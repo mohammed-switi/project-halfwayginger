@@ -81,13 +81,16 @@ public class ResearchPaperController {
         .toUri()).body(entityModel);
   }
 
-  @PutMapping("/{id}")
-  ResponseEntity<?> editResearchPaper(@RequestBody @Valid ResearchPaperRequestDTO newResearchPaperDTO,
-      @PathVariable @NotNull Long id) {
+  // @PutMapping("/{id}")
+  // ResponseEntity<?> editResearchPaper(@RequestBody @Valid
+  // ResearchPaperRequestDTO newResearchPaperDTO,
+  // @PathVariable @NotNull Long id) {
 
-    EntityModel<ResearchPaper> entityModel = service.updateResearchPaper(id, newResearchPaperDTO);
-    return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
-  }
+  // EntityModel<ResearchPaper> entityModel = service.updateResearchPaper(id,
+  // newResearchPaperDTO);
+  // return
+  // ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
+  // }
 
   @PatchMapping("/{id}")
   public ResponseEntity<?> updateUserPartially(@PathVariable(value = "id") Long researchpaperId,

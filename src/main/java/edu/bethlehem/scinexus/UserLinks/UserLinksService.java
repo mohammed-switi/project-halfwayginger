@@ -30,6 +30,15 @@ public class UserLinksService {
         return ulr.existsByLinksToAndLinksFrom(link1, link2) || ulr.existsByLinksToAndLinksFrom(link2, link1);
     }
 
+    public Boolean areTheyLinked(Long link1, Long link2) {
+        User user1 = userRepository.findById(link1)
+                .orElseThrow(() -> new UserNotFoundException("User Is Not Found", HttpStatus.NOT_FOUND));
+        User user2 = userRepository.findById(link2)
+                .orElseThrow(() -> new UserNotFoundException("User Is Not Found", HttpStatus.NOT_FOUND));
+
+        return ulr.existsByLinksToAndLinksFrom(user1, user2) || ulr.existsByLinksToAndLinksFrom(user1, user2);
+    }
+
     private User getUser(Authentication auth) {
         Long userId = ((User) auth.getPrincipal()).getId();
         return userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));

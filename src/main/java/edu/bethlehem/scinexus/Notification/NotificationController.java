@@ -32,18 +32,19 @@ public class NotificationController {
     return service.findAllNotifications();
   }
 
-  @PostMapping("/{userId}")
-  ResponseEntity<?> newNotification(@RequestBody String content, @PathVariable Long userId) {
+  // @PostMapping("/{userId}")
+  // ResponseEntity<?> newNotification(@RequestBody String content, @PathVariable
+  // Long userId) {
 
-    return ResponseEntity.ok(service.createNotification(content, userId));
-  }
+  // return ResponseEntity.ok(service.createNotification(content, userId));
+  // }
 
-  @DeleteMapping("/{notificationId}")
-  ResponseEntity<?> deleteNotification(@PathVariable Long notificationId) {
+  // @DeleteMapping("/{notificationId}")
+  // ResponseEntity<?> deleteNotification(@PathVariable Long notificationId) {
 
-    service.deleteNotification(notificationId);
+  // service.deleteNotification(notificationId);
 
-    return ResponseEntity.noContent().build();
+  // return ResponseEntity.noContent().build();
 
-  }
+  // }
 }

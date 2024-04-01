@@ -20,6 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -39,14 +40,14 @@ public class FileController {
 
     @PostMapping("/single-file-upload")
     public ResponseEntity<?> handleFileUploadUsingCurl(
-            @RequestParam("file") MultipartFile file) throws IOException {
-        return ResponseEntity.ok(fileStorageManager.save(file));
+            @RequestParam("file") MultipartFile file, Authentication auth) throws IOException {
+        return ResponseEntity.ok(fileStorageManager.save(file, auth));
     }
 
     @PostMapping("/multiple-files-upload")
     public CollectionModel<EntityModel<Media>> handleConcurrentFilesUpload(
-            @RequestParam("files") MultipartFile[] files) throws IOException {
-        return fileStorageManager.saveAll(files);
+            @RequestParam("files") MultipartFile[] files, Authentication auth) throws IOException {
+        return fileStorageManager.saveAll(files, auth);
     }
 
     // Getting list of filenames that have been uploaded

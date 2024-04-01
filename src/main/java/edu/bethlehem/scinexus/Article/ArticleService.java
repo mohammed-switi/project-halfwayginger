@@ -105,21 +105,22 @@ public class ArticleService {
         return assembler.toModel(article);
     }
 
-    public EntityModel<Article> updateArticle(Long articleId,
-            ArticleRequestDTO newArticleRequestDTO) {
-        logger.trace("Updating Article");
-        return articleRepository.findById(
-                articleId)
-                .map(article -> {
-                    article.setContent(newArticleRequestDTO.getContent());
-                    article.setVisibility(newArticleRequestDTO.getVisibility());
-                    article.setTitle(newArticleRequestDTO.getTitle());
-                    article.setSubject(newArticleRequestDTO.getSubject());
-                    return assembler.toModel(articleRepository.save(article));
-                })
-                .orElseThrow(() -> new ArticleNotFoundException(
-                        articleId, HttpStatus.UNPROCESSABLE_ENTITY));
-    }
+    // No need for any PUT method
+    // public EntityModel<Article> updateArticle(Long articleId,
+    // ArticleRequestDTO newArticleRequestDTO) {
+    // logger.trace("Updating Article");
+    // return articleRepository.findById(
+    // articleId)
+    // .map(article -> {
+    // article.setContent(newArticleRequestDTO.getContent());
+    // article.setVisibility(newArticleRequestDTO.getVisibility());
+    // article.setTitle(newArticleRequestDTO.getTitle());
+    // article.setSubject(newArticleRequestDTO.getSubject());
+    // return assembler.toModel(articleRepository.save(article));
+    // })
+    // .orElseThrow(() -> new ArticleNotFoundException(
+    // articleId, HttpStatus.UNPROCESSABLE_ENTITY));
+    // }
 
     public EntityModel<Article> updateArticlePartially(Long articleId,
             ArtilceRequestPatchDTO newArticleRequestDTO) {
@@ -134,6 +135,8 @@ public class ArticleService {
                     Object value = method.invoke(newArticleRequestDTO);
                     if (value != null) {
                         String propertyName = method.getName().substring(3); // remove "get"
+                        if (propertyName.equals("Class")) // Class is a reserved keyword in Java
+                            continue;
                         Method setter = Article.class.getMethod("set" + propertyName, method.getReturnType());
                         setter.invoke(article, value);
                     }

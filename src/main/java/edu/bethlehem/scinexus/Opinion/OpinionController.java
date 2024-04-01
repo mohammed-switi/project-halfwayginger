@@ -42,13 +42,17 @@ public class OpinionController {
     return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
   }
 
-  @PutMapping("/{id}")
-  public ResponseEntity<?> editOpinion(@RequestBody @Valid OpinionDTO newOpinion,
-      @PathVariable Long id) {
-    EntityModel<Opinion> entityModel = opinionService.updateOpinion(id, newOpinion);
-    return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
+  // We Won't need a PUT method
+  // @PutMapping("/{id}")
+  // public ResponseEntity<?> editOpinion(@RequestBody @Valid OpinionDTO
+  // newOpinion,
+  // @PathVariable Long id) {
+  // EntityModel<Opinion> entityModel = opinionService.updateOpinion(id,
+  // newOpinion);
+  // return
+  // ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
 
-  }
+  // }
 
   @PatchMapping("{id}")
   public ResponseEntity<?> updateUserPartially(@PathVariable(value = "id") Long opinionId,

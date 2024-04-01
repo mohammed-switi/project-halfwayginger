@@ -85,22 +85,27 @@ public class NotificationService {
         return notificationRepository.save(notification);
     }
 
-    public EntityModel<Notification> createNotification(String content,
-            Long userId) {
-        Notification notification = new Notification();
-        notification.setContent(content);
-        System.out.println("here");
-        notification.setUser(getUserById(userId));
-        notification.setStatus(Status.UNSEEN);
-        return assembler.toModel(saveNotification(notification));
-    }
+    // Notifications are made within the application
 
-    public void deleteNotification(Long notificationId) {
-        Notification notification = notificationRepository.findById(notificationId)
-                .orElseThrow(
-                        () -> new NotificationNotFoundException(notificationId, HttpStatus.UNPROCESSABLE_ENTITY));
-        notificationRepository.delete(notification);
-    }
+    // public EntityModel<Notification> createNotification(String content,
+    // Long userId) {
+    // Notification notification = new Notification();
+    // notification.setContent(content);
+    // System.out.println("here");
+    // notification.setUser(getUserById(userId));
+    // notification.setStatus(Status.UNSEEN);
+    // return assembler.toModel(saveNotification(notification));
+    // }
+
+    // You cant delete a notification
+
+    // public void deleteNotification(Long notificationId) {
+    // Notification notification = notificationRepository.findById(notificationId)
+    // .orElseThrow(
+    // () -> new NotificationNotFoundException(notificationId,
+    // HttpStatus.UNPROCESSABLE_ENTITY));
+    // notificationRepository.delete(notification);
+    // }
 
     private List<Notification> getNotifs(Authentication auth) {
         User user = userRepository.findById(((User) auth.getPrincipal()).getId())

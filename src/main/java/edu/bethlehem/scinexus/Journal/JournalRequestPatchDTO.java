@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class JournalRequestPatchDTO {
 
-    @NotBlank(message = "The Journal Content Shouldn't Be Empty")
+    // @NotBlank(message = "The Journal Content Shouldn't Be Empty")
     private String content;
 
     @Enumerated(EnumType.STRING)

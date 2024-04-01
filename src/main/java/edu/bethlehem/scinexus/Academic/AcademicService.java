@@ -69,33 +69,35 @@ public class AcademicService {
         return userRepository.save(academic);
     }
 
-    public EntityModel<User> updateAcademic(Long academicId,
-            AcademicRequestDTO newAcademicRequestDTO) {
-        logger.trace("Updating Academic");
+    // No need for any PUT method
+    // public EntityModel<User> updateAcademic(Long academicId,
+    // AcademicRequestDTO newAcademicRequestDTO) {
+    // logger.trace("Updating Academic");
 
-        User academic = userRepository.findById(academicId)
-                .orElseThrow(() -> new AcademicNotFoundException(academicId));
+    // User academic = userRepository.findById(academicId)
+    // .orElseThrow(() -> new AcademicNotFoundException(academicId));
 
-        try {
-            for (Method method : AcademicRequestDTO.class.getMethods()) {
-                if (method.getName().startsWith("get") && method.getParameterCount() == 0) {
-                    logger.trace("Property Name: " + method.getName());
-                    Object value = method.invoke(newAcademicRequestDTO);
+    // try {
+    // for (Method method : AcademicRequestDTO.class.getMethods()) {
+    // if (method.getName().startsWith("get") && method.getParameterCount() == 0) {
+    // logger.trace("Property Name: " + method.getName());
+    // Object value = method.invoke(newAcademicRequestDTO);
 
-                    String propertyName = method.getName().substring(3); // remove "get"
-                    if (propertyName.equals("Role")) {
-                        continue;
-                    }
-                    Method setter = User.class.getMethod("set" + propertyName, method.getReturnType());
-                    setter.invoke(academic, value);
+    // String propertyName = method.getName().substring(3); // remove "get"
+    // if (propertyName.equals("Role")) {
+    // continue;
+    // }
+    // Method setter = User.class.getMethod("set" + propertyName,
+    // method.getReturnType());
+    // setter.invoke(academic, value);
 
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return assembler.toModel(userRepository.save(academic));
-    }
+    // }
+    // }
+    // } catch (Exception e) {
+    // e.printStackTrace();
+    // }
+    // return assembler.toModel(userRepository.save(academic));
+    // }
 
     public EntityModel<User> updateAcademicPartially(Long academicId,
             AcademicRequestPatchDTO newAcademicRequestDTO) {
@@ -108,7 +110,10 @@ public class AcademicService {
                 if (method.getName().startsWith("get") && method.getParameterCount() == 0) {
                     Object value = method.invoke(newAcademicRequestDTO);
                     if (value != null) {
+
                         String propertyName = method.getName().substring(3); // remove "get"
+                        if (propertyName.equals("Class")) // Class is a reserved keyword in Java
+                            continue;
                         Method setter = User.class.getMethod("set" + propertyName, method.getReturnType());
                         setter.invoke(academic, value);
                     }
@@ -122,11 +127,13 @@ public class AcademicService {
 
     }
 
-    public void deleteAcademic(Long academicId) {
-        logger.trace("Deleting Academic");
-        User academic = userRepository.findById(academicId)
-                .orElseThrow(() -> new AcademicNotFoundException(academicId, HttpStatus.NOT_FOUND));
-        userRepository.delete(academic);
-    }
+    // We will be deleteing a user
+    // public void deleteAcademic(Long academicId) {
+    // logger.trace("Deleting Academic");
+    // User academic = userRepository.findById(academicId)
+    // .orElseThrow(() -> new AcademicNotFoundException(academicId,
+    // HttpStatus.NOT_FOUND));
+    // userRepository.delete(academic);
+    // }
 
 }

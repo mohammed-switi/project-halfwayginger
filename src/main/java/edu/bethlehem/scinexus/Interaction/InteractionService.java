@@ -122,7 +122,12 @@ public class InteractionService {
                 Opinion opinion = opinionRepository.findById(
                                 opinionId)
                                 .orElseThrow(() -> new JournalNotFoundException(opinionId, HttpStatus.NOT_FOUND));
+                Interaction interaction = interactionRepository.findByInteractorUserAndOpinion(user, opinion);
+                if (interaction != null) {
+                        interaction.setType(interactionDTO.getType());
+                        return assembler.toModel(interactionRepository.save(interaction));
 
+                }
                 notificationService.notifyUser(
                                 opinion.getOpinionOwner(),
                                 user.getFirstName() + " Interacted with your Opinoin: " + opinion.getContent(),
@@ -130,7 +135,7 @@ public class InteractionService {
                                                 OpinionController.class).one(
                                                                 opinion.getId())));
 
-                Interaction interaction = new Interaction(interactionDTO.getType(), user);
+                interaction = new Interaction(interactionDTO.getType(), user);
                 interaction.setOpinion(opinion);
 
                 interaction = interactionRepository.save(interaction);
@@ -158,7 +163,12 @@ public class InteractionService {
                 Journal journal = journalRepository.findById(
                                 journalId)
                                 .orElseThrow(() -> new JournalNotFoundException(journalId, HttpStatus.NOT_FOUND));
+                Interaction interaction = interactionRepository.findByInteractorUserAndJournal(user, journal);
+                if (interaction != null) {
+                        interaction.setType(interactionDTO.getType());
+                        return assembler.toModel(interactionRepository.save(interaction));
 
+                }
                 notificationService.notifyUser(
                                 journal.getPublisher(),
                                 user.getFirstName() + " Interacted with your journal: " + journal.getId(),
@@ -166,7 +176,7 @@ public class InteractionService {
                                                 JournalController.class).one(
                                                                 journal.getId())));
 
-                Interaction interaction = new Interaction(interactionDTO.getType(), user);
+                interaction = new Interaction(interactionDTO.getType(), user);
 
                 interaction.setJournal(journal);
                 interaction.setInteractorUser(user);

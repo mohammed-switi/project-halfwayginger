@@ -35,11 +35,12 @@ public class OrganizationController {
     return service.findAllOrganizations();
   }
 
-  @PutMapping("/{id}")
-  ResponseEntity<?> editOrganization(@Valid @RequestBody OrganizationRequestDTO newOrganization,
-      @PathVariable Long id) {
-    return ResponseEntity.ok(service.updateOrganization(id, newOrganization));
-  }
+  // @PutMapping("/{id}")
+  // ResponseEntity<?> editOrganization(@Valid @RequestBody OrganizationRequestDTO
+  // newOrganization,
+  // @PathVariable Long id) {
+  // return ResponseEntity.ok(service.updateOrganization(id, newOrganization));
+  // }
 
   @PatchMapping("/{id}")
   public ResponseEntity<?> updateUserPartially(@PathVariable(value = "id") Long organizationId,

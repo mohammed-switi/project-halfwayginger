@@ -58,16 +58,16 @@ public class OpinionService {
         return assembler.toModel(opinionRepository.save(newOpinion));
     }
 
-    public EntityModel<Opinion> updateOpinion(Long id, OpinionDTO opinionDTO) {
-        logger.trace("Updating Opinion");
-        return opinionRepository.findById(id)
-                .map(opinion -> {
-                    opinion.setContent(opinionDTO.getContent());
-                    return assembler.toModel(opinionRepository.save(opinion));
-                })
-                .orElseThrow(() -> new JournalNotFoundException(id));
+    // public EntityModel<Opinion> updateOpinion(Long id, OpinionDTO opinionDTO) {
+    // logger.trace("Updating Opinion");
+    // return opinionRepository.findById(id)
+    // .map(opinion -> {
+    // opinion.setContent(opinionDTO.getContent());
+    // return assembler.toModel(opinionRepository.save(opinion));
+    // })
+    // .orElseThrow(() -> new JournalNotFoundException(id));
 
-    }
+    // }
 
     public EntityModel<Opinion> updateOpinionPartially(Long opinionId, OpinionPatchDTO opinionPatchDTO) {
         logger.trace("Partially Updating Opinion");
