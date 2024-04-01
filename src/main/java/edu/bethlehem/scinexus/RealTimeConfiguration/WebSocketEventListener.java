@@ -1,7 +1,7 @@
 package edu.bethlehem.scinexus.RealTimeConfiguration;
 
 
-import edu.bethlehem.scinexus.Chat.ChatMessage;
+import edu.bethlehem.scinexus.Chat.GroupChatMessage;
 import edu.bethlehem.scinexus.Chat.MessageType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,11 +26,11 @@ public class WebSocketEventListener {
 
         if(username!= null){
             log.info("User Discconected : {}",username);
-            ChatMessage chatMessage=ChatMessage.builder()
+            GroupChatMessage groupChatMessage = GroupChatMessage.builder()
                     .type(MessageType.LEAVE)
                     .sender(username)
                     .build();
-            messageTemplate.convertAndSend("/topic/public",chatMessage);
+            messageTemplate.convertAndSend("/topic/public", groupChatMessage);
 
         }
 

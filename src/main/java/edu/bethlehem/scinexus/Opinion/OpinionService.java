@@ -1,9 +1,9 @@
 package edu.bethlehem.scinexus.Opinion;
 
 import edu.bethlehem.scinexus.DatabaseLoading.DataLoader;
+import edu.bethlehem.scinexus.JPARepository.OpinionRepository;
 import edu.bethlehem.scinexus.Journal.JournalNotFoundException;
-import edu.bethlehem.scinexus.Journal.JournalRepository;
-import lombok.Builder;
+import edu.bethlehem.scinexus.JPARepository.JournalRepository;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
@@ -12,10 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 

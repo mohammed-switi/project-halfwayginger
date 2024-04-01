@@ -3,11 +3,10 @@ package edu.bethlehem.scinexus.Authorization;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.bethlehem.scinexus.Journal.Journal;
 import edu.bethlehem.scinexus.Journal.JournalNotFoundException;
-import edu.bethlehem.scinexus.Journal.JournalRepository;
+import edu.bethlehem.scinexus.JPARepository.JournalRepository;
 import edu.bethlehem.scinexus.Journal.Visibility;
 import edu.bethlehem.scinexus.User.User;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
@@ -17,7 +16,6 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.Map;
-import java.util.function.Supplier;
 
 @Component
 @RequiredArgsConstructor

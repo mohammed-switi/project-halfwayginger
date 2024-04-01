@@ -1,9 +1,9 @@
 package edu.bethlehem.scinexus.Interaction;
 
-import java.lang.reflect.Method;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import edu.bethlehem.scinexus.JPARepository.InteractionRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.hateoas.CollectionModel;
@@ -13,28 +13,19 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
-import edu.bethlehem.scinexus.Organization.OrganizationNotFoundException;
 import edu.bethlehem.scinexus.DatabaseLoading.DataLoader;
-import edu.bethlehem.scinexus.Interaction.Interaction;
-import edu.bethlehem.scinexus.Interaction.InteractionNotFoundException;
-import edu.bethlehem.scinexus.Interaction.InteractionRepository;
-import edu.bethlehem.scinexus.Interaction.InteractionRequestDTO;
 import edu.bethlehem.scinexus.Journal.Journal;
 import edu.bethlehem.scinexus.Journal.JournalNotFoundException;
-import edu.bethlehem.scinexus.Journal.JournalRepository;
+import edu.bethlehem.scinexus.JPARepository.JournalRepository;
 import edu.bethlehem.scinexus.Opinion.Opinion;
-import edu.bethlehem.scinexus.Opinion.OpinionRepository;
+import edu.bethlehem.scinexus.JPARepository.OpinionRepository;
 import edu.bethlehem.scinexus.SecurityConfig.JwtService;
 import edu.bethlehem.scinexus.User.User;
 import edu.bethlehem.scinexus.User.UserNotFoundException;
-import edu.bethlehem.scinexus.User.UserRepository;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
+import edu.bethlehem.scinexus.JPARepository.UserRepository;
 import lombok.RequiredArgsConstructor;
 
 @Service

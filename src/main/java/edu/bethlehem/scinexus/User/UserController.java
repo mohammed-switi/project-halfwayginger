@@ -1,20 +1,17 @@
 package edu.bethlehem.scinexus.User;
 
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
-
 import java.util.List;
-import java.util.stream.Collectors;
+
 import org.springframework.http.*;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.security.core.Authentication;
 import org.springframework.hateoas.*;
 import org.springframework.web.bind.annotation.*;
 
 import edu.bethlehem.scinexus.Article.Article;
-import edu.bethlehem.scinexus.Article.ArticleRepository;
 import edu.bethlehem.scinexus.ResearchPaper.ResearchPaper;
-import edu.bethlehem.scinexus.Article.ArticleModelAssembler;
-import edu.bethlehem.scinexus.SecurityConfig.JwtService;
-import edu.bethlehem.scinexus.User.UserRepository;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -22,12 +19,11 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/users")
 public class UserController {
 
-    private final UserRepository repository;
-    private final ArticleRepository articleRepository;
-    private final UserModelAssembler assembler;
-    private final ArticleModelAssembler articleAssembler;
-    private final JwtService jwtService;
+
     private final UserService service;
+
+
+
 
     @GetMapping()
     CollectionModel<EntityModel<User>> all() {
@@ -35,10 +31,10 @@ public class UserController {
         return service.all();
     }
 
-    @GetMapping("/{userId}")
-    EntityModel<User> one(@PathVariable Long userId) {
+    @GetMapping("/{Id}")
+    EntityModel<User> one(@PathVariable Long id) {
 
-        return service.one(userId);
+        return service.one(id);
     }
 
     @PatchMapping("/{id}")

@@ -4,6 +4,7 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import edu.bethlehem.scinexus.JPARepository.ArticleRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.hateoas.CollectionModel;
@@ -13,21 +14,13 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
-import edu.bethlehem.scinexus.Organization.OrganizationNotFoundException;
-import edu.bethlehem.scinexus.Article.Article;
-import edu.bethlehem.scinexus.Article.ArticleNotFoundException;
-import edu.bethlehem.scinexus.Article.ArticleRepository;
-import edu.bethlehem.scinexus.Article.ArticleRequestDTO;
 import edu.bethlehem.scinexus.DatabaseLoading.DataLoader;
-import edu.bethlehem.scinexus.Interaction.Interaction;
-import edu.bethlehem.scinexus.Interaction.InteractionRepository;
-import edu.bethlehem.scinexus.Opinion.OpinionRepository;
+import edu.bethlehem.scinexus.JPARepository.InteractionRepository;
+import edu.bethlehem.scinexus.JPARepository.OpinionRepository;
 import edu.bethlehem.scinexus.SecurityConfig.JwtService;
 import edu.bethlehem.scinexus.User.User;
 import edu.bethlehem.scinexus.User.UserNotFoundException;
-import edu.bethlehem.scinexus.User.UserRepository;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
+import edu.bethlehem.scinexus.JPARepository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 

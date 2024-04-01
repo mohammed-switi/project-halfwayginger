@@ -1,21 +1,19 @@
 package edu.bethlehem.scinexus.DatabaseLoading;
 
-import edu.bethlehem.scinexus.LoggingController;
 import edu.bethlehem.scinexus.Article.Article;
-import edu.bethlehem.scinexus.Article.ArticleRepository;
+import edu.bethlehem.scinexus.JPARepository.ArticleRepository;
 import edu.bethlehem.scinexus.Interaction.Interaction;
-import edu.bethlehem.scinexus.Interaction.InteractionRepository;
+import edu.bethlehem.scinexus.JPARepository.InteractionRepository;
 import edu.bethlehem.scinexus.Journal.Journal;
-import edu.bethlehem.scinexus.Journal.JournalRepository;
+import edu.bethlehem.scinexus.JPARepository.JournalRepository;
 import edu.bethlehem.scinexus.Opinion.Opinion;
-import edu.bethlehem.scinexus.Opinion.OpinionRepository;
-import edu.bethlehem.scinexus.User.UserRepository;
+import edu.bethlehem.scinexus.JPARepository.OpinionRepository;
+import edu.bethlehem.scinexus.JPARepository.UserRepository;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.PersistenceContext;
 import edu.bethlehem.scinexus.ResearchPaper.ResearchLanguage;
 import edu.bethlehem.scinexus.ResearchPaper.ResearchPaper;
-import edu.bethlehem.scinexus.ResearchPaper.ResearchPaperRepository;
+import edu.bethlehem.scinexus.JPARepository.ResearchPaperRepository;
 import edu.bethlehem.scinexus.User.OrganizationType;
 import edu.bethlehem.scinexus.User.Position;
 import edu.bethlehem.scinexus.User.Role;

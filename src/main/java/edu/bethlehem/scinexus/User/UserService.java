@@ -1,7 +1,7 @@
 package edu.bethlehem.scinexus.User;
 
-import edu.bethlehem.scinexus.SecurityConfig.UserDetailsImpl;
-import io.jsonwebtoken.Jwt;
+import edu.bethlehem.scinexus.MongoRepository.UserMongoRepository;
+import edu.bethlehem.scinexus.JPARepository.UserRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
@@ -19,8 +19,6 @@ import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -28,12 +26,10 @@ import org.springframework.stereotype.Service;
 
 import edu.bethlehem.scinexus.Article.Article;
 import edu.bethlehem.scinexus.Article.ArticleModelAssembler;
-import edu.bethlehem.scinexus.Article.ArticleRepository;
-import edu.bethlehem.scinexus.DatabaseLoading.DataLoader;
+import edu.bethlehem.scinexus.JPARepository.ArticleRepository;
 import edu.bethlehem.scinexus.ResearchPaper.ResearchPaper;
 import edu.bethlehem.scinexus.ResearchPaper.ResearchPaperModelAssembler;
-import edu.bethlehem.scinexus.ResearchPaper.ResearchPaperNotFoundException;
-import edu.bethlehem.scinexus.ResearchPaper.ResearchPaperRepository;
+import edu.bethlehem.scinexus.JPARepository.ResearchPaperRepository;
 import edu.bethlehem.scinexus.SecurityConfig.JwtService;
 
 @Service
@@ -43,6 +39,7 @@ public class UserService implements UserDetailsService {
     @PersistenceContext
     private EntityManager entityManager;
     private final UserRepository repository;
+    private final UserMongoRepository mongoRepository;
     private final ArticleRepository articleRepository;
     private final ResearchPaperRepository researchPapersRepository;
     private final ResearchPaperModelAssembler researchPapersAssembler;
@@ -223,6 +220,25 @@ public class UserService implements UserDetailsService {
                 .toModel(researchPapersRepository.findByIdAndPublisherId(researchPaperId, userId));
     }
 
+
+    public void saveUser(UserDocument user){
+        user.setStatus(Status.ONLINE);
+        System.out.println("Saving ths uer from the Service:" +mongoRepository.save(user));
+    }
+
+    public void disconnect(UserDocument user){
+        var storedUser = mongoRepository.findById(user.getNickName()).orElse(null);
+        if (storedUser!=null){
+        storedUser.setStatus(Status.OFFLINE);
+            mongoRepository.save(storedUser);
+        }
+
+    }
+
+    public List<UserDocument> findConnectedUser(){
+        return mongoRepository.findAllByStatus(Status.ONLINE);
+
+    }
     ResponseEntity<?> deleteUser(Long userId) {
         logger.debug("deleting user with id: " + userId);
         User user = repository.findById(userId)
@@ -238,9 +254,8 @@ public class UserService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-
-
-        return   repository.findByEmail(email).orElseThrow(() -> new UserNotFoundException("User with username "+ email +" is not found"));
+        return   repository.findByEmail(email).
+                orElseThrow(() -> new UserNotFoundException("User with username "+ email +" is not found"));
     }
 
     public int enableUser(String email) {

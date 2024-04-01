@@ -2,9 +2,7 @@ package edu.bethlehem.scinexus.Opinion;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
+import edu.bethlehem.scinexus.JPARepository.OpinionRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;

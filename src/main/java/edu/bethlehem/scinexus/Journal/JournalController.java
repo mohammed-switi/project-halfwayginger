@@ -1,5 +1,6 @@
 package edu.bethlehem.scinexus.Journal;
 
+import edu.bethlehem.scinexus.JPARepository.JournalRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -7,8 +8,8 @@ import org.springframework.http.*;
 import org.springframework.hateoas.*;
 import org.springframework.web.bind.annotation.*;
 
-import edu.bethlehem.scinexus.Interaction.InteractionRepository;
-import edu.bethlehem.scinexus.User.UserRepository;
+import edu.bethlehem.scinexus.JPARepository.InteractionRepository;
+import edu.bethlehem.scinexus.JPARepository.UserRepository;
 
 @RestController
 @RequiredArgsConstructor

@@ -4,24 +4,17 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import edu.bethlehem.scinexus.JPARepository.NotificationRepository;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
-import edu.bethlehem.scinexus.Organization.OrganizationNotFoundException;
-import edu.bethlehem.scinexus.Notification.Notification;
-import edu.bethlehem.scinexus.Notification.NotificationNotFoundException;
-import edu.bethlehem.scinexus.Notification.NotificationRepository;
-import edu.bethlehem.scinexus.Notification.NotificationRequestDTO;
 import edu.bethlehem.scinexus.SecurityConfig.JwtService;
 import edu.bethlehem.scinexus.User.User;
 import edu.bethlehem.scinexus.User.UserNotFoundException;
-import edu.bethlehem.scinexus.User.UserRepository;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
+import edu.bethlehem.scinexus.JPARepository.UserRepository;
 import lombok.RequiredArgsConstructor;
 
 @Service

@@ -79,11 +79,22 @@ public class SecurityConfig  {
                                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
                                                 .requestMatchers("/api/v1/auth/**").permitAll()
                                                 .requestMatchers("/index.html").permitAll()
+                                                .requestMatchers("/privateChat.html").permitAll()
                                                 .requestMatchers("/css/**").permitAll()
                                                 .requestMatchers("/js/**").permitAll()
                                                 .requestMatchers("/ws/**").permitAll()
+                                                 .requestMatchers("/chat").permitAll()
+                                             .requestMatchers("/user/**").permitAll()
+                                                .requestMatchers("/messages/{senderId}/{recipientId}").permitAll()
+                                                .requestMatchers("/chat.sendMessage").permitAll()
+                                                .requestMatchers("/chat.addUser").permitAll()
                                                 .requestMatchers("/topic/public").permitAll()
-                                                .requestMatchers("/app/**").permitAll()
+                                                   .requestMatchers("/user/public").permitAll()
+                                                  .requestMatchers("/user.addUser").permitAll()
+                                                  .requestMatchers("/user.disconnectUser").permitAll()
+                                                     .requestMatchers("/connected-users").permitAll()
+
+                                              .requestMatchers("/app/**").permitAll()
                                                 .requestMatchers("/actuator/**").permitAll()
                                                 .requestMatchers("/oauth2/authorization/google").permitAll()
 

@@ -1,6 +1,8 @@
-package edu.bethlehem.scinexus.Article;
+package edu.bethlehem.scinexus.JPARepository;
 
 import java.util.*;
+
+import edu.bethlehem.scinexus.Article.Article;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ArticleRepository extends JpaRepository<Article, Long> {

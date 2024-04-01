@@ -1,8 +1,8 @@
 package edu.bethlehem.scinexus.ResearchPaper;
 
+import edu.bethlehem.scinexus.JPARepository.ResearchPaperRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 import java.lang.reflect.Method;
@@ -16,20 +16,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
-import edu.bethlehem.scinexus.DatabaseLoading.DataLoader;
-import edu.bethlehem.scinexus.Interaction.InteractionRepository;
-import edu.bethlehem.scinexus.Opinion.OpinionRepository;
+import edu.bethlehem.scinexus.JPARepository.InteractionRepository;
+import edu.bethlehem.scinexus.JPARepository.OpinionRepository;
 import edu.bethlehem.scinexus.Organization.OrganizationNotFoundException;
-import edu.bethlehem.scinexus.ResearchPaper.ResearchPaper;
-import edu.bethlehem.scinexus.ResearchPaper.ResearchPaperNotFoundException;
-import edu.bethlehem.scinexus.ResearchPaper.ResearchPaperRequestPatchDTO;
-import edu.bethlehem.scinexus.ResearchPaper.ResearchPaperRequestDTO;
 import edu.bethlehem.scinexus.SecurityConfig.JwtService;
 import edu.bethlehem.scinexus.User.User;
 import edu.bethlehem.scinexus.User.UserNotFoundException;
-import edu.bethlehem.scinexus.User.UserRepository;
-import edu.bethlehem.scinexus.User.UserRequestDTO;
-import edu.bethlehem.scinexus.User.UserRequestPatchDTO;
+import edu.bethlehem.scinexus.JPARepository.UserRepository;
 
 @Service
 @RequiredArgsConstructor

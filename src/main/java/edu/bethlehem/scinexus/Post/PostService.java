@@ -1,15 +1,11 @@
 package edu.bethlehem.scinexus.Post;
 
-import edu.bethlehem.scinexus.Auth.UserNotAuthorizedException;
-import edu.bethlehem.scinexus.DatabaseLoading.DataLoader;
-import edu.bethlehem.scinexus.Journal.Visibility;
+import edu.bethlehem.scinexus.JPARepository.PostRepository;
 import edu.bethlehem.scinexus.User.UserService;
 import edu.bethlehem.scinexus.SecurityConfig.JwtService;
 import edu.bethlehem.scinexus.User.User;
 import edu.bethlehem.scinexus.User.UserNotFoundException;
-import edu.bethlehem.scinexus.User.UserRepository;
-import edu.bethlehem.scinexus.User.UserRequestDTO;
-import edu.bethlehem.scinexus.User.UserRequestPatchDTO;
+import edu.bethlehem.scinexus.JPARepository.UserRepository;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
@@ -22,7 +18,6 @@ import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Method;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service

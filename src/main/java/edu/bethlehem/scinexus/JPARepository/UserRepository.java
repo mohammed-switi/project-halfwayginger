@@ -1,5 +1,7 @@
-package edu.bethlehem.scinexus.User;
+package edu.bethlehem.scinexus.JPARepository;
 
+import edu.bethlehem.scinexus.User.Role;
+import edu.bethlehem.scinexus.User.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

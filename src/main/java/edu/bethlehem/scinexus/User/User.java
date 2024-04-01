@@ -20,7 +20,6 @@ import edu.bethlehem.scinexus.ResearchPaper.ResearchPaper;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
-import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
@@ -35,7 +34,6 @@ import java.util.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Document
 @Inheritance(strategy = InheritanceType.JOINED)
 @JsonSerialize
 @Builder
@@ -56,6 +54,10 @@ public class User implements UserDetailsImpl {
     @Size(min = 2, max = 30, message = "First Name must be between 2 and 30 Characters")
     private String firstName;
 
+
+    @Enumerated(EnumType.STRING)
+    private Status status;
+
     @NotNull(message = "Last Name is mandatory")
     @NotBlank(message = "Last Name is mandatory")
     @Size(min = 2, max = 30)
@@ -66,6 +68,8 @@ public class User implements UserDetailsImpl {
     @NotBlank(message = "Username is mandatory")
     @Size(min = 1, max = 50)
     private String username;
+
+
 
     @NotNull(message = "Email is mandatory")
     @NotBlank(message = "Email Name is mandatory")
@@ -152,6 +156,7 @@ public class User implements UserDetailsImpl {
             inverseJoinColumns = @JoinColumn(name = "journal_id")
     )
     @JsonBackReference
+
     private Set<Journal> contributedJournals = new HashSet<>();
 
 
