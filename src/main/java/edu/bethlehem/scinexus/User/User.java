@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.util.JSONPObject;
+import edu.bethlehem.scinexus.Opinion.Opinion;
 import jakarta.persistence.*;
 
 import jakarta.validation.constraints.NotBlank;
@@ -43,6 +44,8 @@ import java.util.*;
         "education", "badge", "position" })
 @Conditional(selected = "role", values = { "ORGANIZATION" }, required = {
         "type" })
+@Table(name = "_user") // Specify the custom table name here
+
 public class User implements UserDetailsImpl {
 
     @Id
@@ -165,6 +168,8 @@ public class User implements UserDetailsImpl {
     @JdbcTypeCode(SqlTypes.JSON)
     @JsonIgnore
     private List<User> links;
+
+
 
     // Academic Specific Fields
     private String badge;

@@ -23,13 +23,11 @@ public class Notification {
 
     @Enumerated(EnumType.STRING)
     @NotNull(message = "The Notification Content Shouldn't Be Null")
-    @NotBlank(message = "The Notification Status Should Be Specified")
     private Status status = Status.UNSEEN;
 
     @ManyToOne
     @JoinColumn(name = "notifications")
     @NotNull(message = "The Notification Meant User Shouldn't Be Null")
-    @NotBlank(message = "The Notification Meant User Empty")
     private User user;
 
     public Notification(String content, Status status) {

@@ -48,6 +48,8 @@ public class DataLoader implements CommandLineRunner {
     private final RandomDataGenerator dataGenerator;
     private final PasswordEncoder passwordEncoder;
 
+
+
     @Override
     public void run(String... args) {
         logger.trace("Starting Random Data Generation: \n\n");
@@ -65,7 +67,24 @@ public class DataLoader implements CommandLineRunner {
         logger.info("Random Data Generation Completed with time of " + totalTime + " milliseconds");
     }
 
-    private void generateUser() {
+    public User generateUserAndSaveIt() {
+        logger.debug("Generating User and Saving it: \n\n");
+        User user = new User();
+        String username= dataGenerator.generateRandomRealUsername();
+        user.setFirstName(dataGenerator.generateRandomFirstName());
+        user.setLastName(dataGenerator.generateRandomLastName());
+        user.setUsername(username);
+        user.setEmail(dataGenerator.generateRandomEmail(username,dataGenerator.generateRandomCharacterName()));
+        user.setPassword(passwordEncoder.encode("Mohammed1234!"));
+        user.setPhoneNumber(dataGenerator.generateRandomPhoneNumber());
+        user.setRole((Math.random() < 0.5) ? Role.ACADEMIC : Role.ORGANIZATION);
+        user.setType(OrganizationType.BUSINESS);
+
+
+       return userRepository.save(user);
+    }
+
+    public void generateUser() {
         logger.debug("Generating base User and base Article: \n\n");
         User user = new User();
         user.setFirstName("Mohammed");

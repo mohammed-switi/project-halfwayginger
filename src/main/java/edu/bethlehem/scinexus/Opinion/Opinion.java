@@ -42,6 +42,7 @@ public class Opinion {
     @JsonManagedReference
     private Journal journal;
 
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "papaOpinion")
     @JdbcTypeCode(SqlTypes.JSON)
