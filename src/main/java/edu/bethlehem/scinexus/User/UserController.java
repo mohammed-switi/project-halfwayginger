@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import edu.bethlehem.scinexus.Article.Article;
 import edu.bethlehem.scinexus.Article.ArticleRepository;
+import edu.bethlehem.scinexus.Notification.Notification;
 import edu.bethlehem.scinexus.ResearchPaper.ResearchPaper;
 import edu.bethlehem.scinexus.Article.ArticleModelAssembler;
 import edu.bethlehem.scinexus.SecurityConfig.JwtService;
@@ -124,6 +125,12 @@ public class UserController {
             Authentication authentication)
             throws UserNotFoundException {
         return service.getUserResearchPaper(researchPaperId, authentication);
+    }
+
+    @GetMapping("/notifications")
+    CollectionModel<EntityModel<Notification>> getUserNotifications(Authentication authentication)
+            throws UserNotFoundException {
+        return service.getUserNotifications(authentication);
     }
 
     // @DeleteMapping("/{id}")

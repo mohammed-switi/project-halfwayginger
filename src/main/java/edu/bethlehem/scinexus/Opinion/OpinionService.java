@@ -3,6 +3,9 @@ package edu.bethlehem.scinexus.Opinion;
 import edu.bethlehem.scinexus.DatabaseLoading.DataLoader;
 import edu.bethlehem.scinexus.Journal.JournalNotFoundException;
 import edu.bethlehem.scinexus.Journal.JournalRepository;
+import edu.bethlehem.scinexus.User.User;
+import edu.bethlehem.scinexus.User.UserNotFoundException;
+import edu.bethlehem.scinexus.User.UserRepository;
 import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,15 +30,20 @@ public class OpinionService {
 
     private final JournalRepository journalRepository;
     private final OpinionRepository opinionRepository;
+    private final UserRepository userRepository;
     private final OpinionModelAssembler assembler;
     Logger logger = LoggerFactory.getLogger(DataLoader.class);
 
-    public Opinion convertOpinionDtoToOpinionEntity(OpinionDTO opinionDTO) {
+    public Opinion convertOpinionDtoToOpinionEntity(OpinionDTO opinionDTO, Authentication auth) {
 
         return Opinion.builder()
                 .content(opinionDTO.getContent())
                 .journal(journalRepository.findById(opinionDTO.getJournalId())
                         .orElseThrow(() -> new JournalNotFoundException(opinionDTO.getJournalId())))
+                .opinionOwner(userRepository.findById(((User) auth.getPrincipal()).getId())
+                        .orElseThrow(() -> new UserNotFoundException(
+                                ((User) auth.getPrincipal())
+                                        .getId())))
                 .build();
 
     }
@@ -52,9 +61,9 @@ public class OpinionService {
                 .collect(Collectors.toList());
     }
 
-    public EntityModel<Opinion> postOpinion(OpinionDTO newOpinionDTO) {
+    public EntityModel<Opinion> postOpinion(OpinionDTO newOpinionDTO, Authentication auth) {
         logger.trace("Posting New Opinion");
-        Opinion newOpinion = convertOpinionDtoToOpinionEntity(newOpinionDTO);
+        Opinion newOpinion = convertOpinionDtoToOpinionEntity(newOpinionDTO, auth);
         return assembler.toModel(opinionRepository.save(newOpinion));
     }
 

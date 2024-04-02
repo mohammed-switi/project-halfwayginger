@@ -61,8 +61,14 @@ public class NotificationService {
 
     }
 
-    public EntityModel<Notification> findNotificationById(Long NotificationId) {
+    public User getUserById(Authentication auth) {
+        Long id = ((User) auth.getPrincipal()).getId();
+        return userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("User Not Found", HttpStatus.NOT_FOUND));
 
+    }
+
+    public EntityModel<Notification> findNotificationById(Long NotificationId) {
         Notification notification = notificationRepository.findById(
                 NotificationId)
                 .orElseThrow(() -> new NotificationNotFoundException(NotificationId, HttpStatus.NOT_FOUND));

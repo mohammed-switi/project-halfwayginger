@@ -135,8 +135,8 @@ public class JournalService {
         Journal journal = journalRepository.findById(journalId)
                 .orElseThrow(() -> new JournalNotFoundException(journalId, HttpStatus.NOT_FOUND));
 
-        if (journal.getContributors().contains(contributorUser))
-            throw new ContributionException("User is Already A Contributor");
+        if (!journal.getContributors().contains(contributorUser))
+            throw new ContributionException("User is Already Not A Contributor");
 
         // Add contributor to the journal and save
         journal.getContributors().remove(contributorUser);
@@ -157,6 +157,8 @@ public class JournalService {
         for (Long mediaId : mediaIds.getMediaIds()) {
             Media media = mediaRepository.findById(mediaId)
                     .orElseThrow(() -> new MediaNotFoundException(mediaId, HttpStatus.NOT_FOUND));
+            if (media.getOwnerJournal() == null)
+                throw new MediaNotFoundException("media is already attached to a journal", HttpStatus.CONFLICT);
             journal.getMedias().add(media);
             media.setOwnerJournal(journal);
         }
@@ -168,7 +170,6 @@ public class JournalService {
         Journal journal = journalRepository.findById(journalId)
                 .orElseThrow(() -> new JournalNotFoundException(journalId, HttpStatus.NOT_FOUND));
         for (Long mediaId : mediaIds.getMediaIds()) {
-
             journal.getMedias().stream().filter(m -> Objects.equals(m.getId(), mediaId)).anyMatch(m -> {
                 journal.getMedias().remove(m);
                 mediaRepository.delete(m);

@@ -91,7 +91,6 @@ public class SecurityConfig {
                                                 .requestMatchers(HttpMethod.POST, "/interactions/journal/{journalId}")
                                                 .access(authorizationManager.readJournals())
                                                 // Finished Testing Till here only
-                                                // ===============================================================================^^^^^^^^^^^^^^^^Tested^^^^^^^^
                                                 // Journals
                                                 .requestMatchers(HttpMethod.GET,
                                                                 "/journals")
@@ -129,6 +128,10 @@ public class SecurityConfig {
                                                 .requestMatchers(HttpMethod.DELETE,
                                                                 "/medias/{mediaId}")
                                                 .access(authorizationManager.mediaOwner())
+
+                                                .requestMatchers(HttpMethod.GET,
+                                                                "/medias")
+                                                .access(authorizationManager.admin())
 
                                                 // Notifications
                                                 .requestMatchers(HttpMethod.GET,
@@ -191,9 +194,10 @@ public class SecurityConfig {
                                                                 "/researchpapers/{journalId}")
                                                 .access(authorizationManager.readJournals())
 
-                                                .requestMatchers(HttpMethod.GET,
+                                                .requestMatchers(HttpMethod.POST,
                                                                 "/researchpapers/{journalId}/access/**")
                                                 .access(authorizationManager.journalOwnerContributors())
+                                                // ^^^^^^^^^^^^^^^^Tested^^^^^^^^^^^^^^^^
 
                                                 // Users
 

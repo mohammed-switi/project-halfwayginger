@@ -30,6 +30,7 @@ import edu.bethlehem.scinexus.ResearchPaper.ResearchPaperNotFoundException;
 import edu.bethlehem.scinexus.ResearchPaper.ResearchPaperRequestPatchDTO;
 import edu.bethlehem.scinexus.ResearchPaper.ResearchPaperRequestDTO;
 import edu.bethlehem.scinexus.SecurityConfig.JwtService;
+import edu.bethlehem.scinexus.User.Role;
 import edu.bethlehem.scinexus.User.User;
 import edu.bethlehem.scinexus.User.UserNotFoundException;
 import edu.bethlehem.scinexus.User.UserRepository;
@@ -229,7 +230,7 @@ public class ResearchPaperService {
         ResearchPaper researchPaper = researchPaperRepository.findById(researchPaperId)
                 .orElseThrow(
                         () -> new ResearchPaperNotFoundException(researchPaperId, HttpStatus.UNPROCESSABLE_ENTITY));
-        User organization = userRepository.findById(jwtService.extractId(authentication))
+        User organization = userRepository.findByIdAndRole(jwtService.extractId(authentication), Role.ORGANIZATION)
                 .orElseThrow(() -> new OrganizationNotFoundException("Organization Not Found", HttpStatus.NOT_FOUND));
         logger.trace("Adding the organization to the research paper's validatedBy list");
         researchPaper.getValidatedBy().add(organization);

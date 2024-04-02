@@ -16,7 +16,7 @@ public class MediaModelAssembler implements RepresentationModelAssembler<Media, 
                                 media, //
                                 linkTo(methodOn(
                                                 MediaController.class).one(
-                                                                media.getId()))
+                                                                media.getId(), null))
                                                 .withSelfRel(),
                                 linkTo(methodOn(MediaController.class).all()).withRel(
                                                 "+medias"));

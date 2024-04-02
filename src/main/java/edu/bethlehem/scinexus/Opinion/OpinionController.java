@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
-
+import org.springframework.security.core.Authentication;
 import org.springframework.hateoas.*;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,9 +35,9 @@ public class OpinionController {
   }
 
   @PostMapping()
-  ResponseEntity<?> newOpinion(@RequestBody @Valid OpinionDTO newOpinion) {
+  ResponseEntity<?> newOpinion(@RequestBody @Valid OpinionDTO newOpinion, Authentication auth) {
 
-    EntityModel<Opinion> entityModel = opinionService.postOpinion(newOpinion);
+    EntityModel<Opinion> entityModel = opinionService.postOpinion(newOpinion, auth);
 
     return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
   }

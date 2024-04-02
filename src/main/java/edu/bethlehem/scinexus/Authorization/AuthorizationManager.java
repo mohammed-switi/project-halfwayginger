@@ -14,6 +14,7 @@ import edu.bethlehem.scinexus.Media.MediaRepository;
 import edu.bethlehem.scinexus.Notification.Notification;
 import edu.bethlehem.scinexus.Notification.NotificationRepository;
 import edu.bethlehem.scinexus.Opinion.Opinion;
+import edu.bethlehem.scinexus.Opinion.OpinionNotFoundException;
 import edu.bethlehem.scinexus.Opinion.OpinionRepository;
 import edu.bethlehem.scinexus.User.Role;
 import edu.bethlehem.scinexus.User.User;
@@ -150,8 +151,8 @@ public class AuthorizationManager {
                     return new AuthorizationDecision(true);
 
             }
-            return new AuthorizationDecision(false);
 
+            return new AuthorizationDecision(false);
         };
     }
 
@@ -290,7 +291,7 @@ public class AuthorizationManager {
             Long opinionId = Long.parseLong(context.getVariables().get("opinionId"));
             Opinion opinon = opinionRepository.findById(
                     opinionId)
-                    .orElseThrow(() -> new JournalNotFoundException(String.valueOf(
+                    .orElseThrow(() -> new OpinionNotFoundException(String.valueOf(
                             opinionId),
                             HttpStatus.NOT_FOUND));
             User user = (User) authentication.get().getPrincipal();

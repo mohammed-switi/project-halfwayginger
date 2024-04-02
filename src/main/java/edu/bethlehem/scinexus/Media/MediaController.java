@@ -2,30 +2,46 @@ package edu.bethlehem.scinexus.Media;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.http.*;
-
+import org.springframework.security.core.Authentication;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.hateoas.*;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.http.MediaType;
+
+import edu.bethlehem.scinexus.File.FileStorageService;
+import edu.bethlehem.scinexus.User.User;
+import edu.bethlehem.scinexus.User.UserNotFoundException;
+import edu.bethlehem.scinexus.User.UserRepository;
+import lombok.AllArgsConstructor;
 
 @RestController
+@AllArgsConstructor
 public class MediaController {
 
   private final MediaRepository repository;
+  private final UserRepository userRepository;
   private final MediaModelAssembler assembler;
-
-  MediaController(MediaRepository repository, MediaModelAssembler assembler) {
-    this.repository = repository;
-    this.assembler = assembler;
-  }
+  @Autowired
+  FileStorageService fileStorageManager;
 
   @GetMapping("/medias/{mediaId}")
-  EntityModel<Media> one(@PathVariable Long mediaId) {
+  EntityModel<Media> one(@PathVariable Long mediaId, Authentication auth) {
+    Long userId = ((User) auth.getPrincipal()).getId();
+    User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User Not Found"));
 
-    Media media = repository.findById(mediaId)
-        .orElseThrow(() -> new MediaNotFoundException(mediaId, HttpStatus.NOT_FOUND));
-
+    Media media = repository.findByIdAndOwner(mediaId, user);
+    if (media == null)
+      throw new MediaNotFoundException(mediaId, HttpStatus.NOT_FOUND);
     return assembler.toModel(media);
   }
 
@@ -38,53 +54,66 @@ public class MediaController {
   }
 
   @PostMapping("/medias")
-  ResponseEntity<?> newMedia(@RequestBody Media newMedia) {
-
-    EntityModel<Media> entityModel = assembler.toModel(repository.save(newMedia));
-
-    return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
+  public CollectionModel<EntityModel<Media>> handleConcurrentFilesUpload(
+      @RequestParam("files") MultipartFile[] files, Authentication auth) throws IOException {
+    return fileStorageManager.saveAll(files, auth);
   }
 
-  // @PutMapping("/medias/{id}")
-  // ResponseEntity<?> editMedia(@RequestBody Media newMedia, @PathVariable Long
-  // id) {
+  @RequestMapping(value = "medias/{mediaId}/files", method = RequestMethod.GET)
+  public ResponseEntity<?> getFile(@PathVariable("mediaId") Long mediaId)
+      throws FileNotFoundException {
+    Media media = repository.findById(mediaId)
+        .orElseThrow(() -> new MediaNotFoundException(mediaId, HttpStatus.NOT_FOUND));
+    String filename = media.getFileName();
+    // Checking whether the file requested for download exists or not
+    String fileUploadpath = System.getProperty("user.dir") + "/Uploads";
+    String[] filenames = this.getFiles();
+    boolean contains = Arrays.asList(filenames).contains(filename);
+    if (!contains) {
+      return new ResponseEntity("File Not Found", HttpStatus.NOT_FOUND);
+    }
 
-  // return repository.findById(id)
-  // .map(media -> {
-  // media.setId(newMedia.getId());
-  // media.setType(newMedia.getType());
-  // media.setPath(newMedia.getPath());
-  // EntityModel<Media> entityModel = assembler.toModel(repository.save(media));
-  // return
-  // ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
-  // })
-  // .orElseGet(() -> {
-  // newMedia.setId(id);
-  // EntityModel<Media> entityModel =
-  // assembler.toModel(repository.save(newMedia));
-  // return
-  // ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
-  // });
-  // }
+    // Setting up the filepath
+    String filePath = fileUploadpath + File.separator + filename;
 
-  // @PatchMapping("/medias/{id}")
-  // public ResponseEntity<?> updateUserPartially(@PathVariable(value = "id") Long
-  // mediaId,
-  // @RequestBody Media newMedia) {
-  // Media media = repository.findById(mediaId)
-  // .orElseThrow(() -> new MediaNotFoundException(mediaId,
-  // HttpStatus.NOT_FOUND));
-  // if (newMedia.getId() != null)
-  // media.setId(newMedia.getId());
-  // if (newMedia.getType() != null)
-  // media.setType(newMedia.getType());
-  // if (newMedia.getPath() != null)
-  // media.setPath(newMedia.getPath());
+    // Creating new file instance
+    File file = new File(filePath);
 
-  // EntityModel<Media> entityModel = assembler.toModel(repository.save(media));
-  // return
-  // ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
-  // }
+    // Creating a new InputStreamResource object
+    InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
+
+    // Creating a new instance of HttpHeaders Object
+    HttpHeaders headers = new HttpHeaders();
+
+    // Setting up values for contentType and headerValue
+    String contentType = "application/octet-stream";
+    String headerValue = "attachment; filename=\"" + resource.getFilename() +
+        "\"";
+
+    return ResponseEntity.ok()
+        .contentType(MediaType.parseMediaType(contentType))
+        .header(HttpHeaders.CONTENT_DISPOSITION, headerValue)
+        .body(resource);
+
+  }
+
+  // Getting list of filenames that have been uploaded
+  // @RequestMapping(value = "/getFiles", method = RequestMethod.GET)
+  public String[] getFiles() {
+    String folderPath = System.getProperty("user.dir") + "/Uploads";
+
+    // Creating a new File instance
+    File directory = new File(folderPath);
+
+    // list() method returns an array of strings
+    // naming the files and directories
+    // in the directory denoted by this abstract pathname
+    String[] filenames = directory.list();
+
+    // returning the list of filenames
+    return filenames;
+
+  }
 
   @DeleteMapping("/medias/{id}")
   ResponseEntity<?> deleteMedia(@PathVariable Long id) {

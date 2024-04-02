@@ -39,7 +39,7 @@ public class UserLinksService {
         return ulr.existsByLinksToAndLinksFrom(user1, user2) || ulr.existsByLinksToAndLinksFrom(user1, user2);
     }
 
-    private User getUser(Authentication auth) {
+    public User getUser(Authentication auth) {
         Long userId = ((User) auth.getPrincipal()).getId();
         return userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
 

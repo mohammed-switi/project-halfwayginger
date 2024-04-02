@@ -7,19 +7,20 @@ import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.stereotype.Component;
 
 @Component
-class NotificationModelAssembler implements RepresentationModelAssembler<Notification, EntityModel<Notification>> {
+public class NotificationModelAssembler
+                implements RepresentationModelAssembler<Notification, EntityModel<Notification>> {
 
-    @Override
-    public EntityModel<Notification> toModel(Notification notification) {
+        @Override
+        public EntityModel<Notification> toModel(Notification notification) {
 
-        return EntityModel.of(
-                notification, //
-                linkTo(methodOn(
-                        NotificationController.class).one(
-                                notification.getId()))
-                        .withSelfRel(),
-                linkTo(methodOn(NotificationController.class).all()).withRel(
-                        "+notifications"));
-    }
+                return EntityModel.of(
+                                notification, //
+                                linkTo(methodOn(
+                                                NotificationController.class).one(
+                                                                notification.getId()))
+                                                .withSelfRel(),
+                                linkTo(methodOn(NotificationController.class).all()).withRel(
+                                                "+notifications"));
+        }
 
 }
