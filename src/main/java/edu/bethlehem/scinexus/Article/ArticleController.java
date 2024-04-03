@@ -49,11 +49,13 @@ public class ArticleController {
     return ResponseEntity.ok(service.createArticle(newArticle, authentication));
   }
 
-  @PutMapping("/{id}")
-  ResponseEntity<?> editArticle(@RequestBody @Valid ArticleRequestDTO newArticle, @PathVariable Long id,
-      Authentication authentication) {
-    return ResponseEntity.ok(service.updateArticle(id, newArticle));
-  }
+  // No need for any PUT Method
+  // @PutMapping("/{id}")
+  // ResponseEntity<?> editArticle(@RequestBody @Valid ArticleRequestDTO
+  // newArticle, @PathVariable Long id,
+  // Authentication authentication) {
+  // return ResponseEntity.ok(service.updateArticle(id, newArticle));
+  // }
 
   @PatchMapping("/{id}")
   public ResponseEntity<?> updateUserPartially(@PathVariable(value = "id") Long id,
@@ -62,9 +64,10 @@ public class ArticleController {
 
   }
 
-  @DeleteMapping("/{id}")
-  ResponseEntity<?> deleteArticle(@PathVariable Long id) {
-    service.deleteArticle(id);
+  // will be deleting from journal
+  @DeleteMapping("/{articleId}")
+  ResponseEntity<?> deleteArticle(@PathVariable Long articleId) {
+    service.deleteArticle(articleId);
     return ResponseEntity.noContent().build();
   }
 }

@@ -26,6 +26,9 @@ import org.springframework.stereotype.Service;
 
 import com.mysql.cj.x.protobuf.MysqlxCrud.Collection;
 import edu.bethlehem.scinexus.Article.Article;
+import edu.bethlehem.scinexus.Notification.Notification;
+import edu.bethlehem.scinexus.Notification.NotificationModelAssembler;
+import edu.bethlehem.scinexus.Notification.NotificationRepository;
 import edu.bethlehem.scinexus.Article.ArticleModelAssembler;
 import edu.bethlehem.scinexus.Article.ArticleRepository;
 import edu.bethlehem.scinexus.DatabaseLoading.DataLoader;
@@ -55,8 +58,10 @@ public class UserService implements UserDetailsService {
     private final ArticleRepository articleRepository;
     private final ResearchPaperRepository researchPaperRepository;
     private final MediaRepository mediaRepository;
+    private final NotificationRepository notificationRepository;
     private final ResearchPaperRepository researchPapersRepository;
     private final ResearchPaperModelAssembler researchPapersAssembler;
+    private final NotificationModelAssembler notificationAssembler;
     private final UserModelAssembler assembler;
     private final ArticleModelAssembler articleAssembler;
     private final UserResearchPaperRequestRepository userResearchPaperRequestRepository;
@@ -77,6 +82,16 @@ public class UserService implements UserDetailsService {
 
     // return count > 0;
     // }
+    public User getUser(Authentication auth) {
+        Long userId = ((User) auth.getPrincipal()).getId();
+        return repository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
+
+    }
+
+    private User getUser(Long userId) {
+        return repository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
+
+    }
 
     CollectionModel<EntityModel<User>> all() {
         List<EntityModel<User>> users = repository.findAll().stream()
@@ -223,6 +238,21 @@ public class UserService implements UserDetailsService {
         logger.trace("Got user articles");
         logger.trace("returning user articles");
         return CollectionModel.of(articles, linkTo(methodOn(UserController.class).all()).withSelfRel());
+
+    }
+
+    CollectionModel<EntityModel<Notification>> getUserNotifications(Authentication authentication) {
+        logger.debug("returning user Notifications");
+
+        User user = getUser(authentication);
+        logger.trace("Got user with id: " + user.getId());
+        List<EntityModel<Notification>> notifications = notificationRepository.findByUser(
+                user).stream()
+                .map(article -> notificationAssembler.toModel(article))
+                .collect(Collectors.toList());
+        logger.trace("Got user notifications");
+        logger.trace("returning user notifications");
+        return CollectionModel.of(notifications, linkTo(methodOn(UserController.class).all()).withSelfRel());
 
     }
 

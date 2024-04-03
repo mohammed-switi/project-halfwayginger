@@ -24,7 +24,7 @@ public class JournalController {
     private final JournalService service;
 
     @GetMapping("/{journalId}")
-    EntityModel<Journal> one(@PathVariable Long journalId) {
+    public EntityModel<Journal> one(@PathVariable Long journalId) {
 
         return service.findJournalById(journalId);
     }
@@ -51,14 +51,22 @@ public class JournalController {
     }
 
     @PostMapping("{journalId}/media")
-    public ResponseEntity<?> attachMedia(@PathVariable Long journalId, @RequestBody MediaIdDTO mediaIds)
-            throws IOException {
+    public ResponseEntity<?> attachMedia(@PathVariable Long journalId, @RequestBody MediaIdDTO mediaIds) {
         return ResponseEntity.ok(service.attachMedia(journalId, mediaIds));
     }
 
+    @GetMapping("{journalId}/interactions")
+    public ResponseEntity<?> getJournalInteractions(@PathVariable Long journalId) {
+        return ResponseEntity.ok(service.getJournalInteractions(journalId));
+    }
+
+    @GetMapping("{journalId}/opinions")
+    public ResponseEntity<?> getJournalOpinions(@PathVariable Long journalId) {
+        return ResponseEntity.ok(service.getJournalOpinions(journalId));
+    }
+
     @DeleteMapping("{journalId}/media")
-    public ResponseEntity<?> deattachMedia(@PathVariable Long journalId, @RequestBody MediaIdDTO mediaIds)
-            throws IOException {
+    public ResponseEntity<?> deattachMedia(@PathVariable Long journalId, @RequestBody MediaIdDTO mediaIds) {
         return ResponseEntity.ok(service.deattachMedia(journalId, mediaIds));
     }
 

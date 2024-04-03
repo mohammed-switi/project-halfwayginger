@@ -16,10 +16,16 @@ public class MediaModelAssembler implements RepresentationModelAssembler<Media, 
                                 media, //
                                 linkTo(methodOn(
                                                 MediaController.class).one(
-                                                                media.getId()))
+                                                                media.getId(), null))
                                                 .withSelfRel(),
                                 linkTo(methodOn(MediaController.class).all()).withRel(
-                                                "+medias"));
+                                                "medias"),
+                                linkTo(methodOn(MediaController.class).handleConcurrentFilesUpload(null, null)).withRel(
+                                                "upload"),
+                                linkTo(methodOn(MediaController.class).getFile(media.getId())).withRel(
+                                                "download"),
+                                linkTo(methodOn(MediaController.class).deleteMedia(media.getId())).withRel(
+                                                "delete"));
         }
 
 }

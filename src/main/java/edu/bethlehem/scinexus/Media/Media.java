@@ -3,7 +3,7 @@ package edu.bethlehem.scinexus.Media;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import edu.bethlehem.scinexus.Journal.Journal;
-
+import edu.bethlehem.scinexus.User.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -34,6 +34,10 @@ public class Media {
     // @NotNull(message = "The Media Owner Shouldn't Be Null")
     // @NotBlank(message = "The Media Owner Shouldn't Be Empty")
     private Journal ownerJournal;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user")
+    private User owner;
 
     public Media(String type, String path) {
         this.type = type;

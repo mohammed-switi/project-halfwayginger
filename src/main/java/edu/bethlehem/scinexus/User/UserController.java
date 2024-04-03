@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import edu.bethlehem.scinexus.Article.Article;
 import edu.bethlehem.scinexus.Article.ArticleRepository;
+import edu.bethlehem.scinexus.Notification.Notification;
 import edu.bethlehem.scinexus.ResearchPaper.ResearchPaper;
 import edu.bethlehem.scinexus.Article.ArticleModelAssembler;
 import edu.bethlehem.scinexus.SecurityConfig.JwtService;
@@ -38,7 +39,7 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
-    EntityModel<User> one(@PathVariable Long userId) {
+    public EntityModel<User> one(@PathVariable Long userId) {
 
         return service.one(userId);
     }
@@ -90,7 +91,7 @@ public class UserController {
     }
 
     @PutMapping("/links/{userLinkTo}/response")
-    ResponseEntity<?> respondToLinkage(Authentication authentication, @PathVariable Long userLinkTo,
+    public ResponseEntity<?> respondToLinkage(Authentication authentication, @PathVariable Long userLinkTo,
             @RequestBody Boolean answer) {
         return ulService.acceptLink(authentication, userLinkTo, answer);
     }
@@ -108,7 +109,7 @@ public class UserController {
     }
 
     @GetMapping("/articles/{articleId}")
-    EntityModel<Article> getUserArticles(@PathVariable Long articleId, Authentication authentication)
+    EntityModel<Article> getUserArticle(@PathVariable Long articleId, Authentication authentication)
             throws UserNotFoundException {
         return service.getUserArticle(articleId, authentication);
     }
@@ -126,11 +127,18 @@ public class UserController {
         return service.getUserResearchPaper(researchPaperId, authentication);
     }
 
-    @DeleteMapping("/{id}")
-    ResponseEntity<?> deleteUser(@PathVariable Long id) throws UserNotFoundException {
-
-        return service.deleteUser(id);
-
+    @GetMapping("/notifications")
+    CollectionModel<EntityModel<Notification>> getUserNotifications(Authentication authentication)
+            throws UserNotFoundException {
+        return service.getUserNotifications(authentication);
     }
+
+    // @DeleteMapping("/{id}")
+    // ResponseEntity<?> deleteUser(@PathVariable Long id) throws
+    // UserNotFoundException {
+
+    // return service.deleteUser(id);
+
+    // }
 
 }

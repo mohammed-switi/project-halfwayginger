@@ -125,7 +125,7 @@ public class OrganizationService {
 
     public EntityModel<User> addAcademic(Authentication auth, Long academicId) {
         User organization = getOrganization(auth);
-        User academic = userRepository.findById(academicId)
+        User academic = userRepository.findByIdAndRole(academicId, Role.ACADEMIC)
                 .orElseThrow(() -> new UserNotFoundException(academicId));
         if (academic.getOrganization() != null)
             throw new UserNotFoundException("Academic is Already accosiated with an organization", HttpStatus.CONFLICT);
@@ -134,11 +134,15 @@ public class OrganizationService {
 
     }
 
-    public EntityModel<User> removeAcademic(Long academicId) {
+    public EntityModel<User> removeAcademic(Long academicId, Authentication auth) {
+        User organization = getOrganization(auth);
         User academic = userRepository.findById(academicId)
                 .orElseThrow(() -> new UserNotFoundException(academicId));
         if (academic.getOrganization() == null)
             throw new UserNotFoundException("Academic is not accosiated with any organization", HttpStatus.CONFLICT);
+        if (academic.getOrganization().getId() == organization.getId())
+            throw new UserNotFoundException("Academic is not accosiated with your organization", HttpStatus.FORBIDDEN);
+
         academic.setOrganization(null);
         return assembler.toModel(userRepository.save(academic));
 

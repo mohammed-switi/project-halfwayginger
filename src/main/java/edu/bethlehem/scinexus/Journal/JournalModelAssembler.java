@@ -15,11 +15,22 @@ public class JournalModelAssembler implements RepresentationModelAssembler<Journ
                 return EntityModel.of(
                                 journal, //
                                 linkTo(methodOn(
-                                                JournalController.class).one(
-                                                                journal.getId()))
+                                                JournalController.class).one(journal.getId()))
                                                 .withSelfRel(),
-                                linkTo(methodOn(JournalController.class).all()).withRel(
-                                                "journals"));
+                                linkTo(methodOn(JournalController.class).all())
+                                                .withRel("journals"),
+                                linkTo(methodOn(JournalController.class).addContributorNew(journal.getId(), null))
+                                                .withRel("addContributor"),
+                                linkTo(methodOn(JournalController.class).removeContributorNew(journal.getId(), null))
+                                                .withRel("removeContributor"),
+                                linkTo(methodOn(JournalController.class).attachMedia(journal.getId(), null))
+                                                .withRel("attachMedia"),
+                                linkTo(methodOn(JournalController.class).deattachMedia(journal.getId(), null))
+                                                .withRel("deattachMedia"),
+                                linkTo(methodOn(JournalController.class).getJournalInteractions(journal.getId()))
+                                                .withRel("interactions"),
+                                linkTo(methodOn(JournalController.class).getJournalOpinions(journal.getId()))
+                                                .withRel("opinions"));
         }
 
 }

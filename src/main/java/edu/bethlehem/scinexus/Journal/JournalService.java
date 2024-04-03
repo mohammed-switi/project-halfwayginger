@@ -2,9 +2,14 @@ package edu.bethlehem.scinexus.Journal;
 
 import edu.bethlehem.scinexus.Authorization.AuthorizationManager;
 import edu.bethlehem.scinexus.DatabaseLoading.DataLoader;
+import edu.bethlehem.scinexus.Interaction.Interaction;
+import edu.bethlehem.scinexus.Interaction.InteractionModelAssembler;
 import edu.bethlehem.scinexus.Media.Media;
 import edu.bethlehem.scinexus.Media.MediaNotFoundException;
 import edu.bethlehem.scinexus.Media.MediaRepository;
+import edu.bethlehem.scinexus.Notification.NotificationService;
+import edu.bethlehem.scinexus.Opinion.Opinion;
+import edu.bethlehem.scinexus.Opinion.OpinionModelAssembler;
 import edu.bethlehem.scinexus.User.UserService;
 import edu.bethlehem.scinexus.SecurityConfig.JwtService;
 import edu.bethlehem.scinexus.User.User;
@@ -24,6 +29,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
+import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -36,7 +46,10 @@ public class JournalService {
     private final UserRepository userRepository;
     private final MediaRepository mediaRepository;
     private final JournalModelAssembler assembler;
+    private final InteractionModelAssembler interactionAssembler;
+    private final OpinionModelAssembler opinionAssembler;
     private final JwtService jwtService;
+    private final NotificationService notificationService;
     private final UserService userService;
     private final AuthorizationManager authorizationManager;
     Logger logger = LoggerFactory.getLogger(DataLoader.class);
@@ -105,7 +118,10 @@ public class JournalService {
         // Add journal to the contributor's contributed journals and save
         contributorUser.getContributedJournals().add(journal);
         userRepository.save(contributorUser);
-
+        notificationService.notifyUser(contributorUser,
+                "You have been added to contribute to this journal " + journal.getId(), linkTo(methodOn(
+                        JournalController.class).one(
+                                journal.getId())));
         // Return response with created journal entity
         EntityModel<Journal> entityModel = assembler.toModel(journal);
         return entityModel;
@@ -119,8 +135,8 @@ public class JournalService {
         Journal journal = journalRepository.findById(journalId)
                 .orElseThrow(() -> new JournalNotFoundException(journalId, HttpStatus.NOT_FOUND));
 
-        if (journal.getContributors().contains(contributorUser))
-            throw new ContributionException("User is Already A Contributor");
+        if (!journal.getContributors().contains(contributorUser))
+            throw new ContributionException("User is Already Not A Contributor");
 
         // Add contributor to the journal and save
         journal.getContributors().remove(contributorUser);
@@ -141,6 +157,8 @@ public class JournalService {
         for (Long mediaId : mediaIds.getMediaIds()) {
             Media media = mediaRepository.findById(mediaId)
                     .orElseThrow(() -> new MediaNotFoundException(mediaId, HttpStatus.NOT_FOUND));
+            if (media.getOwnerJournal() == null)
+                throw new MediaNotFoundException("media is already attached to a journal", HttpStatus.CONFLICT);
             journal.getMedias().add(media);
             media.setOwnerJournal(journal);
         }
@@ -152,7 +170,6 @@ public class JournalService {
         Journal journal = journalRepository.findById(journalId)
                 .orElseThrow(() -> new JournalNotFoundException(journalId, HttpStatus.NOT_FOUND));
         for (Long mediaId : mediaIds.getMediaIds()) {
-
             journal.getMedias().stream().filter(m -> Objects.equals(m.getId(), mediaId)).anyMatch(m -> {
                 journal.getMedias().remove(m);
                 mediaRepository.delete(m);
@@ -164,4 +181,23 @@ public class JournalService {
         return assembler.toModel(journalRepository.save(journal));
     }
 
+    public CollectionModel<EntityModel<Interaction>> getJournalInteractions(Long journalId) {
+        Journal journal = journalRepository.findById(journalId)
+                .orElseThrow(() -> new JournalNotFoundException(journalId, HttpStatus.NOT_FOUND));
+        List<EntityModel<Interaction>> interactions = journal.getInteractions()
+                .stream()
+                .map(interactionAssembler::toModel)
+                .collect(Collectors.toList());
+        return CollectionModel.of(interactions);
+    }
+
+    public CollectionModel<EntityModel<Opinion>> getJournalOpinions(Long journalId) {
+        Journal journal = journalRepository.findById(journalId)
+                .orElseThrow(() -> new JournalNotFoundException(journalId, HttpStatus.NOT_FOUND));
+        List<EntityModel<Opinion>> opinions = journal.getOpinions()
+                .stream()
+                .map(opinionAssembler::toModel)
+                .collect(Collectors.toList());
+        return CollectionModel.of(opinions);
+    }
 }

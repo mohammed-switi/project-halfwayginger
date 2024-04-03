@@ -1,12 +1,18 @@
 package edu.bethlehem.scinexus.UserLinks;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
+import edu.bethlehem.scinexus.Journal.JournalController;
+import edu.bethlehem.scinexus.Notification.NotificationService;
 import edu.bethlehem.scinexus.User.User;
+import edu.bethlehem.scinexus.User.UserController;
 import edu.bethlehem.scinexus.User.UserNotFoundException;
 import edu.bethlehem.scinexus.User.UserRepository;
 import lombok.AllArgsConstructor;
@@ -17,13 +23,23 @@ public class UserLinksService {
     private final UserLinksRepository ulr;
     private final UserRepository userRepository;
     private final UserLinksModelAssembler ulAssembler;
+    private final NotificationService notificationService;
 
     public Boolean areTheyLinked(User link1, User link2) {
 
         return ulr.existsByLinksToAndLinksFrom(link1, link2) || ulr.existsByLinksToAndLinksFrom(link2, link1);
     }
 
-    private User getUser(Authentication auth) {
+    public Boolean areTheyLinked(Long link1, Long link2) {
+        User user1 = userRepository.findById(link1)
+                .orElseThrow(() -> new UserNotFoundException("User Is Not Found", HttpStatus.NOT_FOUND));
+        User user2 = userRepository.findById(link2)
+                .orElseThrow(() -> new UserNotFoundException("User Is Not Found", HttpStatus.NOT_FOUND));
+
+        return ulr.existsByLinksToAndLinksFrom(user1, user2) || ulr.existsByLinksToAndLinksFrom(user1, user2);
+    }
+
+    public User getUser(Authentication auth) {
         Long userId = ((User) auth.getPrincipal()).getId();
         return userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
 
@@ -43,6 +59,10 @@ public class UserLinksService {
             throw new UserNotFoundException("users cannot link to themselves", HttpStatus.CONFLICT);
         UserLinks ul = new UserLinks(linkFrom, linkTo);
         ulr.save(ul);
+        notificationService.notifyUser(linkTo, linkFrom.getFirstName() + " has requested to Link with you",
+                linkTo(methodOn(
+                        UserController.class).respondToLinkage(null, linkToId, null)));
+
         return ulAssembler.toModel(ulr.save(ul));
 
     }
@@ -62,6 +82,10 @@ public class UserLinksService {
             return ResponseEntity.noContent().build();
         }
         ul.setAccepted(true);
+        notificationService.notifyUser(
+                linkFrom, linkTo.getFirstName() + " has accepted to Link with you",
+                linkTo(methodOn(
+                        UserController.class).one(linkFromId)));
         return ResponseEntity.ok(ulAssembler.toModel(ulr.save(ul)));
     }
 

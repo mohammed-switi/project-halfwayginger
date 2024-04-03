@@ -11,6 +11,7 @@ import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,6 +22,9 @@ import edu.bethlehem.scinexus.Journal.JournalRepository;
 import edu.bethlehem.scinexus.Media.Media;
 import edu.bethlehem.scinexus.Media.MediaModelAssembler;
 import edu.bethlehem.scinexus.Media.MediaRepository;
+import edu.bethlehem.scinexus.User.User;
+import edu.bethlehem.scinexus.User.UserNotFoundException;
+import edu.bethlehem.scinexus.User.UserRepository;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 
@@ -30,10 +34,14 @@ public class FileStorageService {
 
     private final MediaRepository mediaRepository;
     private final JournalRepository journalRepository;
+    private final UserRepository userRepository;
     private final MediaModelAssembler mediaAssembler;
     private final JournalModelAssembler journalAssembler;
 
-    public EntityModel<Media> save(MultipartFile file) {
+    public EntityModel<Media> save(MultipartFile file, Authentication auth) {
+        Long userId = ((User) auth.getPrincipal()).getId();
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException());
+
         Long time = System.currentTimeMillis();
         String filePath = System.getProperty("user.dir") + "/Uploads" + File.separator + time + " "
                 + file.getOriginalFilename();
@@ -57,11 +65,13 @@ public class FileStorageService {
         media.setPath(filePath);
         media.setFileName(time + " " + file.getOriginalFilename());
         media.setType(file.getContentType());
+        media.setOwner(user);
         return mediaAssembler.toModel(mediaRepository.save(media));
     }
 
-    public CollectionModel<EntityModel<Media>> saveAll(MultipartFile[] files) {
-
+    public CollectionModel<EntityModel<Media>> saveAll(MultipartFile[] files, Authentication auth) {
+        Long userId = ((User) auth.getPrincipal()).getId();
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException());
         List<Media> mediaList = new ArrayList<Media>();
         for (MultipartFile file : files) {
             Long time = System.currentTimeMillis();
@@ -88,6 +98,7 @@ public class FileStorageService {
             media.setPath(filePath);
             media.setFileName(time + " " + file.getOriginalFilename());
             media.setType(file.getContentType());
+            media.setOwner(user);
             mediaList.add(media);
         }
 

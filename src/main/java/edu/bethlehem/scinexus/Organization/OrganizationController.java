@@ -35,14 +35,15 @@ public class OrganizationController {
     return service.findAllOrganizations();
   }
 
-  @PutMapping("/{id}")
-  ResponseEntity<?> editOrganization(@Valid @RequestBody OrganizationRequestDTO newOrganization,
-      @PathVariable Long id) {
-    return ResponseEntity.ok(service.updateOrganization(id, newOrganization));
-  }
+  // @PutMapping("/{id}")
+  // ResponseEntity<?> editOrganization(@Valid @RequestBody OrganizationRequestDTO
+  // newOrganization,
+  // @PathVariable Long id) {
+  // return ResponseEntity.ok(service.updateOrganization(id, newOrganization));
+  // }
 
   @PatchMapping("/{id}")
-  public ResponseEntity<?> updateUserPartially(@PathVariable(value = "id") Long organizationId,
+  public ResponseEntity<?> updateOrganizationPartially(@PathVariable(value = "id") Long organizationId,
       @Valid @RequestBody OrganizationRequestPatchDTO newOrganization) {
     return ResponseEntity.ok(service.updateOrganizationPartially(organizationId, newOrganization));
   }
@@ -56,14 +57,14 @@ public class OrganizationController {
   }
 
   @DeleteMapping("/{academicId}/organization")
-  ResponseEntity<?> removeUserFromOrganization(@PathVariable Long academicId) {
-    service.removeAcademic(academicId);
+  ResponseEntity<?> removeUserFromOrganization(@PathVariable Long academicId, Authentication auth) {
+    service.removeAcademic(academicId, auth);
     return ResponseEntity.noContent().build();
 
   }
 
   @PatchMapping("/{academicId}/organization")
-  ResponseEntity<?> addUserToOrganization(Authentication authentication, @PathVariable Long academicId) {
+  ResponseEntity<?> addUserToOrganization(@PathVariable Long academicId, Authentication authentication) {
 
     return ResponseEntity.ok(service.addAcademic(authentication, academicId));
   }

@@ -46,7 +46,7 @@ public class InteractionController {
   }
 
   @PatchMapping("/{id}")
-  public ResponseEntity<?> updateUserPartially(@PathVariable(value = "id") Long interactionId,
+  public ResponseEntity<?> updateInteractionPartially(@PathVariable(value = "id") Long interactionId,
       @Valid @RequestBody InteractionRequestDTO newInteraction) {
     return ResponseEntity.ok().body(service.updateInteraction(interactionId, newInteraction));
   }

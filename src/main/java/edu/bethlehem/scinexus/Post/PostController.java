@@ -42,14 +42,16 @@ public class PostController {
     return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
   }
 
-  @PutMapping("/{id}")
-  public ResponseEntity<?> editPost(@PathVariable @NotNull Long id,
-      @Valid @RequestBody @NotNull PostRequestDTO newPostRequestDTO) {
+  // @PutMapping("/{id}")
+  // public ResponseEntity<?> editPost(@PathVariable @NotNull Long id,
+  // @Valid @RequestBody @NotNull PostRequestDTO newPostRequestDTO) {
 
-    EntityModel<Post> entityModel = postService.updatePost(id, newPostRequestDTO);
+  // EntityModel<Post> entityModel = postService.updatePost(id,
+  // newPostRequestDTO);
 
-    return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
-  }
+  // return
+  // ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
+  // }
 
   @PatchMapping("/{id}")
   public ResponseEntity<?> updatePostPartially(@PathVariable(value = "id") Long postId,

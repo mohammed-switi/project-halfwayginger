@@ -2,7 +2,9 @@ package edu.bethlehem.scinexus.Post;
 
 import edu.bethlehem.scinexus.Auth.UserNotAuthorizedException;
 import edu.bethlehem.scinexus.DatabaseLoading.DataLoader;
+import edu.bethlehem.scinexus.Journal.JournalController;
 import edu.bethlehem.scinexus.Journal.Visibility;
+import edu.bethlehem.scinexus.Notification.NotificationService;
 import edu.bethlehem.scinexus.User.UserService;
 import edu.bethlehem.scinexus.SecurityConfig.JwtService;
 import edu.bethlehem.scinexus.User.User;
@@ -20,6 +22,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Objects;
@@ -35,6 +40,7 @@ public class PostService {
     private final PostModelAssembler assembler;
     private final JwtService jwtService;
     private final UserService userService;
+    private final NotificationService notificationService;
     Logger logger = LoggerFactory.getLogger(PostService.class);
 
     public Post convertPostDtoToPostEntity(Authentication authentication, PostRequestDTO postRequestDTO) {
@@ -85,7 +91,13 @@ public class PostService {
         logger.trace("Creating Post");
         Post newPost = convertPostDtoToPostEntity(authentication, newPostRequestDTO);
         logger.debug("Post Created");
-        return assembler.toModel(savePost(newPost));
+        newPost = savePost(newPost);
+        notificationService.notifyLinks(((User) authentication.getPrincipal()).getId(),
+                "Your Link have Posted a new Post ", linkTo(methodOn(
+                        JournalController.class).one(
+                                newPost.getId())));
+
+        return assembler.toModel(newPost);
     }
 
     public EntityModel<Post> updatePost(Long postId,
