@@ -57,6 +57,7 @@ public class SecurityConfig {
                                                 .requestMatchers("/topic/public").permitAll()
                                                 .requestMatchers("/app/**").permitAll()
                                                 .requestMatchers("/actuator/**").permitAll()
+                                                .requestMatchers("/swagger-ui.html").permitAll()
                                                 // Academics
                                                 .requestMatchers(HttpMethod.GET, "/academics")
                                                 .access(authorizationManager.admin())
@@ -88,7 +89,8 @@ public class SecurityConfig {
                                                 .requestMatchers(HttpMethod.PATCH, "/interactions/{interactionId}")
                                                 .access(authorizationManager.interactionOwner())
 
-                                                .requestMatchers(HttpMethod.POST, "/interactions/journal/{journalId}")
+                                                .requestMatchers(HttpMethod.POST,
+                                                                "/interactions/journal/{journalId}")
                                                 .access(authorizationManager.readJournals())
                                                 // Finished Testing Till here only
                                                 // Journals
@@ -209,7 +211,7 @@ public class SecurityConfig {
                                                                 "/users")
                                                 .access(authorizationManager.admin())
 
-                                                .anyRequest().authenticated())
+                                                .anyRequest().permitAll())
 
                                 .formLogin(httpSecurityFormLoginConfigurer -> {
                                         httpSecurityFormLoginConfigurer.loginPage("/api/v1/auth/login").permitAll();
