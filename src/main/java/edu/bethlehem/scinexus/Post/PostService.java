@@ -2,11 +2,15 @@ package edu.bethlehem.scinexus.Post;
 
 import edu.bethlehem.scinexus.Auth.UserNotAuthorizedException;
 import edu.bethlehem.scinexus.DatabaseLoading.DataLoader;
+import edu.bethlehem.scinexus.Journal.Journal;
 import edu.bethlehem.scinexus.Journal.JournalController;
+import edu.bethlehem.scinexus.Journal.JournalNotFoundException;
+import edu.bethlehem.scinexus.Journal.JournalRepository;
 import edu.bethlehem.scinexus.Journal.Visibility;
 import edu.bethlehem.scinexus.Notification.NotificationService;
 import edu.bethlehem.scinexus.User.UserService;
 import edu.bethlehem.scinexus.SecurityConfig.JwtService;
+import edu.bethlehem.scinexus.User.Role;
 import edu.bethlehem.scinexus.User.User;
 import edu.bethlehem.scinexus.User.UserNotFoundException;
 import edu.bethlehem.scinexus.User.UserRepository;
@@ -36,6 +40,7 @@ import java.util.stream.Collectors;
 public class PostService {
 
     private final PostRepository postRepository;
+    private final JournalRepository journalRepository;
     private final UserRepository userRepository;
     private final PostModelAssembler assembler;
     private final JwtService jwtService;
@@ -97,6 +102,27 @@ public class PostService {
                         JournalController.class).one(
                                 newPost.getId())));
 
+        return assembler.toModel(newPost);
+    }
+
+    public EntityModel<Post> createResharePost(Authentication authentication, PostRequestDTO newPostRequestDTO,
+            Long resharedJournal) {
+        logger.trace("Creating Post");
+        Post newPost = convertPostDtoToPostEntity(authentication, newPostRequestDTO);
+        logger.debug("Post Created");
+        newPost = savePost(newPost);
+        Journal journal = journalRepository.findById(resharedJournal)
+                .orElseThrow(() -> new JournalNotFoundException(resharedJournal));
+        if (journal.getVisibility() == Visibility.LINKS)
+            throw new JournalNotFoundException(resharedJournal);
+        notificationService.notifyLinks(((User) authentication.getPrincipal()).getId(),
+                "Your Link have Posted a new Post ", linkTo(methodOn(
+                        JournalController.class).one(
+                                newPost.getId())));
+        notificationService.notifyUser(journal.getPublisher(), "Someone Reshared your journal", linkTo(methodOn(
+                JournalController.class).one(
+                        newPost.getId())));
+        newPost.setReShare(journal);
         return assembler.toModel(newPost);
     }
 

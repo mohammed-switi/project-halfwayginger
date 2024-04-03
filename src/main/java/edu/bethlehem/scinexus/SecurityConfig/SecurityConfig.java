@@ -124,6 +124,10 @@ public class SecurityConfig {
                                                                 "/journals/{journalId}/opinions")
                                                 .access(authorizationManager.readJournals())
 
+                                                .requestMatchers(HttpMethod.POST,
+                                                                "/journals/{journalId}/reshare")
+                                                .access(authorizationManager.readJournals())
+
                                                 // Media
                                                 .requestMatchers(HttpMethod.DELETE,
                                                                 "/medias/{mediaId}")
@@ -155,7 +159,6 @@ public class SecurityConfig {
                                                 .requestMatchers(HttpMethod.DELETE,
                                                                 "/organizations/{userId}")
                                                 .access(authorizationManager.userHimSelfAndAdmin())
-                                                
 
                                                 .requestMatchers(HttpMethod.PATCH,
                                                                 "/organizations/{userId}")

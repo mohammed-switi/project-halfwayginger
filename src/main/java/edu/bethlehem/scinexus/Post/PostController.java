@@ -42,6 +42,14 @@ public class PostController {
     return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
   }
 
+  @PostMapping("/{journalId}/reshare")
+  public ResponseEntity<?> createNewPostReshare(Authentication authentication,
+      @Valid @RequestBody @NotNull PostRequestDTO newPostRequestDTO, @PathVariable Long journalId) {
+
+    EntityModel<Post> entityModel = postService.createResharePost(authentication, newPostRequestDTO, journalId);
+    return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
+  }
+
   // @PutMapping("/{id}")
   // public ResponseEntity<?> editPost(@PathVariable @NotNull Long id,
   // @Valid @RequestBody @NotNull PostRequestDTO newPostRequestDTO) {

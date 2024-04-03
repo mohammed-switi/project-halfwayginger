@@ -81,11 +81,6 @@ public class Journal implements Serializable {
     @JsonBackReference
     private List<Media> medias;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "reShare")
-    @JdbcTypeCode(SqlTypes.JSON)
-    private Journal reShare;
-
     // @ManyToMany(mappedBy = "contributors", fetch = FetchType.EAGER)
     // @JdbcTypeCode(SqlTypes.JSON)
     // // @JsonIgnore

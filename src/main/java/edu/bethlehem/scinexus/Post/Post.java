@@ -19,6 +19,11 @@ import org.hibernate.type.SqlTypes;
 public class Post extends Journal {
   // private @Id @GeneratedValue Long id;
 
+  @ManyToOne(fetch = FetchType.EAGER)
+  @JoinColumn(name = "reShare")
+  @JdbcTypeCode(SqlTypes.JSON)
+  private Journal reShare;
+
   public Post(String content, User publisher) {
     super(content, publisher);
 
