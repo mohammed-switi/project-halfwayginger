@@ -9,7 +9,12 @@ import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+
+import java.time.LocalDateTime;
+
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.type.SqlTypes;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -21,6 +26,12 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 public class Interaction {
 
     private @Id @GeneratedValue Long id;
+
+    @CreationTimestamp
+    private LocalDateTime createDateTime;
+
+    @UpdateTimestamp
+    private LocalDateTime updateDateTime;
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Enumerated(EnumType.STRING)

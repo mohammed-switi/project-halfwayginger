@@ -1,5 +1,10 @@
 package edu.bethlehem.scinexus.Notification;
 
+import java.time.LocalDateTime;
+
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
 import edu.bethlehem.scinexus.User.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
@@ -16,6 +21,12 @@ public class Notification {
     @Id
     @GeneratedValue
     private Long id;
+
+    @CreationTimestamp
+    private LocalDateTime createDateTime;
+
+    @UpdateTimestamp
+    private LocalDateTime updateDateTime;
 
     @NotNull(message = "The Notification Content Shouldn't Be Null")
     @NotBlank(message = "The Notification Content cannot Be Empty")

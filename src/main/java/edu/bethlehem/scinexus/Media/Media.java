@@ -1,5 +1,10 @@
 package edu.bethlehem.scinexus.Media;
 
+import java.time.LocalDateTime;
+
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import edu.bethlehem.scinexus.Journal.Journal;
@@ -15,6 +20,12 @@ import lombok.Data;
 public class Media {
     @Column()
     private @Id @GeneratedValue Long id;
+
+    @CreationTimestamp
+    private LocalDateTime createDateTime;
+
+    @UpdateTimestamp
+    private LocalDateTime updateDateTime;
 
     @NotNull(message = "The Media Type Shouldn't Be Null")
     @NotBlank(message = "The Media Type Shouldn't Be Empty")

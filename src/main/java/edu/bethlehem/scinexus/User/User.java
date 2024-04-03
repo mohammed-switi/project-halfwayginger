@@ -19,7 +19,10 @@ import edu.bethlehem.scinexus.Journal.Journal;
 import edu.bethlehem.scinexus.Media.Media;
 import edu.bethlehem.scinexus.Notification.Notification;
 import edu.bethlehem.scinexus.ResearchPaper.ResearchPaper;
+
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.type.SqlTypes;
 
 import org.springframework.security.core.GrantedAuthority;
@@ -27,6 +30,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import javax.annotation.Nullable;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 // @Entity
@@ -49,6 +53,12 @@ public class User implements UserDetailsImpl {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+
+    @CreationTimestamp
+    private LocalDateTime createDateTime;
+
+    @UpdateTimestamp
+    private LocalDateTime updateDateTime;
 
     @NotNull(message = "First Name is mandatory")
     @NotBlank(message = "First Name is mandatory")

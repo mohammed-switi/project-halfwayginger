@@ -1,5 +1,10 @@
 package edu.bethlehem.scinexus.UserResearchPaper;
 
+import java.time.LocalDateTime;
+
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
 import edu.bethlehem.scinexus.ResearchPaper.ResearchPaper;
 import edu.bethlehem.scinexus.User.User;
 import jakarta.persistence.EmbeddedId;
@@ -22,6 +27,12 @@ import lombok.Setter;
 public class UserResearchPaperRequest {
     @EmbeddedId
     ResearchPaperRequestKey id;
+
+    @CreationTimestamp
+    private LocalDateTime createDateTime;
+
+    @UpdateTimestamp
+    private LocalDateTime updateDateTime;
 
     @ManyToOne
     @MapsId("userId")

@@ -5,7 +5,10 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.validation.constraints.*;
+
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.type.SqlTypes;
 
 import edu.bethlehem.scinexus.Interaction.Interaction;
@@ -14,6 +17,7 @@ import edu.bethlehem.scinexus.User.User;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -25,6 +29,11 @@ public class Opinion {
     @Id
     @GeneratedValue
     private Long id;
+    @CreationTimestamp
+    private LocalDateTime createDateTime;
+
+    @UpdateTimestamp
+    private LocalDateTime updateDateTime;
 
     @NotNull(message = "The Opinion Content Can't Be Null")
     @NotBlank(message = "The Opinion Content Can't Be Empty")
