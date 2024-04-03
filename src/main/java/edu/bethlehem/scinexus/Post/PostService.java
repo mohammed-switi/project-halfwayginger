@@ -115,6 +115,7 @@ public class PostService {
                 .orElseThrow(() -> new JournalNotFoundException(resharedJournal));
         if (journal.getVisibility() == Visibility.LINKS)
             throw new JournalNotFoundException(resharedJournal);
+
         notificationService.notifyLinks(((User) authentication.getPrincipal()).getId(),
                 "Your Link have Posted a new Post ", linkTo(methodOn(
                         JournalController.class).one(
