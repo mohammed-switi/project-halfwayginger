@@ -2,6 +2,7 @@ package edu.bethlehem.scinexus.User;
 
 import java.util.List;
 
+import org.springframework.context.annotation.Import;
 import org.springframework.http.*;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -17,6 +18,8 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/users")
+@Import({ UserModelAssembler.class })
+
 public class UserController {
 
 
@@ -26,15 +29,15 @@ public class UserController {
 
 
     @GetMapping()
-    CollectionModel<EntityModel<User>> all() {
+    ResponseEntity<CollectionModel<EntityModel<User>>> all() {
 
-        return service.all();
+        return ResponseEntity.ok(service.all());
     }
 
-    @GetMapping("/{Id}")
-    EntityModel<User> one(@PathVariable Long id) {
+    @GetMapping("/{id}")
+   ResponseEntity< EntityModel<User>> one(@PathVariable Long id) {
 
-        return service.one(id);
+        return ResponseEntity.ok(service.one(id));
     }
 
     @PatchMapping("/{id}")
@@ -43,74 +46,49 @@ public class UserController {
         return service.updateUserPartially(newUser, userId);
     }
 
-    // @PutMapping("/{id}")
-    // ResponseEntity<?> linkUser(@RequestBody User newUser, @PathVariable Long id)
-    // {
-
-    // return repository.findById(id)
-    // .map(user -> {
-    // user.setUsername(newUser.getUsername());
-    // user.setPassword(newUser.getPassword());
-    // user.setEmail(newUser.getEmail());
-    // user.setProfilePicture(newUser.getProfilePicture());
-    // user.setProfileCover(newUser.getProfileCover());
-    // user.setBio(newUser.getBio());
-    // user.setPhoneNumber(newUser.getPhoneNumber());
-    // user.setFieldOfWork(newUser.getFieldOfWork());
-    // user.setUserSettings(newUser.getUserSettings());
-    // user.setFirstName(newUser.getFirstName());
-
-    // EntityModel<User> entityModel = assembler.toModel(repository.save(user));
-    // return
-    // ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri())
-    // .body(entityModel);
-    // })
-    // .orElseThrow(() -> {
-    // return new UserNotFoundException("The user with id:" + id + " is not found",
-    // HttpStatus.NOT_FOUND);
-    // });
-    // }
 
     @GetMapping("/links")
-    CollectionModel<EntityModel<User>> getUserLinks(Authentication authentication)
+    public CollectionModel<EntityModel<User>> getUserLinks(Authentication authentication)
             throws UserNotFoundException {
         return service.getLinks(authentication);
     }
 
     @PutMapping("/links/{userLinkTo}")
-    ResponseEntity<?> linkUser(Authentication authentication, @PathVariable Long userLinkTo) {
+     public ResponseEntity<?> linkUser(Authentication authentication, @PathVariable Long userLinkTo) {
         return service.linkUser(authentication, userLinkTo);
     }
 
     @GetMapping("/articles")
-    CollectionModel<EntityModel<Article>> getUserArticles(Authentication authentication)
+    public CollectionModel<EntityModel<Article>> getUserArticles(Authentication authentication)
             throws UserNotFoundException {
         return service.getUserArticles(authentication);
     }
 
     @GetMapping("/articles/{articleId}")
-    EntityModel<Article> getUserArticles(@PathVariable Long articleId, Authentication authentication)
+   public EntityModel<Article> getUserArticles(@PathVariable Long articleId, Authentication authentication)
             throws UserNotFoundException {
         return service.getUserArticle(articleId, authentication);
     }
 
     @GetMapping("/researchpapers")
-    CollectionModel<EntityModel<ResearchPaper>> getUserResearchPapers(Authentication authentication)
+   public CollectionModel<EntityModel<ResearchPaper>> getUserResearchPapers(Authentication authentication)
             throws UserNotFoundException {
         return service.getUserResearchPapers(authentication);
     }
 
     @GetMapping("/researchpapers/{researchPaperId}")
-    EntityModel<ResearchPaper> getUserResearchPaper(@PathVariable Long researchPaperId,
+     public EntityModel<ResearchPaper> getUserResearchPaper(@PathVariable Long researchPaperId,
             Authentication authentication)
             throws UserNotFoundException {
         return service.getUserResearchPaper(researchPaperId, authentication);
     }
 
     @DeleteMapping("/{id}")
-    ResponseEntity<?> deleteUser(@PathVariable Long id) throws UserNotFoundException {
+    public ResponseEntity<?> deleteUser(@PathVariable Long id) throws UserNotFoundException {
 
-        return service.deleteUser(id);
+        service.deleteUser(id);
+
+        return ResponseEntity.noContent().build();
 
     }
 

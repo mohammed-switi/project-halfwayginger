@@ -62,7 +62,7 @@ public class UserService implements UserDetailsService {
         return count > 0;
     }
 
-    CollectionModel<EntityModel<User>> all() {
+   public CollectionModel<EntityModel<User>> all() {
         List<EntityModel<User>> users = repository.findAll().stream()
                 .map(user -> assembler.toModel(user))
                 .collect(Collectors.toList());
@@ -71,7 +71,7 @@ public class UserService implements UserDetailsService {
         return CollectionModel.of(users, linkTo(methodOn(UserController.class).all()).withSelfRel());
     }
 
-    EntityModel<User> one(Long userId) {
+    public EntityModel<User> one(Long userId) {
         logger.debug("returning user with id: " + userId);
         User user = entityManager.find(User.class, userId);
         logger.trace("Got user with id: " + userId);
@@ -110,7 +110,7 @@ public class UserService implements UserDetailsService {
 
     }
 
-    CollectionModel<EntityModel<User>> getLinks(Authentication authentication) {
+     public CollectionModel<EntityModel<User>> getLinks(Authentication authentication) {
         logger.debug("returning user links");
         Long userId = ((User) (authentication.getPrincipal())).getId();
 
@@ -129,11 +129,11 @@ public class UserService implements UserDetailsService {
 
     }
 
-    ResponseEntity<?> linkUser(Authentication authentication, Long userLinkToId) {
+    public ResponseEntity<?> linkUser(Authentication authentication, Long userLinkToId) {
 
         logger.debug("linking user with id: " + userLinkToId);
 
-        Long linkFromId = ((User) (authentication.getPrincipal())).getId();
+        Long linkFromId = jwtService.extractId(authentication);
 
         logger.trace("Got user with id: " + linkFromId);
 
@@ -239,7 +239,7 @@ public class UserService implements UserDetailsService {
         return mongoRepository.findAllByStatus(Status.ONLINE);
 
     }
-    ResponseEntity<?> deleteUser(Long userId) {
+    public  void deleteUser(Long userId) {
         logger.debug("deleting user with id: " + userId);
         User user = repository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("The user with id:" + userId + " is not found",
@@ -248,7 +248,6 @@ public class UserService implements UserDetailsService {
 
         repository.delete(user);
         logger.trace("Deleted user with id: " + userId);
-        return ResponseEntity.noContent().build();
 
     }
 

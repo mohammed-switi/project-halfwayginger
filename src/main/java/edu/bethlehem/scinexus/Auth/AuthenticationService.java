@@ -4,11 +4,14 @@ import edu.bethlehem.scinexus.Auth.Email.EmailSender;
 import edu.bethlehem.scinexus.Auth.EmailToken.ConfirmationToken;
 import edu.bethlehem.scinexus.Auth.EmailToken.ConfirmationTokenService;
 import edu.bethlehem.scinexus.Auth.EmailToken.EmailConfirmationException;
+import edu.bethlehem.scinexus.Post.PostService;
 import edu.bethlehem.scinexus.SecurityConfig.JwtService;
 import edu.bethlehem.scinexus.User.*;
 
 import edu.bethlehem.scinexus.JPARepository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -19,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -36,7 +40,10 @@ public class AuthenticationService {
 
         private final EmailSender emailSender;
 
-        public AuthenticationResponse register(RegisterRequest request) {
+        Logger logger = LoggerFactory.getLogger(AuthenticationService.class);
+
+
+        public RegisterRequest register(RegisterRequest request) {
                 User user;
 
                 if (request.getRole() == Role.ACADEMIC) {
@@ -76,27 +83,28 @@ public class AuthenticationService {
 
                 userRepository.save(user);
 
-//                String token = UUID.randomUUID().toString();
-//
-//                ConfirmationToken confirmationToken=ConfirmationToken.builder()
-//                        .token(token)
-//                        .createdAt(LocalDateTime.now())
-//                        .expiresAt(LocalDateTime.now().plusMinutes(15))
-//                        .user(user)
-//                        .build();
-//
-//                confirmationTokenService.saveConfirmationToken(confirmationToken);
-//                String link = "http://localhost:8080/api/v1/auth/confirm?token=" + token;
-//
-//                emailSender.send(request.getEmail(),
-//                        buildEmail(request.getFirstName(),link));
+                String token = UUID.randomUUID().toString();
+
+                ConfirmationToken confirmationToken=ConfirmationToken.builder()
+                        .token(token)
+                        .createdAt(LocalDateTime.now())
+                        .expiresAt(LocalDateTime.now().plusMinutes(15))
+                        .user(user)
+                        .build();
+
+                confirmationTokenService.saveConfirmationToken(confirmationToken);
+                String link = "http://localhost:8080/api/v1/auth/confirm?token=" + token;
+
+                emailSender.send(request.getEmail(),
+                        buildEmail(request.getFirstName(),link));
 
                 // Remember to Delete the following Lines, because the JWT Token Must Be Returned When Authenticating
-                var jwtToken = service.generateToken(user);
-                return AuthenticationResponse.builder()
-                                .jwtToken(jwtToken)
-                                .confirmationToken("token")
-                                .build();
+    //            var jwtToken = service.generateToken(user);
+                return request;
+//                return AuthenticationResponse.builder()
+//                                .jwtToken(jwtToken)
+//                                .confirmationToken("token")
+//                                .build();
 
         }
 
@@ -110,6 +118,7 @@ public class AuthenticationService {
                                 .orElseThrow(() -> new UserNotFoundException("User Not Found Exception", HttpStatus.NOT_FOUND));
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
+                logger.trace(String.format("User %s is Authenticated", user.toString()));
                 var jwtToken = service.generateToken(user);
                 return AuthenticationResponse.builder()
                                 .jwtToken(jwtToken)
@@ -141,7 +150,7 @@ public class AuthenticationService {
         }
 
 
-        private String buildEmail(String name, String link) {
+        public String buildEmail(String name, String link) {
                 return "<div style=\"font-family:Helvetica,Arial,sans-serif;font-size:16px;margin:0;color:#0b0c0c\">\n" +
                         "\n" +
                         "<span style=\"display:none;font-size:1px;color:#fff;max-height:0\"></span>\n" +
