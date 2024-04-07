@@ -113,6 +113,7 @@ public class InteractionService {
                                                                 "User is not found with username: "
                                                                                 + authentication.getName(),
                                                                 HttpStatus.NOT_FOUND));
+
                 Opinion opinion = opinionRepository.findById(
                                 opinionId)
                                 .orElseThrow(() -> new JournalNotFoundException(opinionId, HttpStatus.NOT_FOUND));
@@ -135,6 +136,7 @@ public class InteractionService {
                 interaction = interactionRepository.save(interaction);
 
                 opinion.addInteraction();
+
                 opinionRepository.save(opinion);
 
                 return assembler.toModel(interaction);
@@ -147,13 +149,7 @@ public class InteractionService {
                         Authentication authentication) {
                 logger.trace("Adding Journal Interaction");
 
-                User user = userRepository.findById(jwtService.extractId(
-                                authentication))
-                                .orElseThrow(
-                                                () -> new UserNotFoundException(
-                                                                "User is not found with username: "
-                                                                                + authentication.getName(),
-                                                                HttpStatus.NOT_FOUND));
+                User user = jwtService.getUser(authentication);
 
                 Journal journal = journalRepository.findById(
                                 journalId)
@@ -164,12 +160,6 @@ public class InteractionService {
                         return assembler.toModel(interactionRepository.save(interaction));
 
                 }
-                notificationService.notifyUser(
-                                journal.getPublisher(),
-                                user.getFirstName() + " Interacted with your journal: " + journal.getId(),
-                                linkTo(methodOn(
-                                                JournalController.class).one(
-                                                                journal.getId())));
 
                 interaction = new Interaction(interactionDTO.getType(), user);
 
@@ -178,6 +168,13 @@ public class InteractionService {
 
                 journal.addInteraction();
                 journalRepository.save(journal);
+
+                notificationService.notifyUser(
+                                journal.getPublisher(),
+                                user.getFirstName() + " Interacted with your journal: " + journal.getId(),
+                                linkTo(methodOn(
+                                                JournalController.class).one(
+                                                                journal.getId())));
                 return assembler.toModel(interactionRepository.save(interaction));
 
         }

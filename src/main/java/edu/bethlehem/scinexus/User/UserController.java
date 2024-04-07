@@ -10,6 +10,7 @@ import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.security.core.Authentication;
 import org.springframework.hateoas.*;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import edu.bethlehem.scinexus.Article.Article;
 import edu.bethlehem.scinexus.Notification.Notification;
@@ -44,6 +45,18 @@ public class UserController {
     public ResponseEntity<?> updateUserPartially(@PathVariable(value = "id") Long userId,
             @RequestBody UserRequestPatchDTO newUser) throws UserNotFoundException {
         return service.updateUserPartially(newUser, userId);
+    }
+
+    @PatchMapping("/profilePicture")
+    public ResponseEntity<?> changeProfilePicture(Authentication auth,
+            @RequestParam("file") MultipartFile file) throws UserNotFoundException {
+        return ResponseEntity.ok(service.uploadProfilePicture(auth, file));
+    }
+
+    @PatchMapping("/coverPicture")
+    public ResponseEntity<?> changeCoverPicture(Authentication auth,
+            @RequestParam("file") MultipartFile file) throws UserNotFoundException {
+        return ResponseEntity.ok(service.uploadCoverPicture(auth, file));
     }
 
     @GetMapping("/links")

@@ -14,6 +14,7 @@ import java.util.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.IanaLinkRelations;
@@ -24,12 +25,15 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import edu.bethlehem.scinexus.Article.Article;
 import edu.bethlehem.scinexus.Notification.Notification;
 import edu.bethlehem.scinexus.Notification.NotificationModelAssembler;
 import edu.bethlehem.scinexus.JPARepository.NotificationRepository;
 import edu.bethlehem.scinexus.Article.ArticleModelAssembler;
+import edu.bethlehem.scinexus.JPARepository.ArticleRepository;
+import edu.bethlehem.scinexus.File.FileStorageService;
 import edu.bethlehem.scinexus.JPARepository.ArticleRepository;
 import edu.bethlehem.scinexus.ResearchPaper.ResearchPaper;
 import edu.bethlehem.scinexus.ResearchPaper.ResearchPaperModelAssembler;
@@ -64,6 +68,9 @@ public class UserService implements UserDetailsService {
     private final ArticleModelAssembler articleAssembler;
     private final UserResearchPaperRequestRepository userResearchPaperRequestRepository;
 
+    @Autowired
+    FileStorageService fileStorageManager;
+
     private final JwtService jwtService;
     Logger logger = LoggerFactory.getLogger(UserService.class);
 
@@ -97,12 +104,11 @@ public class UserService implements UserDetailsService {
         return assembler.toModel(user);
     }
 
-    public ResponseEntity<?> updateUserPartially(UserRequestPatchDTO editUser, Long userId) {
-        logger.debug("partially updating user with id: " + userId);
-        User user = repository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("The user with id:" + userId + " is not found",
-                        HttpStatus.NOT_FOUND));
-        logger.trace("Got user with id: " + userId);
+    public ResponseEntity<?> updateUserPartially(UserRequestPatchDTO editUser, Authentication auth) {
+        User user = jwtService.getUser(auth);
+        logger.debug("partially updating user with id: " + user.getId());
+
+        logger.trace("Got user with id: " + user.getId());
         // User Properties
 
         try {
@@ -133,9 +139,9 @@ public class UserService implements UserDetailsService {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        logger.trace("Updated user with id: " + userId);
+        logger.trace("Updated user with id: " + user.getId());
         EntityModel<User> entityModel = assembler.toModel(repository.save(user));
-        logger.trace("returning updated user with id: " + userId);
+        logger.trace("returning updated user with id: " + user.getId());
         return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
 
     }
@@ -153,16 +159,6 @@ public class UserService implements UserDetailsService {
 
     }
 
-   public EntityModel<Article> getUserArticle(Long articleId, Authentication authentication) {
-        logger.debug("returning user articles");
-        Long userId = jwtService.extractId(authentication);
-        logger.trace("Got user with id: " + userId);
-
-        logger.trace("returning user articles");
-        return articleAssembler
-                .toModel(articleRepository.findByIdAndPublisherId(articleId, userId));
-
-    }
 
      public CollectionModel<EntityModel<ResearchPaper>> getUserResearchPapers(Authentication authentication) {
         logger.debug("returning user ResearchPapers");
@@ -230,6 +226,7 @@ public class UserService implements UserDetailsService {
         return repository.enableAppUser(email);
     }
 
+
     CollectionModel<EntityModel<Notification>> getUserNotifications(Authentication authentication) {
         logger.debug("returning user Notifications");
 
@@ -245,66 +242,20 @@ public class UserService implements UserDetailsService {
 
     }
 
-    // @Override
-    // public UserDetails loadUserByUsername(String username) throws
-    // UsernameNotFoundException {
-    // String userName = null, password=null;
-    // List<GrantedAuthority> authorities=null;
-    // User user=repository.findByEmail(username).orElseThrow(() -> new
-    // UserNotFoundException());
-    //
-    // userName=user.getEmail();
-    // password=user.getPassword();
-    // authorities=new ArrayList<>();
-    // authorities.add(new SimpleGrantedAuthority(user.getRole().toString()));
-    //
-    // return new
-    // org.springframework.security.core.userdetails.User(username,password,authorities);
-    // }
-    // @Override
-    // public UserDetails loadUserByUsername(String username) throws
-    // UsernameNotFoundException {
-    // String userName = null, password=null;
-    // List<GrantedAuthority> authorities=null;
-    // User user=repository.findByEmail(username).orElseThrow(() -> new
-    // UserNotFoundException());
-    //
-    // userName=user.getEmail();
-    // password=user.getPassword();
-    // authorities=new ArrayList<>();
-    // authorities.add(new SimpleGrantedAuthority(user.getRole().toString()));
-    //
-    // return new
-    // org.springframework.security.core.userdetails.User(username,password,authorities);
-    // }
+    EntityModel<User> uploadProfilePicture(Authentication authentication, MultipartFile file) {
+        User user = jwtService.getUser(authentication);
+        Media media = fileStorageManager.saveOne(file, authentication);
 
-    // if (editUser.getUsername() != null)
-    // user.setUsername(editUser.getUsername());
-    // if (editUser.getPassword() != null)
-    // user.setPassword(editUser.getPassword());
-    // if (editUser.getEmail() != null)
-    // user.setEmail(editUser.getEmail());
-    // if (editUser.getBio() != null)
-    // user.setBio(editUser.getBio());
-    // if (editUser.getPhoneNumber() != null)
-    // user.setPhoneNumber(editUser.getPhoneNumber());
-    // if (editUser.getFieldOfWork() != null)
-    // user.setFieldOfWork(editUser.getFieldOfWork());
-    // if (editUser.getFirstName() != null)
-    // user.setFirstName(editUser.getFirstName());
+        user.setProfilePicture(media);
+        return assembler.toModel(repository.save(user));
+    }
 
-    // Using Native MySQL Query Language (Not Tested Yet!)
-    // public boolean areUsersLinked(User user1, User user2) {
-    // Query query = entityManager.createNativeQuery(
-    // "SELECT COUNT(*) FROM user_links " +
-    // "WHERE user_id = :userId1 AND linked_user_id = :userId2");
-    //
-    // query.setParameter("userId1", user1.getId());
-    // query.setParameter("userId2", user2.getId());
-    //
-    // Long count = ((Number) query.getSingleResult()).longValue();
-    //
-    // return count > 0;
-    // }
+    EntityModel<User> uploadCoverPicture(Authentication authentication, MultipartFile file) {
+        User user = jwtService.getUser(authentication);
+        Media media = fileStorageManager.saveOne(file, authentication);
+
+        user.setProfileCover(media);
+        return assembler.toModel(repository.save(user));
+    }
 
 }
