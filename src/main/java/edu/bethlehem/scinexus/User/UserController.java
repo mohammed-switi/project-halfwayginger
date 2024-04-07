@@ -40,10 +40,10 @@ public class UserController {
         return ResponseEntity.ok(service.one(id));
     }
 
-    @PatchMapping("/{id}")
-    public ResponseEntity<?> updateUserPartially(@PathVariable(value = "id") Long userId,
+    @PatchMapping("")
+    public ResponseEntity<?> updateUserPartially(Authentication auth,
             @RequestBody UserRequestPatchDTO newUser) throws UserNotFoundException {
-        return service.updateUserPartially(newUser, userId);
+        return service.updateUserPartially(newUser, auth);
     }
 
     @GetMapping("/links")

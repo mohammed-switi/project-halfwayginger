@@ -161,11 +161,6 @@ public class InteractionService {
 
                 interaction = new Interaction(interactionDTO.getType(), user);
 
-                journal.getInteractions().stream().forEach(inter -> {
-                        if (inter.getInteractorUser().getId().equals(user.getId()))
-                                throw new InteractionAlreadyExistsException(user.getId());
-                });
-
                 interaction.setJournal(journal);
                 interaction.setInteractorUser(user);
 

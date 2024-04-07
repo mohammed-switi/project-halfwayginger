@@ -97,12 +97,11 @@ public class UserService implements UserDetailsService {
         return assembler.toModel(user);
     }
 
-    ResponseEntity<?> updateUserPartially(UserRequestPatchDTO editUser, Long userId) {
-        logger.debug("partially updating user with id: " + userId);
-        User user = repository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("The user with id:" + userId + " is not found",
-                        HttpStatus.NOT_FOUND));
-        logger.trace("Got user with id: " + userId);
+    ResponseEntity<?> updateUserPartially(UserRequestPatchDTO editUser, Authentication auth) {
+        User user = jwtService.getUser(auth);
+        logger.debug("partially updating user with id: " + user.getId());
+
+        logger.trace("Got user with id: " + user.getId());
         // User Properties
 
         try {
@@ -133,9 +132,9 @@ public class UserService implements UserDetailsService {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        logger.trace("Updated user with id: " + userId);
+        logger.trace("Updated user with id: " + user.getId());
         EntityModel<User> entityModel = assembler.toModel(repository.save(user));
-        logger.trace("returning updated user with id: " + userId);
+        logger.trace("returning updated user with id: " + user.getId());
         return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
 
     }
@@ -245,67 +244,5 @@ public class UserService implements UserDetailsService {
         return CollectionModel.of(notifications, linkTo(methodOn(UserController.class).all()).withSelfRel());
 
     }
-
-    // @Override
-    // public UserDetails loadUserByUsername(String username) throws
-    // UsernameNotFoundException {
-    // String userName = null, password=null;
-    // List<GrantedAuthority> authorities=null;
-    // User user=repository.findByEmail(username).orElseThrow(() -> new
-    // UserNotFoundException());
-    //
-    // userName=user.getEmail();
-    // password=user.getPassword();
-    // authorities=new ArrayList<>();
-    // authorities.add(new SimpleGrantedAuthority(user.getRole().toString()));
-    //
-    // return new
-    // org.springframework.security.core.userdetails.User(username,password,authorities);
-    // }
-    // @Override
-    // public UserDetails loadUserByUsername(String username) throws
-    // UsernameNotFoundException {
-    // String userName = null, password=null;
-    // List<GrantedAuthority> authorities=null;
-    // User user=repository.findByEmail(username).orElseThrow(() -> new
-    // UserNotFoundException());
-    //
-    // userName=user.getEmail();
-    // password=user.getPassword();
-    // authorities=new ArrayList<>();
-    // authorities.add(new SimpleGrantedAuthority(user.getRole().toString()));
-    //
-    // return new
-    // org.springframework.security.core.userdetails.User(username,password,authorities);
-    // }
-
-    // if (editUser.getUsername() != null)
-    // user.setUsername(editUser.getUsername());
-    // if (editUser.getPassword() != null)
-    // user.setPassword(editUser.getPassword());
-    // if (editUser.getEmail() != null)
-    // user.setEmail(editUser.getEmail());
-    // if (editUser.getBio() != null)
-    // user.setBio(editUser.getBio());
-    // if (editUser.getPhoneNumber() != null)
-    // user.setPhoneNumber(editUser.getPhoneNumber());
-    // if (editUser.getFieldOfWork() != null)
-    // user.setFieldOfWork(editUser.getFieldOfWork());
-    // if (editUser.getFirstName() != null)
-    // user.setFirstName(editUser.getFirstName());
-
-    // Using Native MySQL Query Language (Not Tested Yet!)
-    // public boolean areUsersLinked(User user1, User user2) {
-    // Query query = entityManager.createNativeQuery(
-    // "SELECT COUNT(*) FROM user_links " +
-    // "WHERE user_id = :userId1 AND linked_user_id = :userId2");
-    //
-    // query.setParameter("userId1", user1.getId());
-    // query.setParameter("userId2", user2.getId());
-    //
-    // Long count = ((Number) query.getSingleResult()).longValue();
-    //
-    // return count > 0;
-    // }
 
 }
