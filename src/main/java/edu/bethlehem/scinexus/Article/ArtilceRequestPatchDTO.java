@@ -4,8 +4,9 @@ import edu.bethlehem.scinexus.Journal.JournalRequestPatchDTO;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
 import lombok.Data;
+import lombok.experimental.SuperBuilder;
 
-@Builder
+@SuperBuilder
 @Data
 public class ArtilceRequestPatchDTO extends JournalRequestPatchDTO {
     // @NotBlank(message = "The Article Subject Shouldn't Be Empty")
