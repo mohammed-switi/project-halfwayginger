@@ -14,6 +14,7 @@ import java.util.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.IanaLinkRelations;
@@ -24,12 +25,14 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import edu.bethlehem.scinexus.Article.Article;
 import edu.bethlehem.scinexus.Notification.Notification;
 import edu.bethlehem.scinexus.Notification.NotificationModelAssembler;
 import edu.bethlehem.scinexus.JPARepository.NotificationRepository;
 import edu.bethlehem.scinexus.Article.ArticleModelAssembler;
+import edu.bethlehem.scinexus.File.FileStorageService;
 import edu.bethlehem.scinexus.JPARepository.ArticleRepository;
 import edu.bethlehem.scinexus.ResearchPaper.ResearchPaper;
 import edu.bethlehem.scinexus.ResearchPaper.ResearchPaperModelAssembler;
@@ -62,6 +65,8 @@ public class UserService implements UserDetailsService {
     private final NotificationModelAssembler notificationAssembler;
     private final UserModelAssembler assembler;
     private final ArticleModelAssembler articleAssembler;
+    @Autowired
+    FileStorageService fileStorageManager;
     private final UserResearchPaperRequestRepository userResearchPaperRequestRepository;
 
     private final JwtService jwtService;
@@ -243,6 +248,22 @@ public class UserService implements UserDetailsService {
         logger.trace("returning user notifications");
         return CollectionModel.of(notifications, linkTo(methodOn(UserController.class).all()).withSelfRel());
 
+    }
+
+    EntityModel<User> uploadProfilePicture(Authentication authentication, MultipartFile file) {
+        User user = jwtService.getUser(authentication);
+        Media media = fileStorageManager.saveOne(file, authentication);
+
+        user.setProfilePicture(media);
+        return assembler.toModel(repository.save(user));
+    }
+
+    EntityModel<User> uploadCoverPicture(Authentication authentication, MultipartFile file) {
+        User user = jwtService.getUser(authentication);
+        Media media = fileStorageManager.saveOne(file, authentication);
+
+        user.setProfileCover(media);
+        return assembler.toModel(repository.save(user));
     }
 
 }

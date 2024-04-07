@@ -60,14 +60,14 @@ public class DataLoader implements CommandLineRunner {
     public void run(String... args) {
         logger.trace("Starting Random Data Generation: \n\n");
         long startTime = System.currentTimeMillis();
-        generateUser();
-        generateRandomUsers(5);
-        generateLinks();
-        generateResearchPapers();
-        generateArticles();
-        generateOpinions();
-        generateInteractions();
-        generatePosts();
+        // generateUser();
+        // generateRandomUsers(5);
+        // generateLinks();
+        // generateResearchPapers();
+        // generateArticles();
+        // generateOpinions();
+        // generateInteractions();
+        // generatePosts();
 
         long endTime = System.currentTimeMillis();
         long totalTime = endTime - startTime;

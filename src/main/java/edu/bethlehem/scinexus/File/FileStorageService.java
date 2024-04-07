@@ -40,7 +40,7 @@ public class FileStorageService {
     private final JournalModelAssembler journalAssembler;
     private final JwtService jwtService;
 
-    public EntityModel<Media> save(MultipartFile file, Authentication auth) {
+    public Media saveOne(MultipartFile file, Authentication auth) {
         Long userId = jwtService.extractId(auth);
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException());
 
@@ -68,7 +68,7 @@ public class FileStorageService {
         media.setFileName(time + " " + file.getOriginalFilename());
         media.setType(file.getContentType());
         media.setOwner(user);
-        return mediaAssembler.toModel(mediaRepository.save(media));
+        return mediaRepository.save(media);
     }
 
     public CollectionModel<EntityModel<Media>> saveAll(MultipartFile[] files, Authentication auth) {
