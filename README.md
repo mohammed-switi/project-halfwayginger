@@ -5,10 +5,11 @@
 <!-- PROJECT LOGO -->
 
 <br />
-<div align="center">
-<!--   <a href="https://github.com/othneildrew/Best-README-Template">
-<!--     <img src="images/logo.png" alt="Logo" width="80" height="80"> -->
-<!--   </a> -->
+<div align="midpoint">
+
+![Artboard 1](https://github.com/S24-SWER313/project-halfwayginger/assets/56078065/f3a27144-f0e6-40f7-ab7a-663e5b509f9e)
+
+
   <h3 align="center">SciNexus Project Readme</h3>
 
 <p align="center">
@@ -63,7 +64,8 @@ We have implemented RESTFull API and maintained the flow of instructions with th
 
 ## Database Design
 
-![1712494870555](image/README/1712494870555.png)
+![Database Schema](https://github.com/S24-SWER313/project-halfwayginger/assets/56078065/a706da00-7c72-49f2-9c5c-1eeb89c74155)
+
 
 ### Built With
 
