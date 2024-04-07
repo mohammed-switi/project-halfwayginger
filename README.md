@@ -68,19 +68,19 @@ We have implemented RESTFull API and maintained the flow of instructions with th
 
 
 ### Built With
+* [![Spring][spring-icon]][spring-url]
+* [![SpringBoot][springboot-icon]][springboot-url]
+* [![Java][java-icon]][java-url]
+* [![MySQL][mysql-icon]][mysql-url]
+* [![JavaScript][javascript-icon]][javascript-url]
+* [![MongoDB][mongodb-icon]][mongodb-url]
+* [![Docker][docker-icon]][docker-url]
+* [![HTML][html-icon]][html-url]
+* [![CSS][css-icon]][css-url]
+* [![Google][google-icon]][google-url]
+* [![Github][github-icon]][github-url]
+* [![Bootstrap][Bootstrap.com]][Bootstrap-url]
 
-- [Spring][spring-url]
-- [SpringBoot][springboot-url]
-- [Java][java-url]
-- [MySQL][mysql-url]
-- [JavaScript][javascript-url]
-- [MongoDB][mongodb-url]
-- [Docker][docker-url]
-- [HTML][html-url]
-- [CSS][css-url]
-- [Google][google-url]
-- [Github][github-url]
-- [Bootstrap][Bootstrap-url]
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -142,20 +142,41 @@ spring.datasource.password=1234
 
 <!-- USAGE EXAMPLES -->
 
-<!-- ROADMAP -->
+---
 
 ## Features
 
-- Three kinds of media (Research Paper, Articles, and Posts)
-- Two different users (Organization and Academic)
-- Chatting (NoSQL Database)
-- Interactions
-- Opinions
-- High security measuers
-- Bidierctional user linking (i.e. follow and follow back mechanism)
-- Push-notifications
-- Email Verification
-- And many more.
+### Multi-Media Support
+- **Research Papers, Articles, and Posts**: The platform accommodates three distinct types of media, allowing for diverse content contributions.
+  - **Collaborative Research Papers**: Multiple contributors can collaborate on writing research papers, fostering collaborative knowledge creation.
+
+### User Roles and Organizations
+- **Two User Types**: The platform caters to two primary user categories: Organizations and Academics.
+  - **Academic Affiliation**: Academics have the option to be affiliated with an organization, bridging individual and institutional contributions.
+
+### Real-Time Communication
+- **Chat Functionality**: Leveraging a NoSQL database and WebSocket technology, the platform offers real-time chat capabilities for seamless communication.
+  
+### Interactive Features
+- **Journal Interactions**: Users can engage interactively with various journals, enhancing user experience and content engagement.
+  
+### Opinion Sharing and Discussion
+- **Opinions**: Users can post opinions on journals and engage in recursive discussions, fostering a dynamic and interactive community.
+
+### Security Measures
+- **Robust Security Protocols**: The platform implements high-security measures to ensure data integrity, confidentiality, and user trust.
+
+### User Engagement and Notifications
+- **Bidirectional User Linking**: Implementing a follow and follow-back mechanism, users can establish meaningful connections and enhance networking opportunities.
+- **Push Notifications**: Users receive timely push notifications to stay updated on relevant activities and interactions.
+
+### Account Verification
+- **Email Verification**: To ensure the authenticity of users and maintain a trusted community, email verification is implemented as a mandatory step in the registration process.
+
+### And More
+- **Additional Features**: The platform offers a range of other features designed to enhance user experience, facilitate collaboration, and promote knowledge sharing.
+
+---
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
