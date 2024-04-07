@@ -158,9 +158,20 @@ public class UserService implements UserDetailsService {
         return CollectionModel.of(articles, linkTo(methodOn(UserController.class).all()).withSelfRel());
 
     }
+    public EntityModel<Article> getUserArticle(Long articleId, Authentication authentication) {
+        logger.debug("returning user articles");
+        Long userId = jwtService.extractId(authentication);
+        logger.trace("Got user with id: " + userId);
+
+        logger.trace("returning user articles");
+        return articleAssembler
+                .toModel(articleRepository.findByIdAndPublisherId(articleId, userId));
+
+    }
 
 
-     public CollectionModel<EntityModel<ResearchPaper>> getUserResearchPapers(Authentication authentication) {
+
+    public CollectionModel<EntityModel<ResearchPaper>> getUserResearchPapers(Authentication authentication) {
         logger.debug("returning user ResearchPapers");
         Long userId = jwtService.extractId(authentication);
         logger.trace("Got user with id: " + userId);

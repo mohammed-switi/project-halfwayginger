@@ -42,9 +42,9 @@ public class UserController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<?> updateUserPartially(@PathVariable(value = "id") Long userId,
+    public ResponseEntity<?> updateUserPartially(Authentication authentication,
             @RequestBody UserRequestPatchDTO newUser) throws UserNotFoundException {
-        return service.updateUserPartially(newUser, userId);
+        return service.updateUserPartially(newUser, authentication);
     }
 
     @PatchMapping("/profilePicture")
@@ -93,6 +93,7 @@ public class UserController {
             throws UserNotFoundException {
         return service.getUserArticle(articleId, authentication);
     }
+
 
     @GetMapping("/researchpapers")
     public ResponseEntity<CollectionModel<EntityModel<ResearchPaper>>> getUserResearchPapers(Authentication authentication)
