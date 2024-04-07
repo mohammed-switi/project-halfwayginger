@@ -147,13 +147,7 @@ public class InteractionService {
                         Authentication authentication) {
                 logger.trace("Adding Journal Interaction");
 
-                User user = userRepository.findById(jwtService.extractId(
-                                authentication))
-                                .orElseThrow(
-                                                () -> new UserNotFoundException(
-                                                                "User is not found with username: "
-                                                                                + authentication.getName(),
-                                                                HttpStatus.NOT_FOUND));
+                User user = jwtService.getUser(authentication);
 
                 Journal journal = journalRepository.findById(
                                 journalId)
@@ -164,20 +158,26 @@ public class InteractionService {
                         return assembler.toModel(interactionRepository.save(interaction));
 
                 }
-                notificationService.notifyUser(
-                                journal.getPublisher(),
-                                user.getFirstName() + " Interacted with your journal: " + journal.getId(),
-                                linkTo(methodOn(
-                                                JournalController.class).one(
-                                                                journal.getId())));
 
                 interaction = new Interaction(interactionDTO.getType(), user);
+
+                journal.getInteractions().stream().forEach(inter -> {
+                        if (inter.getInteractorUser().getId().equals(user.getId()))
+                                throw new InteractionAlreadyExistsException(user.getId());
+                });
 
                 interaction.setJournal(journal);
                 interaction.setInteractorUser(user);
 
                 journal.addInteraction();
                 journalRepository.save(journal);
+
+                notificationService.notifyUser(
+                                journal.getPublisher(),
+                                user.getFirstName() + " Interacted with your journal: " + journal.getId(),
+                                linkTo(methodOn(
+                                                JournalController.class).one(
+                                                                journal.getId())));
                 return assembler.toModel(interactionRepository.save(interaction));
 
         }
