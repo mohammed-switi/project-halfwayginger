@@ -81,6 +81,15 @@ public class RandomDataGenerator {
         return phoneNumber;
     }
 
+    public String generateRandomRealUsername(){
+        return faker.name().username();
+    }
+
+    public String generateRandomCharacterName(){
+        return faker.gameOfThrones().character();
+    }
+
+
     public String generateRandomFieldOfWork() {
         return faker.job().field();
     }

@@ -1,9 +1,9 @@
 package edu.bethlehem.scinexus.Interaction;
 
-import java.lang.reflect.Method;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import edu.bethlehem.scinexus.JPARepository.InteractionRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.hateoas.CollectionModel;
@@ -13,28 +13,25 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
-import edu.bethlehem.scinexus.Organization.OrganizationNotFoundException;
 import edu.bethlehem.scinexus.DatabaseLoading.DataLoader;
-import edu.bethlehem.scinexus.Interaction.Interaction;
-import edu.bethlehem.scinexus.Interaction.InteractionNotFoundException;
-import edu.bethlehem.scinexus.Interaction.InteractionRepository;
-import edu.bethlehem.scinexus.Interaction.InteractionRequestDTO;
 import edu.bethlehem.scinexus.Journal.Journal;
+import edu.bethlehem.scinexus.Journal.JournalController;
 import edu.bethlehem.scinexus.Journal.JournalNotFoundException;
-import edu.bethlehem.scinexus.Journal.JournalRepository;
+import edu.bethlehem.scinexus.JPARepository.JournalRepository;
+import edu.bethlehem.scinexus.Notification.NotificationService;
 import edu.bethlehem.scinexus.Opinion.Opinion;
-import edu.bethlehem.scinexus.Opinion.OpinionRepository;
+import edu.bethlehem.scinexus.Opinion.OpinionController;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
+
+import edu.bethlehem.scinexus.JPARepository.OpinionRepository;
 import edu.bethlehem.scinexus.SecurityConfig.JwtService;
 import edu.bethlehem.scinexus.User.User;
 import edu.bethlehem.scinexus.User.UserNotFoundException;
-import edu.bethlehem.scinexus.User.UserRepository;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
+import edu.bethlehem.scinexus.JPARepository.UserRepository;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -46,6 +43,7 @@ public class InteractionService {
         private final InteractionRepository interactionRepository;
         private final OpinionRepository opinionRepository;
         private final JournalRepository journalRepository;
+        private final NotificationService notificationService;
         private final InteractionModelAssembler assembler;
         Logger logger = LoggerFactory.getLogger(DataLoader.class);
 
@@ -103,43 +101,54 @@ public class InteractionService {
                                                 interactionId, HttpStatus.UNPROCESSABLE_ENTITY));
         }
 
-        public ResponseEntity<?> addOpinionInteraction(
+        public EntityModel<Interaction> addOpinionInteraction(
                         Long opinionId,
                         InteractionRequestDTO interactionDTO,
                         Authentication authentication) {
                 logger.trace("Adding Opinion Interaction");
 
-                User user = userRepository.findById(((User) authentication.getPrincipal()).getId())
+                User user = userRepository.findById(jwtService.extractId(authentication))
                                 .orElseThrow(
                                                 () -> new UserNotFoundException(
                                                                 "User is not found with username: "
                                                                                 + authentication.getName(),
                                                                 HttpStatus.NOT_FOUND));
-
                 Opinion opinion = opinionRepository.findById(
                                 opinionId)
                                 .orElseThrow(() -> new JournalNotFoundException(opinionId, HttpStatus.NOT_FOUND));
-                Interaction interaction = new Interaction(interactionDTO.getType(), user);
+                Interaction interaction = interactionRepository.findByInteractorUserAndOpinion(user, opinion);
+                if (interaction != null) {
+                        interaction.setType(interactionDTO.getType());
+                        return assembler.toModel(interactionRepository.save(interaction));
+
+                }
+                notificationService.notifyUser(
+                                opinion.getOpinionOwner(),
+                                user.getFirstName() + " Interacted with your Opinoin: " + opinion.getContent(),
+                                linkTo(methodOn(
+                                                OpinionController.class).one(
+                                                                opinion.getId())));
+
+                interaction = new Interaction(interactionDTO.getType(), user);
                 interaction.setOpinion(opinion);
 
                 interaction = interactionRepository.save(interaction);
 
                 opinion.addInteraction();
-
                 opinionRepository.save(opinion);
-                EntityModel<Interaction> entityModel = assembler.toModel(interaction);
-                return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri())
-                                .body(entityModel);
+
+                return assembler.toModel(interaction);
 
         }
 
-        public ResponseEntity<?> addJournalInteraction(
+        public EntityModel<Interaction> addJournalInteraction(
                         Long journalId,
                         InteractionRequestDTO interactionDTO,
                         Authentication authentication) {
                 logger.trace("Adding Journal Interaction");
 
-                User user = userRepository.findById(((User) authentication.getPrincipal()).getId())
+                User user = userRepository.findById(jwtService.extractId(
+                                authentication))
                                 .orElseThrow(
                                                 () -> new UserNotFoundException(
                                                                 "User is not found with username: "
@@ -149,28 +158,44 @@ public class InteractionService {
                 Journal journal = journalRepository.findById(
                                 journalId)
                                 .orElseThrow(() -> new JournalNotFoundException(journalId, HttpStatus.NOT_FOUND));
-                Interaction interaction = new Interaction(interactionDTO.getType(), user);
+                Interaction interaction = interactionRepository.findByInteractorUserAndJournal(user, journal);
+                if (interaction != null) {
+                        interaction.setType(interactionDTO.getType());
+                        return assembler.toModel(interactionRepository.save(interaction));
+
+                }
+                notificationService.notifyUser(
+                                journal.getPublisher(),
+                                user.getFirstName() + " Interacted with your journal: " + journal.getId(),
+                                linkTo(methodOn(
+                                                JournalController.class).one(
+                                                                journal.getId())));
+
+                interaction = new Interaction(interactionDTO.getType(), user);
 
                 interaction.setJournal(journal);
                 interaction.setInteractorUser(user);
 
-                interaction = interactionRepository.save(interaction);
-
-                // journal.addInteraction(interaction);
-
+                journal.addInteraction();
                 journalRepository.save(journal);
-                EntityModel<Interaction> entityModel = assembler.toModel(interaction);
-                return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri())
-                                .body(entityModel);
+                return assembler.toModel(interactionRepository.save(interaction));
 
         }
 
-        public void deleteInteraction(Long interactionId) {
+        public void deleteInteraction(Long interactionId, Authentication authentication) {
                 logger.trace("Deleting Interaction");
-                Interaction interaction = interactionRepository.findById(interactionId)
+                User user = userRepository.findById(jwtService.extractId(
+                                authentication))
                                 .orElseThrow(
-                                                () -> new InteractionNotFoundException(interactionId,
-                                                                HttpStatus.UNPROCESSABLE_ENTITY));
+                                                () -> new UserNotFoundException(
+                                                                "User is not found with username: "
+                                                                                + authentication.getName(),
+                                                                HttpStatus.NOT_FOUND));
+                Interaction interaction = interactionRepository.findByIdAndInteractorUser(interactionId, user);
+                if (interaction == null)
+
+                        throw new InteractionNotFoundException("Interaction with id: " + interactionId
+                                        + " for user with Id: " + user.getId() + " is not Found", HttpStatus.NOT_FOUND);
 
                 if (interaction.getJournal() != null)
                         interaction.getJournal().removeInteraction();

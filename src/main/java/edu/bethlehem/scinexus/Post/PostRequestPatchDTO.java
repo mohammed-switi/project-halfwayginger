@@ -3,8 +3,10 @@ package edu.bethlehem.scinexus.Post;
 import edu.bethlehem.scinexus.Journal.JournalRequestPatchDTO;
 
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
-@Builder
+@SuperBuilder
+@NoArgsConstructor
 public class PostRequestPatchDTO extends JournalRequestPatchDTO {
 
 }

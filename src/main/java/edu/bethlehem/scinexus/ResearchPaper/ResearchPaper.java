@@ -11,12 +11,16 @@ import lombok.Builder.Default;
 import lombok.experimental.SuperBuilder;
 import edu.bethlehem.scinexus.Journal.Journal;
 import edu.bethlehem.scinexus.User.User;
+import edu.bethlehem.scinexus.UserResearchPaper.UserResearchPaperRequest;
 
 import java.util.List;
+import java.util.Set;
 
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Data
 @Entity
@@ -45,10 +49,10 @@ public class ResearchPaper extends Journal {
     // @NotNull(message = "The Research Paper Number Of Pages Can't Be Null")
     private Integer noOfPages = 0;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "research_paper_access_request_academics", joinColumns = @JoinColumn(name = "requestsForAccess"), inverseJoinColumns = @JoinColumn(name = "requestsResearchPapers"))
-    @JdbcTypeCode(SqlTypes.JSON)
-    private List<User> requestsForAccess;
+    @OneToMany
+    @JoinColumn(name = "research_paper_id")
+    @JsonIgnore
+    private Set<UserResearchPaperRequest> requestsForAccess;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "research_paper_validated_by_organization", joinColumns = @JoinColumn(name = "validated"), inverseJoinColumns = @JoinColumn(name = "validated_research_papers"))
@@ -62,16 +66,16 @@ public class ResearchPaper extends Journal {
 
     }
 
-//    @Override
-//    public String toString() {
-//        return "ResearchPaper{" +
-//                "language=" + language +
-//                ", description='" + description + '\'' +
-//                ", title='" + title + '\'' +
-//                ", subject='" + subject + '\'' +
-//                ", noOfPages=" + noOfPages +
-//                ", requestsForAccess=" + requestsForAccess +
-//                ", validatedBy=" + validatedBy +
-//                '}';
-//    }
+    // @Override
+    // public String toString() {
+    // return "ResearchPaper{" +
+    // "language=" + language +
+    // ", description='" + description + '\'' +
+    // ", title='" + title + '\'' +
+    // ", subject='" + subject + '\'' +
+    // ", noOfPages=" + noOfPages +
+    // ", requestsForAccess=" + requestsForAccess +
+    // ", validatedBy=" + validatedBy +
+    // '}';
+    // }
 }

@@ -20,8 +20,19 @@ class OrganizationModelAssembler implements RepresentationModelAssembler<User, E
                                                 OrganizationController.class).one(
                                                                 organization.getId()))
                                                 .withSelfRel(),
-                                linkTo(methodOn(OrganizationController.class).all()).withRel(
-                                                "+organizations"));
+                                linkTo(methodOn(OrganizationController.class).all())
+                                                .withRel("organizations"),
+                                linkTo(methodOn(OrganizationController.class)
+                                                .updateOrganizationPartially(organization.getId(), null))
+                                                .withRel("update"),
+                                linkTo(methodOn(OrganizationController.class).deleteOrganization(organization.getId()))
+                                                .withRel("delete"),
+                                linkTo(methodOn(OrganizationController.class).removeUserFromOrganization(null, null))
+                                                .withRel("removeAcademic"),
+                                linkTo(methodOn(OrganizationController.class).addUserToOrganization(null, null))
+                                                .withRel("addAcademic")
+
+                );
         }
 
 }

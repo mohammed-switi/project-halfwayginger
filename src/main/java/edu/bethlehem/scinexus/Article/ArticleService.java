@@ -4,6 +4,7 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import edu.bethlehem.scinexus.JPARepository.ArticleRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.hateoas.CollectionModel;
@@ -13,21 +14,14 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
-import edu.bethlehem.scinexus.Organization.OrganizationNotFoundException;
-import edu.bethlehem.scinexus.Article.Article;
-import edu.bethlehem.scinexus.Article.ArticleNotFoundException;
-import edu.bethlehem.scinexus.Article.ArticleRepository;
-import edu.bethlehem.scinexus.Article.ArticleRequestDTO;
 import edu.bethlehem.scinexus.DatabaseLoading.DataLoader;
-import edu.bethlehem.scinexus.Interaction.Interaction;
-import edu.bethlehem.scinexus.Interaction.InteractionRepository;
-import edu.bethlehem.scinexus.Opinion.OpinionRepository;
+import edu.bethlehem.scinexus.JPARepository.InteractionRepository;
+import edu.bethlehem.scinexus.Notification.NotificationService;
+import edu.bethlehem.scinexus.JPARepository.OpinionRepository;
 import edu.bethlehem.scinexus.SecurityConfig.JwtService;
 import edu.bethlehem.scinexus.User.User;
 import edu.bethlehem.scinexus.User.UserNotFoundException;
-import edu.bethlehem.scinexus.User.UserRepository;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
+import edu.bethlehem.scinexus.JPARepository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
@@ -41,6 +35,7 @@ public class ArticleService {
     private final OpinionRepository opinionRepository;
     private final InteractionRepository interactionRepository;
     private final ArticleModelAssembler assembler;
+    private final NotificationService notificationService;
     Logger logger = LoggerFactory.getLogger(DataLoader.class);
 
     public Article convertArticleDtoToArticleEntity(Authentication authentication,
@@ -92,38 +87,47 @@ public class ArticleService {
         logger.trace("Creating Article");
         Article article = convertArticleDtoToArticleEntity(authentication,
                 newArticleRequestDTO);
-        return assembler.toModel(saveArticle(article));
+        article = saveArticle(article);
+        notificationService.notifyLinks(
+                jwtService.extractId(authentication),
+                "A new article from your links",
+                linkTo(methodOn(
+                        ArticleController.class).one(article.getId())));
+        return assembler.toModel(article);
     }
 
-    public EntityModel<Article> updateArticle(Long articleId,
-            ArticleRequestDTO newArticleRequestDTO) {
-        logger.trace("Updating Article");
-        return articleRepository.findById(
-                articleId)
-                .map(article -> {
-                    article.setContent(newArticleRequestDTO.getContent());
-                    article.setVisibility(newArticleRequestDTO.getVisibility());
-                    article.setTitle(newArticleRequestDTO.getTitle());
-                    article.setSubject(newArticleRequestDTO.getSubject());
-                    return assembler.toModel(articleRepository.save(article));
-                })
-                .orElseThrow(() -> new ArticleNotFoundException(
-                        articleId, HttpStatus.UNPROCESSABLE_ENTITY));
-    }
+    // No need for any PUT method
+    // public EntityModel<Article> updateArticle(Long articleId,
+    // ArticleRequestDTO newArticleRequestDTO) {
+    // logger.trace("Updating Article");
+    // return articleRepository.findById(
+    // articleId)
+    // .map(article -> {
+    // article.setContent(newArticleRequestDTO.getContent());
+    // article.setVisibility(newArticleRequestDTO.getVisibility());
+    // article.setTitle(newArticleRequestDTO.getTitle());
+    // article.setSubject(newArticleRequestDTO.getSubject());
+    // return assembler.toModel(articleRepository.save(article));
+    // })
+    // .orElseThrow(() -> new ArticleNotFoundException(
+    // articleId, HttpStatus.UNPROCESSABLE_ENTITY));
+    // }
 
     public EntityModel<Article> updateArticlePartially(Long articleId,
-            ArtilceRequestPatchDTO newArticleRequestDTO) {
+            ArticleRequestPatchDTO newArticleRequestDTO) {
         logger.trace("Partially Updating Article");
         Article article = articleRepository.findById(articleId)
                 .orElseThrow(
                         () -> new ArticleNotFoundException(articleId, HttpStatus.UNPROCESSABLE_ENTITY));
 
         try {
-            for (Method method : ArtilceRequestPatchDTO.class.getMethods()) {
+            for (Method method : ArticleRequestPatchDTO.class.getMethods()) {
                 if (method.getName().startsWith("get") && method.getParameterCount() == 0) {
                     Object value = method.invoke(newArticleRequestDTO);
                     if (value != null) {
                         String propertyName = method.getName().substring(3); // remove "get"
+                        if (propertyName.equals("Class")) // Class is a reserved keyword in Java
+                            continue;
                         Method setter = Article.class.getMethod("set" + propertyName, method.getReturnType());
                         setter.invoke(article, value);
                     }

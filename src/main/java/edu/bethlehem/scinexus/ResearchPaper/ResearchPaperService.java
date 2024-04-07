@@ -1,9 +1,12 @@
 package edu.bethlehem.scinexus.ResearchPaper;
 
+import edu.bethlehem.scinexus.JPARepository.ResearchPaperRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 import java.lang.reflect.Method;
 import java.util.List;
@@ -11,25 +14,27 @@ import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
-import edu.bethlehem.scinexus.DatabaseLoading.DataLoader;
-import edu.bethlehem.scinexus.Interaction.InteractionRepository;
-import edu.bethlehem.scinexus.Opinion.OpinionRepository;
+import edu.bethlehem.scinexus.Article.ArticleController;
+import edu.bethlehem.scinexus.JPARepository.InteractionRepository;
+import edu.bethlehem.scinexus.Notification.NotificationService;
+import edu.bethlehem.scinexus.JPARepository.OpinionRepository;
 import edu.bethlehem.scinexus.Organization.OrganizationNotFoundException;
-import edu.bethlehem.scinexus.ResearchPaper.ResearchPaper;
-import edu.bethlehem.scinexus.ResearchPaper.ResearchPaperNotFoundException;
-import edu.bethlehem.scinexus.ResearchPaper.ResearchPaperRequestPatchDTO;
-import edu.bethlehem.scinexus.ResearchPaper.ResearchPaperRequestDTO;
 import edu.bethlehem.scinexus.SecurityConfig.JwtService;
+import edu.bethlehem.scinexus.User.Role;
 import edu.bethlehem.scinexus.User.User;
 import edu.bethlehem.scinexus.User.UserNotFoundException;
-import edu.bethlehem.scinexus.User.UserRepository;
+import edu.bethlehem.scinexus.JPARepository.UserRepository;
+import edu.bethlehem.scinexus.JPARepository.UserResearchPaperRequestRepository;
 import edu.bethlehem.scinexus.User.UserRequestDTO;
 import edu.bethlehem.scinexus.User.UserRequestPatchDTO;
+import edu.bethlehem.scinexus.UserResearchPaper.ResearchPaperRequestKey;
+import edu.bethlehem.scinexus.UserResearchPaper.UserResearchPaperRequest;
 
 @Service
 @RequiredArgsConstructor
@@ -39,10 +44,12 @@ public class ResearchPaperService {
     private EntityManager entityManager;
     private final JwtService jwtService;
     private final ResearchPaperRepository researchPaperRepository;
+    private final UserResearchPaperRequestRepository userResearchPaperRequestRepository;
     private final UserRepository userRepository;
     private final InteractionRepository interactionRepository;
     private final OpinionRepository opinionRepository;
     private final ResearchPaperModelAssembler assembler;
+    private final NotificationService notificationService;
     Logger logger = LoggerFactory.getLogger(ResearchPaperService.class);
 
     public ResearchPaper convertResearchPaperDtoToResearchPaperEntity(Authentication authentication,
@@ -76,13 +83,13 @@ public class ResearchPaperService {
     }
 
     // We Should Specify An Admin Authority To get All ResearchPapers
-    public List<EntityModel<ResearchPaper>> findAllResearchPapers() {
+    public CollectionModel<EntityModel<ResearchPaper>> findAllResearchPapers() {
         logger.trace("Fetching all research papers");
-        return researchPaperRepository
+        return CollectionModel.of(researchPaperRepository
                 .findAll()
                 .stream()
                 .map(assembler::toModel)
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()));
     }
 
     public ResearchPaper saveResearchPaper(ResearchPaper researchPaper) {
@@ -94,8 +101,15 @@ public class ResearchPaperService {
         logger.trace("Creating a new research paper");
         ResearchPaper researchPaper = convertResearchPaperDtoToResearchPaperEntity(authentication,
                 newResearchPaperRequestDTO);
+
+        researchPaper = saveResearchPaper(researchPaper);
+        notificationService.notifyLinks(
+                jwtService.extractId(authentication),
+                "A new Research Paper from your links",
+                linkTo(methodOn(
+                        ResearchPaperController.class).one(researchPaper.getId())));
         logger.debug("Saving the research paper");
-        return assembler.toModel(saveResearchPaper(researchPaper));
+        return assembler.toModel(researchPaper);
     }
 
     public EntityModel<ResearchPaper> updateResearchPaper(Long researchPaperId,
@@ -161,12 +175,55 @@ public class ResearchPaperService {
         logger.debug("Deleting the research paper");
     }
 
+    EntityModel<ResearchPaper> requestAccessToResearchPaper(Long researchPaperId,
+            Authentication authentication) {
+        logger.debug("requesting access to ResearchPaper with id: " + researchPaperId);
+        User user = jwtService.getUser(authentication);
+        logger.trace("Got user with id: " + user.getId());
+        ResearchPaper researchPaper = researchPaperRepository.findById(researchPaperId)
+                .orElseThrow(() -> new ResearchPaperNotFoundException(
+                        "The ResearchPaper with id:" + researchPaperId + " is not found",
+                        HttpStatus.NOT_FOUND));
+        UserResearchPaperRequest urpr = userResearchPaperRequestRepository.findByUserAndResearchPaper(user,
+                researchPaper);
+        if (urpr != null)
+            throw new UserNotFoundException("A request is already has been made", HttpStatus.CONFLICT);
+        UserResearchPaperRequest userResearchPaperRequest = new UserResearchPaperRequest();
+        userResearchPaperRequest.setId(new ResearchPaperRequestKey(user.getId(), researchPaperId));
+        userResearchPaperRequest.setUser(user);
+        userResearchPaperRequest.setResearchPaper(researchPaper);
+        userResearchPaperRequest.setAccepted(false);
+        userResearchPaperRequestRepository.save(userResearchPaperRequest);
+        return assembler.toModel(researchPaper);
+
+    }
+
+    EntityModel<ResearchPaper> respondToRequest(Boolean answer, Long researchPaperId, Long userId) {
+        ResearchPaper researchPaper = researchPaperRepository.findById(researchPaperId)
+                .orElseThrow(() -> new ResearchPaperNotFoundException(researchPaperId));
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
+        UserResearchPaperRequest urpr = userResearchPaperRequestRepository.findByUserAndResearchPaper(user,
+                researchPaper);
+        if (urpr == null)
+            throw new ResearchPaperNotFoundException("Requset is not foung for user with id: " + userId
+                    + " and researchpaper with id: " + researchPaperId, HttpStatus.NOT_FOUND);
+        if (!answer)
+            userResearchPaperRequestRepository.delete(urpr);
+
+        else {
+            urpr.setAccepted(true);
+            userResearchPaperRequestRepository.save(urpr);
+
+        }
+        return assembler.toModel(researchPaper);
+    }
+
     public EntityModel<ResearchPaper> validate(Long researchPaperId, Authentication authentication) {
         logger.trace("Validating the research paper");
         ResearchPaper researchPaper = researchPaperRepository.findById(researchPaperId)
                 .orElseThrow(
                         () -> new ResearchPaperNotFoundException(researchPaperId, HttpStatus.UNPROCESSABLE_ENTITY));
-        User organization = userRepository.findById(jwtService.extractId(authentication))
+        User organization = userRepository.findByIdAndRole(jwtService.extractId(authentication), Role.ORGANIZATION)
                 .orElseThrow(() -> new OrganizationNotFoundException("Organization Not Found", HttpStatus.NOT_FOUND));
         logger.trace("Adding the organization to the research paper's validatedBy list");
         researchPaper.getValidatedBy().add(organization);

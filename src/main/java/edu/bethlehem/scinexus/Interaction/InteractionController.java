@@ -1,66 +1,52 @@
 package edu.bethlehem.scinexus.Interaction;
 
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
-
-import java.util.List;
-import java.util.stream.Collectors;
+import edu.bethlehem.scinexus.JPARepository.InteractionRepository;
 import org.springframework.http.*;
 import org.springframework.security.core.Authentication;
-import org.apache.catalina.connector.Response;
 import org.springframework.hateoas.*;
 import org.springframework.web.bind.annotation.*;
 
-import edu.bethlehem.scinexus.Journal.Journal;
-import edu.bethlehem.scinexus.Journal.JournalNotFoundException;
-import edu.bethlehem.scinexus.Journal.JournalRepository;
-import edu.bethlehem.scinexus.Opinion.Opinion;
-import edu.bethlehem.scinexus.Opinion.OpinionRepository;
-import edu.bethlehem.scinexus.User.User;
-import edu.bethlehem.scinexus.User.UserNotFoundException;
-import edu.bethlehem.scinexus.User.UserRepository;
+import edu.bethlehem.scinexus.JPARepository.JournalRepository;
+import edu.bethlehem.scinexus.JPARepository.OpinionRepository;
+import edu.bethlehem.scinexus.JPARepository.UserRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("interactions")
+@RequestMapping("/interactions")
 public class InteractionController {
 
-  private final InteractionRepository repository;
-  private final UserRepository userRepository;
-  private final JournalRepository journalRepository;
-  private final OpinionRepository opinionRepository;
-  private final InteractionModelAssembler assembler;
-  private final InteractionService service;
+private final InteractionService service;
 
   @GetMapping("/{interactionId}")
-  EntityModel<Interaction> one(@PathVariable Long interactionId) {
+ public ResponseEntity<EntityModel<Interaction>> one(@PathVariable Long interactionId) {
     // TBC
-    return service.findInteractionById(interactionId);
+    return ResponseEntity.ok(service.findInteractionById(interactionId));
   }
 
   @GetMapping()
-  CollectionModel<EntityModel<Interaction>> all() {
+  public ResponseEntity<CollectionModel<EntityModel<Interaction>>> all() {
     // TBC
-    return service.findAllInteractions();
+    return ResponseEntity.ok(service.findAllInteractions());
   }
 
   @PatchMapping("/{id}")
-  public ResponseEntity<?> updateUserPartially(@PathVariable(value = "id") Long interactionId,
+  public ResponseEntity<?> updateInteractionPartially(@PathVariable(value = "id") Long interactionId,
       @Valid @RequestBody InteractionRequestDTO newInteraction) {
     return ResponseEntity.ok().body(service.updateInteraction(interactionId, newInteraction));
   }
 
   @DeleteMapping("/{id}")
-  ResponseEntity<?> deleteInteraction(@PathVariable Long id) {
-    repository.deleteById(id);
+  ResponseEntity<?> deleteInteraction(@PathVariable Long id, Authentication authentication) {
+    service.deleteInteraction(id, authentication);
     return ResponseEntity.noContent().build();
 
   }
 
   @PostMapping("/opinion/{opinionId}")
   public ResponseEntity<?> addOpinionInteraction(
-      @PathVariable(value = "journalId") Long opinionId,
+      @PathVariable(value = "opinionId") Long opinionId,
       @RequestBody InteractionRequestDTO interaction,
       Authentication authentication) {
 
@@ -74,4 +60,5 @@ public class InteractionController {
       Authentication authentication) {
     return ResponseEntity.ok(service.addJournalInteraction(journalId, interaction, authentication));
   }
+
 }

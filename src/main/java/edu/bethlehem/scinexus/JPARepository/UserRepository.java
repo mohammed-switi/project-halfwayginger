@@ -1,5 +1,8 @@
-package edu.bethlehem.scinexus.User;
+package edu.bethlehem.scinexus.JPARepository;
 
+import edu.bethlehem.scinexus.User.Role;
+import edu.bethlehem.scinexus.User.Status;
+import edu.bethlehem.scinexus.User.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -14,7 +17,13 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findByEmail(String email);
 
+
+    Optional<User> findByStatus(Status status);
+    Optional<User> findById(Long id);
+
     List<User> findAllByRole(Role role);
+
+    List<User> findAll();
 
     Optional<User> findByIdAndRole(Long id, Role role);
 

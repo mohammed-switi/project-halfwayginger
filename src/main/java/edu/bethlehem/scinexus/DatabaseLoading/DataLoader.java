@@ -1,21 +1,24 @@
 package edu.bethlehem.scinexus.DatabaseLoading;
 
-import edu.bethlehem.scinexus.LoggingController;
 import edu.bethlehem.scinexus.Article.Article;
-import edu.bethlehem.scinexus.Article.ArticleRepository;
+import edu.bethlehem.scinexus.JPARepository.ArticleRepository;
 import edu.bethlehem.scinexus.Interaction.Interaction;
-import edu.bethlehem.scinexus.Interaction.InteractionRepository;
+import edu.bethlehem.scinexus.JPARepository.InteractionRepository;
 import edu.bethlehem.scinexus.Journal.Journal;
-import edu.bethlehem.scinexus.Journal.JournalRepository;
+import edu.bethlehem.scinexus.JPARepository.JournalRepository;
 import edu.bethlehem.scinexus.Opinion.Opinion;
-import edu.bethlehem.scinexus.Opinion.OpinionRepository;
-import edu.bethlehem.scinexus.User.UserRepository;
+import edu.bethlehem.scinexus.JPARepository.OpinionRepository;
+import edu.bethlehem.scinexus.Post.Post;
+import edu.bethlehem.scinexus.JPARepository.PostRepository;
+import edu.bethlehem.scinexus.JPARepository.UserRepository;
+import edu.bethlehem.scinexus.UserLinks.UserLinks;
+import edu.bethlehem.scinexus.UserLinks.UserLinksService;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.PersistenceContext;
 import edu.bethlehem.scinexus.ResearchPaper.ResearchLanguage;
 import edu.bethlehem.scinexus.ResearchPaper.ResearchPaper;
-import edu.bethlehem.scinexus.ResearchPaper.ResearchPaperRepository;
+import edu.bethlehem.scinexus.JPARepository.ResearchPaperRepository;
+import edu.bethlehem.scinexus.JPARepository.UserLinksRepository;
 import edu.bethlehem.scinexus.User.OrganizationType;
 import edu.bethlehem.scinexus.User.Position;
 import edu.bethlehem.scinexus.User.Role;
@@ -42,7 +45,10 @@ public class DataLoader implements CommandLineRunner {
     private final JournalRepository journalRepository;
     private final OpinionRepository opinionRepository;
     private final InteractionRepository interactionRepository;
+    private final UserLinksRepository userLinksRepository;
+    private final UserLinksService ulService;
     Logger logger = LoggerFactory.getLogger(DataLoader.class);
+    private final PostRepository postRepository;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -55,19 +61,36 @@ public class DataLoader implements CommandLineRunner {
         logger.trace("Starting Random Data Generation: \n\n");
         long startTime = System.currentTimeMillis();
         generateUser();
-        generateRandomUsers(3);
+        generateRandomUsers(5);
         generateLinks();
         generateResearchPapers();
         generateArticles();
         generateOpinions();
         generateInteractions();
+        generatePosts();
 
         long endTime = System.currentTimeMillis();
         long totalTime = endTime - startTime;
         logger.info("Random Data Generation Completed with time of " + totalTime + " milliseconds");
     }
 
-    private void generateUser() {
+    public User generateUserAndSaveIt() {
+        logger.debug("Generating User and Saving it: \n\n");
+        User user = new User();
+        String username = dataGenerator.generateRandomRealUsername();
+        user.setFirstName(dataGenerator.generateRandomFirstName());
+        user.setLastName(dataGenerator.generateRandomLastName());
+        user.setUsername(username);
+        user.setEmail(dataGenerator.generateRandomEmail(username, dataGenerator.generateRandomCharacterName()));
+        user.setPassword(passwordEncoder.encode("Mohammed1234!"));
+        user.setPhoneNumber(dataGenerator.generateRandomPhoneNumber());
+        user.setRole((Math.random() < 0.5) ? Role.ACADEMIC : Role.ORGANIZATION);
+        user.setType(OrganizationType.BUSINESS);
+
+        return userRepository.save(user);
+    }
+
+    public void generateUser() {
         logger.debug("Generating base User and base Article: \n\n");
         User user = new User();
         user.setFirstName("Mohammed");
@@ -99,22 +122,23 @@ public class DataLoader implements CommandLineRunner {
         // it works nvm
 
         List<User> users = userRepository.findAll();
-
+        // List<UserLinks> uls = new ArrayList<UserLinks>();
         Random random = new Random();
 
         logger.trace("Generating Random Users' links for " + users.size() + " users");
-        for (User user : users) {
-            for (int i = 0; i < 3; i++) {
+        for (User linkFrom : users) {
+            for (int i = 0; i < 5; i++) {
                 User linkTo = users.get(random.nextInt(users.size()));
-                if (!user.getLinks().contains(linkTo) && user != linkTo) {
 
-                    if (random.nextInt(2) == 0)
-                        user.getLinks().add(linkTo);
-                    else
-                        user.getLinks().add(linkTo);
+                if (!ulService.areTheyLinked(linkFrom, linkTo) && linkFrom != linkTo) {
+                    UserLinks ul = new UserLinks(linkTo, linkFrom);
+                    if (random.nextInt(2) == 1)
+                        ul.setAccepted(true);
+                    userLinksRepository.save(ul);
                 }
             }
         }
+        // userLinksRepository.saveAll(uls);
         userRepository.saveAll(users);
         logger.debug("Saved Users' links for " + users.size() + " users");
 
@@ -237,7 +261,27 @@ public class DataLoader implements CommandLineRunner {
         logger.trace(researchPapers.size() + " Research Papers generated");
         // userRepository.saveAll(users);
         researchPaperRepository.saveAll(researchPapers);
-        logger.debug(researchPapers.size() + " Research Papers saved");
+
+    }
+
+    private void generatePosts() {
+        List<User> users = userRepository.findAll();
+        List<Post> posts = new ArrayList<>();
+        Random random = new Random();
+        for (User user : users) {
+            for (int i = 0; i < 2; i++) {
+
+                Post post = new Post(dataGenerator.generateRandomUniversityName(), user);
+                post.setInteractionsCount(0);
+                post.setOpinionsCount(0);
+                post.setVisibility(dataGenerator.generateRandomVisibility());
+                user.addJournal(post);
+
+                posts.add(post);
+            }
+        }
+        // userRepository.saveAll(users);
+        postRepository.saveAll(posts);
 
     }
 
@@ -249,7 +293,7 @@ public class DataLoader implements CommandLineRunner {
         List<Opinion> opinions = new ArrayList<>();
         Random random = new Random();
         for (Journal journal : journals) {
-            for (int j = 0; j < random.nextInt(10); j++) {
+            for (int j = 0; j < random.nextInt(5); j++) {
                 Opinion opinion = new Opinion(dataGenerator.generateRandomWords(), journal,
                         users.get(random.nextInt(users.size())));
 
@@ -263,7 +307,7 @@ public class DataLoader implements CommandLineRunner {
         opinionRepository.saveAll(opinions);
         List<Opinion> opinions2 = opinionRepository.findAll();
         for (Opinion opinion : opinions) {
-            for (int j = 0; j < random.nextInt(10); j++) {
+            for (int j = 0; j < random.nextInt(5); j++) {
                 Opinion reOpinion = new Opinion(dataGenerator.generateRandomWords(), opinion.getJournal(),
                         users.get(random.nextInt(users.size())));
 
@@ -293,7 +337,7 @@ public class DataLoader implements CommandLineRunner {
         List<Interaction> interactions = new ArrayList<>();
         Random random = new Random();
         for (Journal journal : journals) {
-            for (int j = 0; j < random.nextInt(10); j++) {
+            for (int j = 0; j < random.nextInt(5); j++) {
 
                 Interaction interaction = new Interaction(
                         dataGenerator.generateRandomInteractionType(), users.get(random.nextInt(users.size())),
@@ -305,7 +349,7 @@ public class DataLoader implements CommandLineRunner {
         logger.trace("generaterd " + interactions.size() + " Interactions for Journals");
 
         for (Opinion opinion : opinions) {
-            for (int j = 0; j < random.nextInt(10); j++) {
+            for (int j = 0; j < random.nextInt(5); j++) {
 
                 Interaction interaction = new Interaction(
                         dataGenerator.generateRandomInteractionType(), users.get(random.nextInt(users.size())),
@@ -323,4 +367,5 @@ public class DataLoader implements CommandLineRunner {
         interactionRepository.saveAll(interactions);
         logger.debug(interactions.size() + " Interactions generated and saved successfully");
     }
+
 }

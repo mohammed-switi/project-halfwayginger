@@ -1,28 +1,22 @@
 package edu.bethlehem.scinexus.Organization;
 
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
-
-import java.util.List;
-import java.util.stream.Collectors;
-
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.*;
-
+import org.springframework.security.core.Authentication;
 import org.springframework.hateoas.*;
 import org.springframework.web.bind.annotation.*;
 
 import edu.bethlehem.scinexus.User.User;
-import edu.bethlehem.scinexus.User.UserRepository;
+import edu.bethlehem.scinexus.JPARepository.UserRepository;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/organizations")
 public class OrganizationController {
 
-  private final UserRepository repository;
-  private final OrganizationModelAssembler assembler;
+
   private final OrganizationService service;
 
   @GetMapping("/{organizationId}")
@@ -35,23 +29,38 @@ public class OrganizationController {
     return service.findAllOrganizations();
   }
 
-  @PutMapping("/{id}")
-  ResponseEntity<?> editOrganization(@Valid @RequestBody OrganizationRequestDTO newOrganization,
-      @PathVariable Long id) {
-    return ResponseEntity.ok(service.updateOrganization(id, newOrganization));
-  }
+  // @PutMapping("/{id}")
+  // ResponseEntity<?> editOrganization(@Valid @RequestBody OrganizationRequestDTO
+  // newOrganization,
+  // @PathVariable Long id) {
+  // return ResponseEntity.ok(service.updateOrganization(id, newOrganization));
+  // }
 
   @PatchMapping("/{id}")
-  public ResponseEntity<?> updateUserPartially(@PathVariable(value = "id") Long organizationId,
-      @Valid @RequestBody OrganizationRequestPatchDTO newOrganization) {
-    return ResponseEntity.ok(service.updateOrganizationPartially(organizationId, newOrganization));
+  public ResponseEntity<?> updateOrganizationPartially(@PathVariable(value = "id") Long organizationId,
+       @RequestBody OrganizationRequestPatchDTO newOrganization) {
+    return new ResponseEntity<>(service.updateOrganizationPartially(organizationId, newOrganization),HttpStatus.CREATED);
+    //return ResponseEntity.ok(service.updateOrganizationPartially(organizationId, newOrganization));
   }
 
   @DeleteMapping("/{id}")
-  ResponseEntity<?> deleteOrganization(@PathVariable Long id) {
+  public ResponseEntity<?> deleteOrganization(@PathVariable Long id) {
     service.deleteOrganization(id);
 
     return ResponseEntity.noContent().build();
 
+  }
+
+  @DeleteMapping("/{academicId}/organization")
+  public ResponseEntity<?> removeUserFromOrganization(@PathVariable Long academicId, Authentication auth) {
+    service.removeAcademic(academicId, auth);
+    return ResponseEntity.noContent().build();
+
+  }
+
+  @PatchMapping("/{academicId}/organization")
+  public ResponseEntity<?> addUserToOrganization(@PathVariable Long academicId, Authentication authentication) {
+
+    return ResponseEntity.ok(service.addAcademic(authentication, academicId));
   }
 }

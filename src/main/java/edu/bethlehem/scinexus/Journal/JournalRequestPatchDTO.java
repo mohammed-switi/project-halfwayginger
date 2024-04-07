@@ -8,13 +8,15 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@SuperBuilder
 public class JournalRequestPatchDTO {
 
-    @NotBlank(message = "The Journal Content Shouldn't Be Empty")
+    // @NotBlank(message = "The Journal Content Shouldn't Be Empty")
     private String content;
 
     @Enumerated(EnumType.STRING)
