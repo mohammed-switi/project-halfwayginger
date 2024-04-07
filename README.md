@@ -45,8 +45,6 @@
   </ol>
 </details>
 
-<!-- ABOUT THE PROJECT -->
-
 ## About The Project
 
 SciNexus is a pioneering social media platform designed specifically for researchers and institutions passionate about advancing scientific knowledge. Our platform serves as a dynamic hub where scientists can communicate, collaborate, and exchange ideas seamlessly. From sharing groundbreaking discoveries to publishing research papers, SciNexus empowers scientists to connect with peers worldwide, fostering innovation and accelerating scientific progress.
@@ -55,9 +53,17 @@ At SciNexus, we prioritize security and confidentiality, ensuring that sensitive
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-##Documentation
+## Documentation
 
 You can access the API documentation through the Swagger-Ui [host]/swagger-ui/index.html
+
+it has an extensive documentation regarding how when and where to use the API.
+
+We have implemented RESTFull API and maintained the flow of instructions with the response itself.
+
+## Database Design
+
+![1712494870555](image/README/1712494870555.png)
 
 ### Built With
 
@@ -146,6 +152,7 @@ spring.datasource.password=1234
 - High security measuers
 - Bidierctional user linking (i.e. follow and follow back mechanism)
 - Push-notifications
+- Email Verification
 - And many more.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
