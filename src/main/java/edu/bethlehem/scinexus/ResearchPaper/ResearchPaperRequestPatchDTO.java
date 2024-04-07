@@ -8,9 +8,11 @@ import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
-@Builder
+@SuperBuilder
 @Data
+@NoArgsConstructor
 public class ResearchPaperRequestPatchDTO extends JournalRequestPatchDTO {
 
     @Enumerated(EnumType.STRING)

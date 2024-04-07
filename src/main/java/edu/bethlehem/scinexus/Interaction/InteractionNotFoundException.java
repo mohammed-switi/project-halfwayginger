@@ -8,4 +8,8 @@ public class InteractionNotFoundException extends GeneralException {
   public InteractionNotFoundException(long id, HttpStatus httpStatus) {
     super("Interaction With Id : " + id + ", is Not Found ", httpStatus);
   }
+
+  public InteractionNotFoundException(String message, HttpStatus httpStatus) {
+    super(message, httpStatus);
+  }
 }

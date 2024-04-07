@@ -7,12 +7,16 @@ import jakarta.validation.constraints.*;
 import lombok.*;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import lombok.experimental.SuperBuilder;
+
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.type.SqlTypes;
 
 import edu.bethlehem.scinexus.Interaction.Interaction;
@@ -32,6 +36,12 @@ public class Journal implements Serializable {
 
     @GeneratedValue(strategy = GenerationType.AUTO)
     private @Id Long id;
+
+    @CreationTimestamp
+    private LocalDateTime createDateTime;
+
+    @UpdateTimestamp
+    private LocalDateTime updateDateTime;
 
     @Min(value = 0)
     private Integer interactionsCount = 0;
@@ -76,11 +86,6 @@ public class Journal implements Serializable {
     @JoinColumn(name = "journal")
     @JsonBackReference
     private List<Media> medias;
-
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "reShare")
-    @JdbcTypeCode(SqlTypes.JSON)
-    private Journal reShare;
 
     // @ManyToMany(mappedBy = "contributors", fetch = FetchType.EAGER)
     // @JdbcTypeCode(SqlTypes.JSON)

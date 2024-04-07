@@ -28,28 +28,42 @@ public class PostController {
   }
 
   @GetMapping()
-  public CollectionModel<EntityModel<Post>> all() {
-    List<EntityModel<Post>> posts = postService.findAllPosts();
+  public ResponseEntity<CollectionModel<EntityModel<Post>>> all() {
+    CollectionModel<EntityModel<Post>> posts = postService.findAllPosts();
 
-    return CollectionModel.of(posts, linkTo(methodOn(PostController.class).all()).withSelfRel());
+    return ResponseEntity.ok(CollectionModel.of(posts, linkTo(methodOn(PostController.class).all()).withSelfRel()));
   }
 
   @PostMapping()
-  public ResponseEntity<?> createNewPost(Authentication authentication,
+  public ResponseEntity<EntityModel<Post>> createNewPost(Authentication authentication,
       @Valid @RequestBody @NotNull PostRequestDTO newPostRequestDTO) {
 
     EntityModel<Post> entityModel = postService.createPost(authentication, newPostRequestDTO);
-    return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
+    return new ResponseEntity<>(entityModel,HttpStatus.CREATED);
+    //This Line Is commented Because of an Issue in testing, but Fixed it with the previous line and both provides same result
+  //  return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
   }
 
-  @PutMapping("/{id}")
-  public ResponseEntity<?> editPost(@PathVariable @NotNull Long id,
-      @Valid @RequestBody @NotNull PostRequestDTO newPostRequestDTO) {
+  @PostMapping("/{journalId}/reshare")
+  public ResponseEntity<?> createNewPostReshare(Authentication authentication,
+      @Valid @RequestBody @NotNull PostRequestDTO newPostRequestDTO, @PathVariable Long journalId) {
 
-    EntityModel<Post> entityModel = postService.updatePost(id, newPostRequestDTO);
-
-    return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
+    EntityModel<Post> entityModel = postService.createResharePost(authentication, newPostRequestDTO, journalId);
+    return new ResponseEntity<>(entityModel,HttpStatus.CREATED);
+    //This Line Is commented Because of an Issue in testing, but Fixed it with the previous line and both provides same result
+//    return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
   }
+
+  // @PutMapping("/{id}")
+  // public ResponseEntity<?> editPost(@PathVariable @NotNull Long id,
+  // @Valid @RequestBody @NotNull PostRequestDTO newPostRequestDTO) {
+
+  // EntityModel<Post> entityModel = postService.updatePost(id,
+  // newPostRequestDTO);
+
+  // return
+  // ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
+  // }
 
   @PatchMapping("/{id}")
   public ResponseEntity<?> updatePostPartially(@PathVariable(value = "id") Long postId,
@@ -57,7 +71,9 @@ public class PostController {
       @RequestBody @NotNull PostRequestPatchDTO newPostRequestDTO) {
 
     EntityModel<Post> entityModel = postService.updatePostPartially(postId, newPostRequestDTO);
-    return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
+    return new ResponseEntity<>(entityModel,HttpStatus.CREATED);
+
+   // return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
   }
 
   @DeleteMapping("/{id}")

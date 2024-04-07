@@ -21,7 +21,11 @@ class AcademicModelAssembler implements RepresentationModelAssembler<User, Entit
                                                                 academic.getId()))
                                                 .withSelfRel(),
                                 linkTo(methodOn(AcademicController.class).all()).withRel(
-                                                "academics"));
+                                                "academics"),
+                                linkTo(methodOn(AcademicController.class).updateUserPartially(academic.getId(), null))
+                                                .withRel("update")
+
+                );
         }
 
 }

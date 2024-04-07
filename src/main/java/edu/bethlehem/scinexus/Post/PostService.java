@@ -1,8 +1,15 @@
 package edu.bethlehem.scinexus.Post;
 
+import edu.bethlehem.scinexus.Journal.Journal;
+import edu.bethlehem.scinexus.Journal.JournalController;
+import edu.bethlehem.scinexus.Journal.JournalNotFoundException;
+import edu.bethlehem.scinexus.Journal.Visibility;
+import edu.bethlehem.scinexus.JPARepository.JournalRepository;
 import edu.bethlehem.scinexus.JPARepository.PostRepository;
+import edu.bethlehem.scinexus.Notification.NotificationService;
 import edu.bethlehem.scinexus.User.UserService;
 import edu.bethlehem.scinexus.SecurityConfig.JwtService;
+import edu.bethlehem.scinexus.User.Role;
 import edu.bethlehem.scinexus.User.User;
 import edu.bethlehem.scinexus.User.UserNotFoundException;
 import edu.bethlehem.scinexus.JPARepository.UserRepository;
@@ -11,10 +18,14 @@ import lombok.RequiredArgsConstructor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 import java.lang.reflect.Method;
 import java.util.List;
@@ -26,10 +37,12 @@ import java.util.stream.Collectors;
 public class PostService {
 
     private final PostRepository postRepository;
+    private final JournalRepository journalRepository;
     private final UserRepository userRepository;
     private final PostModelAssembler assembler;
     private final JwtService jwtService;
     private final UserService userService;
+    private final NotificationService notificationService;
     Logger logger = LoggerFactory.getLogger(PostService.class);
 
     public Post convertPostDtoToPostEntity(Authentication authentication, PostRequestDTO postRequestDTO) {
@@ -62,13 +75,13 @@ public class PostService {
     }
 
     // We Should Specify An Admin Authority To get All Posts
-    public List<EntityModel<Post>> findAllPosts() {
+    public CollectionModel<EntityModel<Post>> findAllPosts() {
         logger.trace("Finding All Posts");
-        return postRepository
+        return CollectionModel.of(postRepository
                 .findAll()
                 .stream()
                 .map(assembler::toModel)
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()));
     }
 
     public Post savePost(Post post) {
@@ -80,7 +93,35 @@ public class PostService {
         logger.trace("Creating Post");
         Post newPost = convertPostDtoToPostEntity(authentication, newPostRequestDTO);
         logger.debug("Post Created");
-        return assembler.toModel(savePost(newPost));
+        newPost = savePost(newPost);
+        notificationService.notifyLinks(jwtService.extractId(authentication),
+                "Your Link have Posted a new Post ", linkTo(methodOn(
+                        JournalController.class).one(
+                                newPost.getId())));
+
+        return assembler.toModel(newPost);
+    }
+
+    public EntityModel<Post> createResharePost(Authentication authentication, PostRequestDTO newPostRequestDTO,
+            Long resharedJournal) {
+        logger.trace("Creating Post");
+        Post newPost = convertPostDtoToPostEntity(authentication, newPostRequestDTO);
+        logger.debug("Post Created");
+        newPost = savePost(newPost);
+        Journal journal = journalRepository.findById(resharedJournal)
+                .orElseThrow(() -> new JournalNotFoundException(resharedJournal));
+        if (journal.getVisibility() == Visibility.LINKS)
+            throw new JournalNotFoundException(resharedJournal);
+
+        notificationService.notifyLinks(jwtService.extractId(authentication),
+                "Your Link have Posted a new Post ", linkTo(methodOn(
+                        JournalController.class).one(
+                                newPost.getId())));
+        notificationService.notifyUser(journal.getPublisher(), "Someone Reshared your journal", linkTo(methodOn(
+                JournalController.class).one(
+                        newPost.getId())));
+        newPost.setReShare(journal);
+        return assembler.toModel(newPost);
     }
 
     public EntityModel<Post> updatePost(Long postId,

@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import edu.bethlehem.scinexus.DatabaseLoading.DataLoader;
@@ -34,17 +35,22 @@ public class OrganizationService {
     private final UserService userService;
     Logger logger = LoggerFactory.getLogger(DataLoader.class);
 
-    public User getUserById(long id) {
+    private User getOrganization(Long organizationId) {
+        return userRepository.findByIdAndRole(organizationId, Role.ORGANIZATION)
+                .orElseThrow(() -> new OrganizationNotFoundException(organizationId));
 
-        return userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException("User Not Found", HttpStatus.NOT_FOUND));
+    }
+
+    private User getOrganization(Authentication auth) {
+        Long organizationId = jwtService.extractId(auth);
+        return userRepository.findByIdAndRole(organizationId, Role.ORGANIZATION)
+                .orElseThrow(() -> new OrganizationNotFoundException(organizationId));
 
     }
 
     public EntityModel<User> findOrganizationById(Long organizationId) {
         logger.trace("Finding Organization by ID");
-        User organization = userRepository.findByIdAndRole(organizationId, Role.ORGANIZATION)
-                .orElseThrow(() -> new OrganizationNotFoundException(organizationId));
+        User organization = getOrganization(organizationId);
 
         return assembler.toModel(organization);
     }
@@ -63,8 +69,7 @@ public class OrganizationService {
     public EntityModel<User> updateOrganization(Long organizationId,
             OrganizationRequestDTO newOrganizationRequestDTO) {
         logger.trace("Updating Organization");
-        User organization = userRepository.findById(organizationId)
-                .orElseThrow(() -> new OrganizationNotFoundException(organizationId));
+        User organization = getOrganization(organizationId);
 
         try {
             for (Method method : OrganizationRequestDTO.class.getMethods()) {
@@ -86,8 +91,7 @@ public class OrganizationService {
     public EntityModel<User> updateOrganizationPartially(Long organizationId,
             OrganizationRequestPatchDTO newOrganizationRequestDTO) {
         logger.trace("Partially Updating Organization");
-        User organization = userRepository.findById(organizationId)
-                .orElseThrow(() -> new OrganizationNotFoundException(organizationId, HttpStatus.UNPROCESSABLE_ENTITY));
+        User organization = getOrganization(organizationId);
 
         try {
             for (Method method : OrganizationRequestPatchDTO.class.getMethods()) {
@@ -105,6 +109,31 @@ public class OrganizationService {
         }
 
         return assembler.toModel(userRepository.save(organization));
+
+    }
+
+    public EntityModel<User> addAcademic(Authentication auth, Long academicId) {
+        User organization = getOrganization(auth);
+        User academic = userRepository.findByIdAndRole(academicId, Role.ACADEMIC)
+                .orElseThrow(() -> new UserNotFoundException(academicId));
+        if (academic.getOrganization() != null)
+            throw new UserNotFoundException("Academic is Already accosiated with an organization", HttpStatus.CONFLICT);
+        academic.setOrganization(organization);
+        return assembler.toModel(userRepository.save(academic));
+
+    }
+
+    public void removeAcademic(Long academicId, Authentication auth) {
+        User organization = getOrganization(auth);
+        User academic = userRepository.findById(academicId)
+                .orElseThrow(() -> new UserNotFoundException(academicId));
+        if (academic.getOrganization() == null)
+            throw new UserNotFoundException("Academic is not accosiated with any organization", HttpStatus.CONFLICT);
+        if (academic.getOrganization().getId() == organization.getId())
+            throw new UserNotFoundException("Academic is not accosiated with your organization", HttpStatus.FORBIDDEN);
+
+        academic.setOrganization(null);
+      assembler.toModel(userRepository.save(academic));
 
     }
 

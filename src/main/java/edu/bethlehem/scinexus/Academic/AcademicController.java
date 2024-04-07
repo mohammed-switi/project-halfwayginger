@@ -16,39 +16,42 @@ import edu.bethlehem.scinexus.JPARepository.UserRepository;
 @RequestMapping("/academics")
 public class AcademicController {
 
-  private final UserRepository repository;
-  private final AcademicModelAssembler assembler;
   private final AcademicService service;
 
   // Gets one Academic by id
   @GetMapping("/{academicId}")
-  EntityModel<User> one(@PathVariable Long academicId) throws AcademicNotFoundException {
-    return service.findAcademicById(academicId);
+  public ResponseEntity<EntityModel<User>> one(@PathVariable Long academicId) throws AcademicNotFoundException {
+    return ResponseEntity.ok(service.findAcademicById(academicId));
   }
 
-  @GetMapping()
-  CollectionModel<EntityModel<User>> all() {
-    return service.findAllAcademics();
+   public @GetMapping()
+    ResponseEntity<CollectionModel<EntityModel<User>>> all() {
+
+    return ResponseEntity.ok(service.findAllAcademics());
   }
 
-  @PutMapping("/{id}")
-  ResponseEntity<?> editAcademic(@Valid @RequestBody AcademicRequestDTO newAcademic, @PathVariable Long id) {
+  // No need for any PUT Method
+  // @PutMapping("/{id}")
+  // ResponseEntity<?> editAcademic(@Valid @RequestBody AcademicRequestDTO
+  // newAcademic, @PathVariable Long id) {
 
-    return ResponseEntity.ok(service.updateAcademic(id, newAcademic));
-  }
+  // return ResponseEntity.ok(service.updateAcademic(id, newAcademic));
+  // }
 
   @PatchMapping("/{id}")
   public ResponseEntity<?> updateUserPartially(@PathVariable(value = "id") Long academicId,
       @RequestBody AcademicRequestPatchDTO newAcademic) {
-    return ResponseEntity.ok(service.updateAcademicPartially(academicId, newAcademic));
+    return new ResponseEntity<>(service.updateAcademicPartially(academicId, newAcademic),HttpStatus.CREATED);
   }
 
-  @DeleteMapping("/{id}")
-  ResponseEntity<?> deleteAcademic(@PathVariable Long id) throws AcademicNotFoundException {
+  // We will be deleteing a user
+  // @DeleteMapping("/{id}")
+  // ResponseEntity<?> deleteAcademic(@PathVariable Long id) throws
+  // AcademicNotFoundException {
 
-    service.deleteAcademic(id);
+  // service.deleteAcademic(id);
 
-    return ResponseEntity.noContent().build();
+  // return ResponseEntity.noContent().build();
 
-  }
+  // }
 }

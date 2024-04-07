@@ -14,44 +14,39 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("interactions")
+@RequestMapping("/interactions")
 public class InteractionController {
 
-  private final InteractionRepository repository;
-  private final UserRepository userRepository;
-  private final JournalRepository journalRepository;
-  private final OpinionRepository opinionRepository;
-  private final InteractionModelAssembler assembler;
-  private final InteractionService service;
+private final InteractionService service;
 
   @GetMapping("/{interactionId}")
-  EntityModel<Interaction> one(@PathVariable Long interactionId) {
+ public ResponseEntity<EntityModel<Interaction>> one(@PathVariable Long interactionId) {
     // TBC
-    return service.findInteractionById(interactionId);
+    return ResponseEntity.ok(service.findInteractionById(interactionId));
   }
 
   @GetMapping()
-  CollectionModel<EntityModel<Interaction>> all() {
+  public ResponseEntity<CollectionModel<EntityModel<Interaction>>> all() {
     // TBC
-    return service.findAllInteractions();
+    return ResponseEntity.ok(service.findAllInteractions());
   }
 
   @PatchMapping("/{id}")
-  public ResponseEntity<?> updateUserPartially(@PathVariable(value = "id") Long interactionId,
+  public ResponseEntity<?> updateInteractionPartially(@PathVariable(value = "id") Long interactionId,
       @Valid @RequestBody InteractionRequestDTO newInteraction) {
     return ResponseEntity.ok().body(service.updateInteraction(interactionId, newInteraction));
   }
 
   @DeleteMapping("/{id}")
-  ResponseEntity<?> deleteInteraction(@PathVariable Long id) {
-    repository.deleteById(id);
+  ResponseEntity<?> deleteInteraction(@PathVariable Long id, Authentication authentication) {
+    service.deleteInteraction(id, authentication);
     return ResponseEntity.noContent().build();
 
   }
 
   @PostMapping("/opinion/{opinionId}")
   public ResponseEntity<?> addOpinionInteraction(
-      @PathVariable(value = "journalId") Long opinionId,
+      @PathVariable(value = "opinionId") Long opinionId,
       @RequestBody InteractionRequestDTO interaction,
       Authentication authentication) {
 
@@ -65,4 +60,5 @@ public class InteractionController {
       Authentication authentication) {
     return ResponseEntity.ok(service.addJournalInteraction(journalId, interaction, authentication));
   }
+
 }

@@ -6,7 +6,16 @@ import edu.bethlehem.scinexus.User.UserRequestPatchDTO;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
+@SuperBuilder
+@NoArgsConstructor
+@Data
+@AllArgsConstructor
 public class AcademicRequestPatchDTO extends UserRequestPatchDTO {
 
     @NotBlank(message = "Education Shouldn't be Empty")

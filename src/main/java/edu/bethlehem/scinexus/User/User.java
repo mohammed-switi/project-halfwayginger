@@ -13,12 +13,17 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import edu.bethlehem.scinexus.SecurityConfig.UserDetailsImpl;
+import edu.bethlehem.scinexus.UserLinks.UserLinks;
+import edu.bethlehem.scinexus.UserResearchPaper.UserResearchPaperRequest;
 import edu.bethlehem.scinexus.Conditional.Conditional;
 import edu.bethlehem.scinexus.Journal.Journal;
 import edu.bethlehem.scinexus.Media.Media;
 import edu.bethlehem.scinexus.Notification.Notification;
 import edu.bethlehem.scinexus.ResearchPaper.ResearchPaper;
+
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.type.SqlTypes;
 
 import org.springframework.security.core.GrantedAuthority;
@@ -26,11 +31,11 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import javax.annotation.Nullable;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 // @Entity
 // @Table(name = "_user")
-
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -40,6 +45,7 @@ import java.util.*;
 @Builder
 @Getter
 @Setter
+@ToString
 @Conditional(selected = "role", values = { "ACADEMIC" }, required = {
         "education", "badge", "position" })
 @Conditional(selected = "role", values = { "ORGANIZATION" }, required = {
@@ -52,11 +58,16 @@ public class User implements UserDetailsImpl {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    @CreationTimestamp
+    private LocalDateTime createDateTime;
+
+    @UpdateTimestamp
+    private LocalDateTime updateDateTime;
+
     @NotNull(message = "First Name is mandatory")
     @NotBlank(message = "First Name is mandatory")
     @Size(min = 2, max = 30, message = "First Name must be between 2 and 30 Characters")
     private String firstName;
-
 
     @Enumerated(EnumType.STRING)
     private Status status;
@@ -71,8 +82,6 @@ public class User implements UserDetailsImpl {
     @NotBlank(message = "Username is mandatory")
     @Size(min = 1, max = 50)
     private String username;
-
-
 
     @NotNull(message = "Email is mandatory")
     @NotBlank(message = "Email Name is mandatory")
@@ -126,9 +135,9 @@ public class User implements UserDetailsImpl {
     @Size(max = 320)
     private String fieldOfWork;
 
-//    @NotNull
+    // @NotNull
     private Boolean locked;
-//    @NotNull
+    // @NotNull
     private Boolean enabled;
 
     @JdbcTypeCode(SqlTypes.JSON)
@@ -136,7 +145,7 @@ public class User implements UserDetailsImpl {
 
     @NotNull
     @Enumerated(EnumType.STRING)
-
+    @Column(name = "role", nullable = false)
     private Role role;
 
     @OneToMany(fetch = FetchType.EAGER)
@@ -145,31 +154,17 @@ public class User implements UserDetailsImpl {
     @JsonBackReference
     private Set<Journal> journals = new HashSet<Journal>();
 
-    @OneToMany(fetch = FetchType.EAGER)
-    @JoinColumn(name = "notifications")
-    @JdbcTypeCode(SqlTypes.JSON)
-    @JsonIgnore
-    private List<Notification> notifications;
-
+    // @OneToMany(fetch = FetchType.EAGER)
+    // @JoinColumn(name = "notifications")
+    // @JdbcTypeCode(SqlTypes.JSON)
+    // @JsonIgnore
+    // private List<Notification> notifications;
 
     @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-            name = "journal_user_contributors",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "journal_id")
-    )
+    @JoinTable(name = "journal_user_contributors", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "journal_id"))
     @JsonBackReference
 
     private Set<Journal> contributedJournals = new HashSet<>();
-
-
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "user_link_user", joinColumns = @JoinColumn(name = "linkFrom"), inverseJoinColumns = @JoinColumn(name = "LinkTo"))
-    @JdbcTypeCode(SqlTypes.JSON)
-    @JsonIgnore
-    private List<User> links;
-
-
 
     // Academic Specific Fields
     private String badge;
@@ -179,15 +174,16 @@ public class User implements UserDetailsImpl {
     @Enumerated(EnumType.STRING)
     private Position position;
 
-    @OneToOne
+    @ManyToOne
     @JdbcTypeCode(SqlTypes.JSON)
-    @JoinColumn(name = "id")
+    @JoinColumn(name = "organizationId")
     @Nullable
     @JsonIgnore
     private User organization;
 
-    @ManyToMany(mappedBy = "requestsForAccess")
-    List<ResearchPaper> requestsResearchPapers;
+    @OneToMany(mappedBy = "user")
+    @JsonIgnore
+    List<UserResearchPaperRequest> requestsResearchPapers;
 
     // Organization Specific Fields
     @Enumerated(EnumType.STRING)
@@ -202,13 +198,13 @@ public class User implements UserDetailsImpl {
     @ManyToMany(mappedBy = "validatedBy")
     List<ResearchPaper> validated;
 
-    public User(String firstName, String username, String password, String email,Boolean locked, Boolean enabled) {
+    public User(String firstName, String username, String password, String email, Boolean locked, Boolean enabled) {
         this.firstName = firstName;
         this.username = username;
         this.password = password;
         this.email = email;
-        this.locked=locked;
-        this.enabled=enabled;
+        this.locked = locked;
+        this.enabled = enabled;
 
     }
 
@@ -240,7 +236,7 @@ public class User implements UserDetailsImpl {
     }
 
     @Override
-   // @JsonIgnore
+    // @JsonIgnore
     public boolean isAccountNonLocked() {
         return true;
     }
@@ -252,7 +248,7 @@ public class User implements UserDetailsImpl {
     }
 
     @Override
-   // @JsonIgnore
+    // @JsonIgnore
     public boolean isEnabled() {
         return true;
     }
@@ -261,6 +257,5 @@ public class User implements UserDetailsImpl {
     public Long getId() {
         return id;
     }
-
 
 }
