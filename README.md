@@ -173,7 +173,7 @@ Copyright (c) 2025 SciNexus
 
 All rights reserved.
 
-Redistribution and use in source and binary forms, with or without modification, are not permitted. This software and associated documentation files (the "Software") may only be used under the terms and conditions defined by [fullname]. Unauthorized reproduction, distribution, or use of the Software or any part thereof is strictly prohibited and may result in severe civil and criminal penalties.
+Redistribution and use in source and binary forms, with or without modification, are not permitted. This software and associated documentation files (the "Software") may only be used under the terms and conditions defined by SciNexus Co. Unauthorized reproduction, distribution, or use of the Software or any part thereof is strictly prohibited and may result in severe civil and criminal penalties.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT, OR OTHERWISE, ARISING FROM, OUT OF, OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
