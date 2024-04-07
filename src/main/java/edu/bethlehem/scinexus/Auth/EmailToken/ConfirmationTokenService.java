@@ -1,5 +1,6 @@
 package edu.bethlehem.scinexus.Auth.EmailToken;
 
+import edu.bethlehem.scinexus.JPARepository.ConfirmationTokenRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 

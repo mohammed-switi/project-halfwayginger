@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.util.JSONPObject;
+import edu.bethlehem.scinexus.Opinion.Opinion;
 import jakarta.persistence.*;
 
 import jakarta.validation.constraints.NotBlank;
@@ -48,6 +49,8 @@ import java.util.*;
         "education", "badge", "position" })
 @Conditional(selected = "role", values = { "ORGANIZATION" }, required = {
         "type" })
+@Table(name = "_user") // Specify the custom table name here
+
 public class User implements UserDetailsImpl {
 
     @Id
@@ -64,6 +67,9 @@ public class User implements UserDetailsImpl {
     @NotBlank(message = "First Name is mandatory")
     @Size(min = 2, max = 30, message = "First Name must be between 2 and 30 Characters")
     private String firstName;
+
+    @Enumerated(EnumType.STRING)
+    private Status status;
 
     @NotNull(message = "Last Name is mandatory")
     @NotBlank(message = "Last Name is mandatory")
@@ -138,7 +144,7 @@ public class User implements UserDetailsImpl {
 
     @NotNull
     @Enumerated(EnumType.STRING)
-
+    @Column(name = "role", nullable = false)
     private Role role;
 
     @OneToMany(fetch = FetchType.EAGER)
@@ -156,6 +162,7 @@ public class User implements UserDetailsImpl {
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "journal_user_contributors", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "journal_id"))
     @JsonBackReference
+
     private Set<Journal> contributedJournals = new HashSet<>();
 
     // Academic Specific Fields

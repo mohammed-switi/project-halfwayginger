@@ -1,5 +1,6 @@
 package edu.bethlehem.scinexus.Journal;
 
+import edu.bethlehem.scinexus.JPARepository.JournalRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -12,9 +13,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import edu.bethlehem.scinexus.File.FileStorageService;
-import edu.bethlehem.scinexus.Interaction.InteractionRepository;
+import edu.bethlehem.scinexus.JPARepository.InteractionRepository;
 import edu.bethlehem.scinexus.Media.Media;
-import edu.bethlehem.scinexus.User.UserRepository;
+import edu.bethlehem.scinexus.JPARepository.UserRepository;
 
 @RestController
 @RequiredArgsConstructor

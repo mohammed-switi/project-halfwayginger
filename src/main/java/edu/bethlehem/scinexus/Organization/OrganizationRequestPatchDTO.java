@@ -19,7 +19,7 @@ import lombok.NoArgsConstructor;
 public class OrganizationRequestPatchDTO extends UserRequestDTO {
 
     @Enumerated(EnumType.STRING)
-    @NotBlank(message = "The Organization Type Must Be Determined")
+    // @NotBlank(message = "The Organization Type Must Be Determined")
     // @NotNull(message = "The Organization Type Must Be Determined")
     private OrganizationType type;
 

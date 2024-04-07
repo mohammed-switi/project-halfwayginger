@@ -1,12 +1,13 @@
 package edu.bethlehem.scinexus.Opinion;
 
 import edu.bethlehem.scinexus.DatabaseLoading.DataLoader;
+import edu.bethlehem.scinexus.JPARepository.OpinionRepository;
+import edu.bethlehem.scinexus.JPARepository.UserRepository;
 import edu.bethlehem.scinexus.Journal.JournalNotFoundException;
-import edu.bethlehem.scinexus.Journal.JournalRepository;
+import edu.bethlehem.scinexus.SecurityConfig.JwtService;
+import edu.bethlehem.scinexus.JPARepository.JournalRepository;
 import edu.bethlehem.scinexus.User.User;
 import edu.bethlehem.scinexus.User.UserNotFoundException;
-import edu.bethlehem.scinexus.User.UserRepository;
-import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
@@ -16,10 +17,7 @@ import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,6 +28,7 @@ public class OpinionService {
 
     private final JournalRepository journalRepository;
     private final OpinionRepository opinionRepository;
+    private final JwtService jwtService;
     private final UserRepository userRepository;
     private final OpinionModelAssembler assembler;
     Logger logger = LoggerFactory.getLogger(DataLoader.class);
@@ -40,10 +39,7 @@ public class OpinionService {
                 .content(opinionDTO.getContent())
                 .journal(journalRepository.findById(opinionDTO.getJournalId())
                         .orElseThrow(() -> new JournalNotFoundException(opinionDTO.getJournalId())))
-                .opinionOwner(userRepository.findById(((User) auth.getPrincipal()).getId())
-                        .orElseThrow(() -> new UserNotFoundException(
-                                ((User) auth.getPrincipal())
-                                        .getId())))
+                .opinionOwner(jwtService.getUser(auth))
                 .build();
 
     }

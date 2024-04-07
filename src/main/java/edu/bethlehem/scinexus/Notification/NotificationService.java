@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import edu.bethlehem.scinexus.JPARepository.NotificationRepository;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
@@ -21,16 +22,14 @@ import edu.bethlehem.scinexus.Organization.OrganizationNotFoundException;
 import edu.bethlehem.scinexus.ResearchPaper.ResearchPaperService;
 import edu.bethlehem.scinexus.Notification.Notification;
 import edu.bethlehem.scinexus.Notification.NotificationNotFoundException;
-import edu.bethlehem.scinexus.Notification.NotificationRepository;
+import edu.bethlehem.scinexus.JPARepository.NotificationRepository;
 import edu.bethlehem.scinexus.Notification.NotificationRequestDTO;
 import edu.bethlehem.scinexus.SecurityConfig.JwtService;
 import edu.bethlehem.scinexus.User.User;
 import edu.bethlehem.scinexus.User.UserNotFoundException;
-import edu.bethlehem.scinexus.User.UserRepository;
+import edu.bethlehem.scinexus.JPARepository.UserRepository;
 import edu.bethlehem.scinexus.UserLinks.UserLinks;
-import edu.bethlehem.scinexus.UserLinks.UserLinksRepository;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
+import edu.bethlehem.scinexus.JPARepository.UserLinksRepository;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
 import reactor.core.scheduler.Schedulers;
@@ -62,7 +61,7 @@ public class NotificationService {
     }
 
     public User getUserById(Authentication auth) {
-        Long id = ((User) auth.getPrincipal()).getId();
+        Long id = jwtService.extractId(auth);
         return userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("User Not Found", HttpStatus.NOT_FOUND));
 
@@ -114,8 +113,7 @@ public class NotificationService {
     // }
 
     private List<Notification> getNotifs(Authentication auth) {
-        User user = userRepository.findById(((User) auth.getPrincipal()).getId())
-                .orElseThrow(() -> new UserNotFoundException("user not found", HttpStatus.NOT_FOUND));
+        User user = jwtService.getUser(auth);
         var notifs = notificationRepository.findByUserAndStatus(user, Status.UNSEEN);
         notifs.forEach(x -> x.setStatus(Status.SENT));
         notificationRepository.saveAll(notifs);
@@ -123,7 +121,7 @@ public class NotificationService {
     }
 
     public Flux<ServerSentEvent<List<Notification>>> getNotificationsByUserToID(Authentication auth) {
-        Long userID = ((User) auth.getPrincipal()).getId();
+        Long userID = jwtService.extractId(auth);
         if (userID != null) {
             return Flux.interval(Duration.ofSeconds(1))
                     .publishOn(Schedulers.boundedElastic())

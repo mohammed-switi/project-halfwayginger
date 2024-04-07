@@ -1,5 +1,6 @@
-package edu.bethlehem.scinexus.Interaction;
+package edu.bethlehem.scinexus.JPARepository;
 
+import edu.bethlehem.scinexus.Interaction.Interaction;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import edu.bethlehem.scinexus.Journal.Journal;

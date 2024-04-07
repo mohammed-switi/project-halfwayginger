@@ -1,21 +1,18 @@
 package edu.bethlehem.scinexus.Post;
 
-import edu.bethlehem.scinexus.Auth.UserNotAuthorizedException;
-import edu.bethlehem.scinexus.DatabaseLoading.DataLoader;
 import edu.bethlehem.scinexus.Journal.Journal;
 import edu.bethlehem.scinexus.Journal.JournalController;
 import edu.bethlehem.scinexus.Journal.JournalNotFoundException;
-import edu.bethlehem.scinexus.Journal.JournalRepository;
 import edu.bethlehem.scinexus.Journal.Visibility;
+import edu.bethlehem.scinexus.JPARepository.JournalRepository;
+import edu.bethlehem.scinexus.JPARepository.PostRepository;
 import edu.bethlehem.scinexus.Notification.NotificationService;
 import edu.bethlehem.scinexus.User.UserService;
 import edu.bethlehem.scinexus.SecurityConfig.JwtService;
 import edu.bethlehem.scinexus.User.Role;
 import edu.bethlehem.scinexus.User.User;
 import edu.bethlehem.scinexus.User.UserNotFoundException;
-import edu.bethlehem.scinexus.User.UserRepository;
-import edu.bethlehem.scinexus.User.UserRequestDTO;
-import edu.bethlehem.scinexus.User.UserRequestPatchDTO;
+import edu.bethlehem.scinexus.JPARepository.UserRepository;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
@@ -31,7 +28,6 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 import java.lang.reflect.Method;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -97,7 +93,7 @@ public class PostService {
         Post newPost = convertPostDtoToPostEntity(authentication, newPostRequestDTO);
         logger.debug("Post Created");
         newPost = savePost(newPost);
-        notificationService.notifyLinks(((User) authentication.getPrincipal()).getId(),
+        notificationService.notifyLinks(jwtService.extractId(authentication),
                 "Your Link have Posted a new Post ", linkTo(methodOn(
                         JournalController.class).one(
                                 newPost.getId())));
@@ -116,7 +112,7 @@ public class PostService {
         if (journal.getVisibility() == Visibility.LINKS)
             throw new JournalNotFoundException(resharedJournal);
 
-        notificationService.notifyLinks(((User) authentication.getPrincipal()).getId(),
+        notificationService.notifyLinks(jwtService.extractId(authentication),
                 "Your Link have Posted a new Post ", linkTo(methodOn(
                         JournalController.class).one(
                                 newPost.getId())));

@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import edu.bethlehem.scinexus.JPARepository.MediaRepository;
 import org.springframework.http.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +23,8 @@ import org.springframework.http.MediaType;
 import edu.bethlehem.scinexus.File.FileStorageService;
 import edu.bethlehem.scinexus.User.User;
 import edu.bethlehem.scinexus.User.UserNotFoundException;
-import edu.bethlehem.scinexus.User.UserRepository;
+import edu.bethlehem.scinexus.JPARepository.UserRepository;
+import edu.bethlehem.scinexus.SecurityConfig.JwtService;
 import lombok.AllArgsConstructor;
 
 @RestController
@@ -31,12 +34,13 @@ public class MediaController {
   private final MediaRepository repository;
   private final UserRepository userRepository;
   private final MediaModelAssembler assembler;
+  private final JwtService jwtService;
   @Autowired
   FileStorageService fileStorageManager;
 
   @GetMapping("/medias/{mediaId}")
   EntityModel<Media> one(@PathVariable Long mediaId, Authentication auth) {
-    Long userId = ((User) auth.getPrincipal()).getId();
+    Long userId = jwtService.extractId(auth);
     User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User Not Found"));
 
     Media media = repository.findByIdAndOwner(mediaId, user);

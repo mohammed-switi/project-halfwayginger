@@ -1,5 +1,8 @@
 package edu.bethlehem.scinexus.User;
 
+import edu.bethlehem.scinexus.MongoRepository.UserMongoRepository;
+import edu.bethlehem.scinexus.JPARepository.UserRepository;
+import edu.bethlehem.scinexus.JPARepository.UserResearchPaperRequestRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
@@ -17,36 +20,30 @@ import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import com.mysql.cj.x.protobuf.MysqlxCrud.Collection;
 import edu.bethlehem.scinexus.Article.Article;
 import edu.bethlehem.scinexus.Notification.Notification;
 import edu.bethlehem.scinexus.Notification.NotificationModelAssembler;
-import edu.bethlehem.scinexus.Notification.NotificationRepository;
+import edu.bethlehem.scinexus.JPARepository.NotificationRepository;
 import edu.bethlehem.scinexus.Article.ArticleModelAssembler;
-import edu.bethlehem.scinexus.Article.ArticleRepository;
-import edu.bethlehem.scinexus.DatabaseLoading.DataLoader;
+import edu.bethlehem.scinexus.JPARepository.ArticleRepository;
 import edu.bethlehem.scinexus.ResearchPaper.ResearchPaper;
 import edu.bethlehem.scinexus.ResearchPaper.ResearchPaperModelAssembler;
 import edu.bethlehem.scinexus.ResearchPaper.ResearchPaperNotFoundException;
-import edu.bethlehem.scinexus.ResearchPaper.ResearchPaperRepository;
+import edu.bethlehem.scinexus.JPARepository.ResearchPaperRepository;
 import edu.bethlehem.scinexus.Media.Media;
 import edu.bethlehem.scinexus.Media.MediaNotFoundException;
-import edu.bethlehem.scinexus.Media.MediaRepository;
+import edu.bethlehem.scinexus.JPARepository.MediaRepository;
 import edu.bethlehem.scinexus.ResearchPaper.ResearchPaper;
 import edu.bethlehem.scinexus.ResearchPaper.ResearchPaperController;
 import edu.bethlehem.scinexus.ResearchPaper.ResearchPaperModelAssembler;
-import edu.bethlehem.scinexus.ResearchPaper.ResearchPaperRepository;
 import edu.bethlehem.scinexus.SecurityConfig.JwtService;
 import edu.bethlehem.scinexus.UserResearchPaper.ResearchPaperRequestKey;
 import edu.bethlehem.scinexus.UserResearchPaper.UserResearchPaperRequest;
-import edu.bethlehem.scinexus.UserResearchPaper.UserResearchPaperRequestRepository;
 
 @Service
 @RequiredArgsConstructor
@@ -55,6 +52,7 @@ public class UserService implements UserDetailsService {
     @PersistenceContext
     private EntityManager entityManager;
     private final UserRepository repository;
+    private final UserMongoRepository mongoRepository;
     private final ArticleRepository articleRepository;
     private final ResearchPaperRepository researchPaperRepository;
     private final MediaRepository mediaRepository;
@@ -82,16 +80,6 @@ public class UserService implements UserDetailsService {
 
     // return count > 0;
     // }
-    public User getUser(Authentication auth) {
-        Long userId = ((User) auth.getPrincipal()).getId();
-        return repository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
-
-    }
-
-    private User getUser(Long userId) {
-        return repository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
-
-    }
 
     CollectionModel<EntityModel<User>> all() {
         List<EntityModel<User>> users = repository.findAll().stream()
@@ -102,7 +90,7 @@ public class UserService implements UserDetailsService {
         return CollectionModel.of(users, linkTo(methodOn(UserController.class).all()).withSelfRel());
     }
 
-    EntityModel<User> one(Long userId) {
+    public EntityModel<User> one(Long userId) {
         logger.debug("returning user with id: " + userId);
         User user = entityManager.find(User.class, userId);
         logger.trace("Got user with id: " + userId);
@@ -152,85 +140,9 @@ public class UserService implements UserDetailsService {
 
     }
 
-    // CollectionModel<EntityModel<User>> getLinks(Authentication authentication) {
-    // logger.debug("returning user links");
-    // Long userId = ((User) (authentication.getPrincipal())).getId();
-
-    // User user = repository.findById(userId)
-    // .orElseThrow(() -> new UserNotFoundException("The user with id:" + userId + "
-    // is not found",
-    // HttpStatus.NOT_FOUND));
-    // logger.trace("Got user with id: " + userId);
-
-    // List<EntityModel<User>> links = user.getLinks().stream()
-    // .map(userLinked -> assembler.toModel(
-    // userLinked))
-    // .collect(Collectors.toList());
-    // logger.trace("Got user links");
-    // logger.trace("returning user links");
-    // return CollectionModel.of(links,
-    // linkTo(methodOn(UserController.class).all()).withSelfRel());
-
-    // }
-
-    // EntityModel<User> linkUser(Authentication authentication, Long userLinkToId)
-    // {
-    // logger.debug("linking user with id: " + userLinkToId);
-    // Long linkFromId = ((User) (authentication.getPrincipal())).getId();
-    // logger.trace("Got user with id: " + linkFromId);
-    // User userLinkTo = repository.findById(
-    // userLinkToId).orElseThrow(
-    // () -> new UserNotFoundException("The user with id:" +
-    // userLinkToId + " is not found", HttpStatus.NOT_FOUND));
-    // logger.trace("Got user with id: " + userLinkToId);
-    // User user = repository.findById(linkFromId)
-    // .orElseThrow(() -> new UserNotFoundException("The user with id:" + linkFromId
-    // + " is not found",
-    // HttpStatus.NOT_FOUND));
-    // logger.trace("Got user with id: " + linkFromId);
-
-    // logger.trace("Checking if the users are already linked");
-    // if (user.getLinks().contains(userLinkTo))
-    // throw new UserNotFoundException("The user with id:" + linkFromId
-    // + " is already linked to the user with id:" + userLinkToId,
-    // HttpStatus.BAD_REQUEST);
-    // if (user.getId() == userLinkTo.getId())
-    // throw new UserNotFoundException("The user with id:" + linkFromId
-    // + " can't be linked to itself", HttpStatus.BAD_REQUEST);
-    // user.getLinks().add(userLinkTo);
-
-    // logger.trace("Linked user with id: " + userLinkToId);
-    // EntityModel<User> entityModel = assembler.toModel(repository.save(user));
-    // logger.trace("returning linked user with id: " + userLinkToId);
-    // return entityModel;
-
-    // }
-
-    // EntityModel<User> unlinkUser(Authentication authentication, Long
-    // userLinkToId) {
-    // Long linkFromId = ((User) (authentication.getPrincipal())).getId();
-    // User userLinkTo = repository.findById(userLinkToId)
-    // .orElseThrow(() -> new UserNotFoundException("The user with id:" +
-    // userLinkToId + " is not found", HttpStatus.NOT_FOUND));
-    // User user = repository.findById(linkFromId)
-    // .orElseThrow(() -> new UserNotFoundException("The user with id:" + linkFromId
-    // + " is not found",
-    // HttpStatus.NOT_FOUND));
-
-    // if (!user.getLinks().contains(userLinkTo))
-    // throw new UserNotFoundException("The user with id:" + linkFromId
-    // + " is not linked to the user with id:" + userLinkToId,
-    // HttpStatus.BAD_REQUEST);
-
-    // user.getLinks().remove(userLinkTo);
-
-    // EntityModel<User> entityModel = assembler.toModel(repository.save(user));
-    // return entityModel;
-    // }
-
     CollectionModel<EntityModel<Article>> getUserArticles(Authentication authentication) {
         logger.debug("returning user articles");
-        Long userId = ((User) (authentication.getPrincipal())).getId();
+        Long userId = jwtService.extractId(authentication);
         logger.trace("Got user with id: " + userId);
         List<EntityModel<Article>> articles = articleRepository.findByPublisherId(userId).stream()
                 .map(article -> articleAssembler.toModel(article))
@@ -241,24 +153,9 @@ public class UserService implements UserDetailsService {
 
     }
 
-    CollectionModel<EntityModel<Notification>> getUserNotifications(Authentication authentication) {
-        logger.debug("returning user Notifications");
-
-        User user = getUser(authentication);
-        logger.trace("Got user with id: " + user.getId());
-        List<EntityModel<Notification>> notifications = notificationRepository.findByUser(
-                user).stream()
-                .map(article -> notificationAssembler.toModel(article))
-                .collect(Collectors.toList());
-        logger.trace("Got user notifications");
-        logger.trace("returning user notifications");
-        return CollectionModel.of(notifications, linkTo(methodOn(UserController.class).all()).withSelfRel());
-
-    }
-
     EntityModel<Article> getUserArticle(Long articleId, Authentication authentication) {
         logger.debug("returning user articles");
-        Long userId = ((User) (authentication.getPrincipal())).getId();
+        Long userId = jwtService.extractId(authentication);
         logger.trace("Got user with id: " + userId);
 
         logger.trace("returning user articles");
@@ -269,7 +166,7 @@ public class UserService implements UserDetailsService {
 
     CollectionModel<EntityModel<ResearchPaper>> getUserResearchPapers(Authentication authentication) {
         logger.debug("returning user ResearchPapers");
-        Long userId = ((User) (authentication.getPrincipal())).getId();
+        Long userId = jwtService.extractId(authentication);
         logger.trace("Got user with id: " + userId);
         List<EntityModel<ResearchPaper>> researchPapers = researchPapersRepository.findByPublisherId(userId).stream()
                 .map(researchPaper -> researchPapersAssembler.toModel(
@@ -284,7 +181,7 @@ public class UserService implements UserDetailsService {
 
     EntityModel<ResearchPaper> getUserResearchPaper(Long researchPaperId, Authentication authentication) {
         logger.debug("returning user ResearchPapers");
-        Long userId = ((User) (authentication.getPrincipal())).getId();
+        Long userId = jwtService.extractId(authentication);
         logger.trace("Got user with id: " + userId);
 
         logger.trace("returning user ResearchPapers");
@@ -292,7 +189,26 @@ public class UserService implements UserDetailsService {
                 .toModel(researchPapersRepository.findByIdAndPublisherId(researchPaperId, userId));
     }
 
-    ResponseEntity<?> deleteUser(Long userId) {
+    public void saveUser(UserDocument user) {
+        user.setStatus(Status.ONLINE);
+        System.out.println("Saving ths uer from the Service:" + mongoRepository.save(user));
+    }
+
+    public void disconnect(UserDocument user) {
+        var storedUser = mongoRepository.findById(user.getNickName()).orElse(null);
+        if (storedUser != null) {
+            storedUser.setStatus(Status.OFFLINE);
+            mongoRepository.save(storedUser);
+        }
+
+    }
+
+    public List<UserDocument> findConnectedUser() {
+        return mongoRepository.findAllByStatus(Status.ONLINE);
+
+    }
+
+    public void deleteUser(Long userId) {
         logger.debug("deleting user with id: " + userId);
         User user = repository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("The user with id:" + userId + " is not found",
@@ -301,7 +217,6 @@ public class UserService implements UserDetailsService {
 
         repository.delete(user);
         logger.trace("Deleted user with id: " + userId);
-        return ResponseEntity.noContent().build();
 
     }
 
@@ -309,10 +224,26 @@ public class UserService implements UserDetailsService {
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         return repository.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException("User with username " + email + " is not found"));
+
     }
 
     public int enableUser(String email) {
         return repository.enableAppUser(email);
+    }
+
+    CollectionModel<EntityModel<Notification>> getUserNotifications(Authentication authentication) {
+        logger.debug("returning user Notifications");
+
+        User user = jwtService.getUser(authentication);
+        logger.trace("Got user with id: " + user.getId());
+        List<EntityModel<Notification>> notifications = notificationRepository.findByUser(
+                user).stream()
+                .map(article -> notificationAssembler.toModel(article))
+                .collect(Collectors.toList());
+        logger.trace("Got user notifications");
+        logger.trace("returning user notifications");
+        return CollectionModel.of(notifications, linkTo(methodOn(UserController.class).all()).withSelfRel());
+
     }
 
     // @Override

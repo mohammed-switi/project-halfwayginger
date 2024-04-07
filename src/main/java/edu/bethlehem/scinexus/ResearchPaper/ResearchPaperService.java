@@ -1,8 +1,8 @@
 package edu.bethlehem.scinexus.ResearchPaper;
 
+import edu.bethlehem.scinexus.JPARepository.ResearchPaperRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -20,25 +20,20 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import edu.bethlehem.scinexus.Article.ArticleController;
-import edu.bethlehem.scinexus.DatabaseLoading.DataLoader;
-import edu.bethlehem.scinexus.Interaction.InteractionRepository;
+import edu.bethlehem.scinexus.JPARepository.InteractionRepository;
 import edu.bethlehem.scinexus.Notification.NotificationService;
-import edu.bethlehem.scinexus.Opinion.OpinionRepository;
+import edu.bethlehem.scinexus.JPARepository.OpinionRepository;
 import edu.bethlehem.scinexus.Organization.OrganizationNotFoundException;
-import edu.bethlehem.scinexus.ResearchPaper.ResearchPaper;
-import edu.bethlehem.scinexus.ResearchPaper.ResearchPaperNotFoundException;
-import edu.bethlehem.scinexus.ResearchPaper.ResearchPaperRequestPatchDTO;
-import edu.bethlehem.scinexus.ResearchPaper.ResearchPaperRequestDTO;
 import edu.bethlehem.scinexus.SecurityConfig.JwtService;
 import edu.bethlehem.scinexus.User.Role;
 import edu.bethlehem.scinexus.User.User;
 import edu.bethlehem.scinexus.User.UserNotFoundException;
-import edu.bethlehem.scinexus.User.UserRepository;
+import edu.bethlehem.scinexus.JPARepository.UserRepository;
+import edu.bethlehem.scinexus.JPARepository.UserResearchPaperRequestRepository;
 import edu.bethlehem.scinexus.User.UserRequestDTO;
 import edu.bethlehem.scinexus.User.UserRequestPatchDTO;
 import edu.bethlehem.scinexus.UserResearchPaper.ResearchPaperRequestKey;
 import edu.bethlehem.scinexus.UserResearchPaper.UserResearchPaperRequest;
-import edu.bethlehem.scinexus.UserResearchPaper.UserResearchPaperRequestRepository;
 
 @Service
 @RequiredArgsConstructor
@@ -108,7 +103,7 @@ public class ResearchPaperService {
 
         researchPaper = saveResearchPaper(researchPaper);
         notificationService.notifyLinks(
-                ((User) authentication.getPrincipal()).getId(),
+                jwtService.extractId(authentication),
                 "A new Research Paper from your links",
                 linkTo(methodOn(
                         ResearchPaperController.class).one(researchPaper.getId())));
@@ -182,11 +177,8 @@ public class ResearchPaperService {
     EntityModel<ResearchPaper> requestAccessToResearchPaper(Long researchPaperId,
             Authentication authentication) {
         logger.debug("requesting access to ResearchPaper with id: " + researchPaperId);
-        Long userId = ((User) (authentication.getPrincipal())).getId();
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("The user with id:" + userId + " is not found",
-                        HttpStatus.NOT_FOUND));
-        logger.trace("Got user with id: " + userId);
+        User user = jwtService.getUser(authentication);
+        logger.trace("Got user with id: " + user.getId());
         ResearchPaper researchPaper = researchPaperRepository.findById(researchPaperId)
                 .orElseThrow(() -> new ResearchPaperNotFoundException(
                         "The ResearchPaper with id:" + researchPaperId + " is not found",
@@ -196,7 +188,7 @@ public class ResearchPaperService {
         if (urpr != null)
             throw new UserNotFoundException("A request is already has been made", HttpStatus.CONFLICT);
         UserResearchPaperRequest userResearchPaperRequest = new UserResearchPaperRequest();
-        userResearchPaperRequest.setId(new ResearchPaperRequestKey(userId, researchPaperId));
+        userResearchPaperRequest.setId(new ResearchPaperRequestKey(user.getId(), researchPaperId));
         userResearchPaperRequest.setUser(user);
         userResearchPaperRequest.setResearchPaper(researchPaper);
         userResearchPaperRequest.setAccepted(false);

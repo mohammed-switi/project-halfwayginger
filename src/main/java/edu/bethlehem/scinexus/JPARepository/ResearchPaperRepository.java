@@ -1,12 +1,9 @@
-package edu.bethlehem.scinexus.ResearchPaper;
+package edu.bethlehem.scinexus.JPARepository;
 
 import java.util.List;
 
-import java.util.List;
-
+import edu.bethlehem.scinexus.ResearchPaper.ResearchPaper;
 import org.springframework.data.jpa.repository.JpaRepository;
-
-import edu.bethlehem.scinexus.Article.Article;
 
 import edu.bethlehem.scinexus.Article.Article;
 

@@ -21,7 +21,7 @@ import edu.bethlehem.scinexus.SecurityConfig.JwtService;
 import edu.bethlehem.scinexus.User.Role;
 import edu.bethlehem.scinexus.User.User;
 import edu.bethlehem.scinexus.User.UserNotFoundException;
-import edu.bethlehem.scinexus.User.UserRepository;
+import edu.bethlehem.scinexus.JPARepository.UserRepository;
 import edu.bethlehem.scinexus.User.UserService;
 
 @Service
@@ -35,17 +35,6 @@ public class OrganizationService {
     private final UserService userService;
     Logger logger = LoggerFactory.getLogger(DataLoader.class);
 
-    private User getUser(Authentication auth) {
-        Long userId = ((User) auth.getPrincipal()).getId();
-        return userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
-
-    }
-
-    private User getUser(Long userId) {
-        return userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
-
-    }
-
     private User getOrganization(Long organizationId) {
         return userRepository.findByIdAndRole(organizationId, Role.ORGANIZATION)
                 .orElseThrow(() -> new OrganizationNotFoundException(organizationId));
@@ -53,7 +42,7 @@ public class OrganizationService {
     }
 
     private User getOrganization(Authentication auth) {
-        Long organizationId = ((User) auth.getPrincipal()).getId();
+        Long organizationId = jwtService.extractId(auth);
         return userRepository.findByIdAndRole(organizationId, Role.ORGANIZATION)
                 .orElseThrow(() -> new OrganizationNotFoundException(organizationId));
 

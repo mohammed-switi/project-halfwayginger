@@ -3,6 +3,10 @@ package edu.bethlehem.scinexus.UserLinks;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
+import java.util.List;
+
+import org.hibernate.mapping.Collection;
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,16 +15,20 @@ import org.springframework.stereotype.Service;
 
 import edu.bethlehem.scinexus.Journal.JournalController;
 import edu.bethlehem.scinexus.Notification.NotificationService;
+import edu.bethlehem.scinexus.SecurityConfig.JwtService;
 import edu.bethlehem.scinexus.User.User;
 import edu.bethlehem.scinexus.User.UserController;
 import edu.bethlehem.scinexus.User.UserNotFoundException;
-import edu.bethlehem.scinexus.User.UserRepository;
+import edu.bethlehem.scinexus.JPARepository.UserLinksRepository;
+import edu.bethlehem.scinexus.JPARepository.UserRepository;
 import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
 public class UserLinksService {
     private final UserLinksRepository ulr;
+    private final JwtService jwtService;
+
     private final UserRepository userRepository;
     private final UserLinksModelAssembler ulAssembler;
     private final NotificationService notificationService;
@@ -39,20 +47,10 @@ public class UserLinksService {
         return ulr.existsByLinksToAndLinksFrom(user1, user2) || ulr.existsByLinksToAndLinksFrom(user1, user2);
     }
 
-    public User getUser(Authentication auth) {
-        Long userId = ((User) auth.getPrincipal()).getId();
-        return userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
-
-    }
-
-    private User getUser(Long userId) {
-        return userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
-
-    }
-
     public EntityModel<UserLinks> linkUser(Authentication auth, Long linkToId) {
-        User linkFrom = getUser(auth);
-        User linkTo = getUser(linkToId);
+        User linkFrom = jwtService.getUser(auth);
+        User linkTo = jwtService.getUser(linkToId);
+
         if (areTheyLinked(linkFrom, linkTo))
             throw new UserNotFoundException("the users are already linked", HttpStatus.CONFLICT);
         if (linkFrom.getId() == linkToId)
@@ -67,9 +65,9 @@ public class UserLinksService {
 
     }
 
-    public ResponseEntity<EntityModel<UserLinks>> acceptLink(Authentication auth, Long linkFromId, Boolean answer) {
-        User linkTo = getUser(auth);
-        User linkFrom = getUser(linkFromId);
+    public EntityModel<UserLinks> acceptLink(Authentication auth, Long linkFromId, Boolean answer) {
+        User linkTo = jwtService.getUser(auth);
+        User linkFrom = jwtService.getUser(linkFromId);
         if (!areTheyLinked(linkFrom, linkTo))
             throw new UserNotFoundException("there is no link to accept", HttpStatus.CONFLICT);
         UserLinks ul = ulr.findByLinksFromAndLinksTo(linkFrom, linkTo);
@@ -79,19 +77,19 @@ public class UserLinksService {
             throw new UserNotFoundException("The Linkage is already accepted");
         if (answer == false) {
             ulr.delete(ul);
-            return ResponseEntity.noContent().build();
+            return ulAssembler.toModel(ul);
         }
         ul.setAccepted(true);
         notificationService.notifyUser(
                 linkFrom, linkTo.getFirstName() + " has accepted to Link with you",
                 linkTo(methodOn(
                         UserController.class).one(linkFromId)));
-        return ResponseEntity.ok(ulAssembler.toModel(ulr.save(ul)));
+        return ulAssembler.toModel(ulr.save(ul));
     }
 
     public ResponseEntity<EntityModel<UserLinks>> unLink(Authentication auth, Long LinkedUserId) {
-        User linked1 = getUser(auth);
-        User linked2 = getUser(LinkedUserId);
+        User linked1 = jwtService.getUser(auth);
+        User linked2 = jwtService.getUser(LinkedUserId);
         if (!areTheyLinked(linked1, linked2))
             throw new UserNotFoundException("there is no link", HttpStatus.CONFLICT);
         UserLinks ul = ulr.findByLinksFromAndLinksTo(linked1, linked2);
@@ -100,6 +98,12 @@ public class UserLinksService {
 
         ulr.delete(ul);
         return ResponseEntity.noContent().build();
+    }
+
+    public CollectionModel<EntityModel<UserLinks>> getUserLinks(Authentication auth) {
+        User user = jwtService.getUser(auth);
+        List<UserLinks> links = ulr.findByLinksFromOrLinksTo(user, user);
+        return ulAssembler.toCollectionModel(links);
     }
 
 }

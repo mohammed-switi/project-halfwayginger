@@ -1,23 +1,14 @@
 package edu.bethlehem.scinexus.Interaction;
 
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
-
-import java.util.List;
-import java.util.stream.Collectors;
+import edu.bethlehem.scinexus.JPARepository.InteractionRepository;
 import org.springframework.http.*;
 import org.springframework.security.core.Authentication;
-import org.apache.catalina.connector.Response;
 import org.springframework.hateoas.*;
 import org.springframework.web.bind.annotation.*;
 
-import edu.bethlehem.scinexus.Journal.Journal;
-import edu.bethlehem.scinexus.Journal.JournalNotFoundException;
-import edu.bethlehem.scinexus.Journal.JournalRepository;
-import edu.bethlehem.scinexus.Opinion.Opinion;
-import edu.bethlehem.scinexus.Opinion.OpinionRepository;
-import edu.bethlehem.scinexus.User.User;
-import edu.bethlehem.scinexus.User.UserNotFoundException;
-import edu.bethlehem.scinexus.User.UserRepository;
+import edu.bethlehem.scinexus.JPARepository.JournalRepository;
+import edu.bethlehem.scinexus.JPARepository.OpinionRepository;
+import edu.bethlehem.scinexus.JPARepository.UserRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 

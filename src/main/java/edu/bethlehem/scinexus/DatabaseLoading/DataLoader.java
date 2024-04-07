@@ -1,26 +1,24 @@
 package edu.bethlehem.scinexus.DatabaseLoading;
 
-import edu.bethlehem.scinexus.LoggingController;
 import edu.bethlehem.scinexus.Article.Article;
-import edu.bethlehem.scinexus.Article.ArticleRepository;
+import edu.bethlehem.scinexus.JPARepository.ArticleRepository;
 import edu.bethlehem.scinexus.Interaction.Interaction;
-import edu.bethlehem.scinexus.Interaction.InteractionRepository;
+import edu.bethlehem.scinexus.JPARepository.InteractionRepository;
 import edu.bethlehem.scinexus.Journal.Journal;
-import edu.bethlehem.scinexus.Journal.JournalRepository;
+import edu.bethlehem.scinexus.JPARepository.JournalRepository;
 import edu.bethlehem.scinexus.Opinion.Opinion;
-import edu.bethlehem.scinexus.Opinion.OpinionRepository;
+import edu.bethlehem.scinexus.JPARepository.OpinionRepository;
 import edu.bethlehem.scinexus.Post.Post;
-import edu.bethlehem.scinexus.Post.PostRepository;
-import edu.bethlehem.scinexus.User.UserRepository;
+import edu.bethlehem.scinexus.JPARepository.PostRepository;
+import edu.bethlehem.scinexus.JPARepository.UserRepository;
 import edu.bethlehem.scinexus.UserLinks.UserLinks;
-import edu.bethlehem.scinexus.UserLinks.UserLinksRepository;
 import edu.bethlehem.scinexus.UserLinks.UserLinksService;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.PersistenceContext;
 import edu.bethlehem.scinexus.ResearchPaper.ResearchLanguage;
 import edu.bethlehem.scinexus.ResearchPaper.ResearchPaper;
-import edu.bethlehem.scinexus.ResearchPaper.ResearchPaperRepository;
+import edu.bethlehem.scinexus.JPARepository.ResearchPaperRepository;
+import edu.bethlehem.scinexus.JPARepository.UserLinksRepository;
 import edu.bethlehem.scinexus.User.OrganizationType;
 import edu.bethlehem.scinexus.User.Position;
 import edu.bethlehem.scinexus.User.Role;
@@ -76,7 +74,23 @@ public class DataLoader implements CommandLineRunner {
         logger.info("Random Data Generation Completed with time of " + totalTime + " milliseconds");
     }
 
-    private void generateUser() {
+    public User generateUserAndSaveIt() {
+        logger.debug("Generating User and Saving it: \n\n");
+        User user = new User();
+        String username = dataGenerator.generateRandomRealUsername();
+        user.setFirstName(dataGenerator.generateRandomFirstName());
+        user.setLastName(dataGenerator.generateRandomLastName());
+        user.setUsername(username);
+        user.setEmail(dataGenerator.generateRandomEmail(username, dataGenerator.generateRandomCharacterName()));
+        user.setPassword(passwordEncoder.encode("Mohammed1234!"));
+        user.setPhoneNumber(dataGenerator.generateRandomPhoneNumber());
+        user.setRole((Math.random() < 0.5) ? Role.ACADEMIC : Role.ORGANIZATION);
+        user.setType(OrganizationType.BUSINESS);
+
+        return userRepository.save(user);
+    }
+
+    public void generateUser() {
         logger.debug("Generating base User and base Article: \n\n");
         User user = new User();
         user.setFirstName("Mohammed");

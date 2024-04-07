@@ -3,7 +3,6 @@ package edu.bethlehem.scinexus.ResearchPaper;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
@@ -11,14 +10,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.hateoas.*;
 import org.springframework.web.bind.annotation.*;
 
-import edu.bethlehem.scinexus.Post.Post;
-import edu.bethlehem.scinexus.User.User;
-import edu.bethlehem.scinexus.User.UserNotFoundException;
-import edu.bethlehem.scinexus.User.UserRepository;
 import edu.bethlehem.scinexus.UserResearchPaper.UserResearchPaperRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor

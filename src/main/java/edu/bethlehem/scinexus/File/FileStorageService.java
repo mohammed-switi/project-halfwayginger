@@ -18,13 +18,14 @@ import org.springframework.web.multipart.MultipartFile;
 import edu.bethlehem.scinexus.Journal.Journal;
 import edu.bethlehem.scinexus.Journal.JournalModelAssembler;
 import edu.bethlehem.scinexus.Journal.JournalNotFoundException;
-import edu.bethlehem.scinexus.Journal.JournalRepository;
+import edu.bethlehem.scinexus.JPARepository.JournalRepository;
 import edu.bethlehem.scinexus.Media.Media;
 import edu.bethlehem.scinexus.Media.MediaModelAssembler;
-import edu.bethlehem.scinexus.Media.MediaRepository;
+import edu.bethlehem.scinexus.SecurityConfig.JwtService;
+import edu.bethlehem.scinexus.JPARepository.MediaRepository;
 import edu.bethlehem.scinexus.User.User;
 import edu.bethlehem.scinexus.User.UserNotFoundException;
-import edu.bethlehem.scinexus.User.UserRepository;
+import edu.bethlehem.scinexus.JPARepository.UserRepository;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 
@@ -37,9 +38,10 @@ public class FileStorageService {
     private final UserRepository userRepository;
     private final MediaModelAssembler mediaAssembler;
     private final JournalModelAssembler journalAssembler;
+    private final JwtService jwtService;
 
     public EntityModel<Media> save(MultipartFile file, Authentication auth) {
-        Long userId = ((User) auth.getPrincipal()).getId();
+        Long userId = jwtService.extractId(auth);
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException());
 
         Long time = System.currentTimeMillis();
@@ -70,7 +72,7 @@ public class FileStorageService {
     }
 
     public CollectionModel<EntityModel<Media>> saveAll(MultipartFile[] files, Authentication auth) {
-        Long userId = ((User) auth.getPrincipal()).getId();
+        Long userId = jwtService.extractId(auth);
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException());
         List<Media> mediaList = new ArrayList<Media>();
         for (MultipartFile file : files) {

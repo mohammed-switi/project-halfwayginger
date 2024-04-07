@@ -1,10 +1,11 @@
-package edu.bethlehem.scinexus.UserLinks;
+package edu.bethlehem.scinexus.JPARepository;
 
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import edu.bethlehem.scinexus.User.User;
+import edu.bethlehem.scinexus.UserLinks.UserLinks;
 
 public interface UserLinksRepository extends JpaRepository<UserLinks, Long> {
 
