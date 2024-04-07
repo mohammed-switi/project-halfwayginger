@@ -55,6 +55,10 @@ At SciNexus, we prioritize security and confidentiality, ensuring that sensitive
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
+##Documentation
+
+You can access the API documentation through the Swagger-Ui [host]/swagger-ui/index.html
+
 ### Built With
 
 - [Spring][spring-url]
