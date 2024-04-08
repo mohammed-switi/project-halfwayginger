@@ -104,7 +104,7 @@ public class UserService implements UserDetailsService {
         return assembler.toModel(user);
     }
 
-    public ResponseEntity<?> updateUserPartially(UserRequestPatchDTO editUser, Authentication auth) {
+    public EntityModel<User> updateUserPartially(UserRequestPatchDTO editUser, Authentication auth) {
         User user = jwtService.getUser(auth);
         logger.debug("partially updating user with id: " + user.getId());
 
@@ -142,7 +142,7 @@ public class UserService implements UserDetailsService {
         logger.trace("Updated user with id: " + user.getId());
         EntityModel<User> entityModel = assembler.toModel(repository.save(user));
         logger.trace("returning updated user with id: " + user.getId());
-        return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
+        return entityModel;
 
     }
 
@@ -158,6 +158,7 @@ public class UserService implements UserDetailsService {
         return CollectionModel.of(articles, linkTo(methodOn(UserController.class).all()).withSelfRel());
 
     }
+
     public EntityModel<Article> getUserArticle(Long articleId, Authentication authentication) {
         logger.debug("returning user articles");
         Long userId = jwtService.extractId(authentication);
@@ -168,8 +169,6 @@ public class UserService implements UserDetailsService {
                 .toModel(articleRepository.findByIdAndPublisherId(articleId, userId));
 
     }
-
-
 
     public CollectionModel<EntityModel<ResearchPaper>> getUserResearchPapers(Authentication authentication) {
         logger.debug("returning user ResearchPapers");
@@ -237,7 +236,6 @@ public class UserService implements UserDetailsService {
         return repository.enableAppUser(email);
     }
 
-
     CollectionModel<EntityModel<Notification>> getUserNotifications(Authentication authentication) {
         logger.debug("returning user Notifications");
 
@@ -253,7 +251,7 @@ public class UserService implements UserDetailsService {
 
     }
 
-    EntityModel<User> uploadProfilePicture(Authentication authentication, MultipartFile file) {
+    public EntityModel<User> uploadProfilePicture(Authentication authentication, MultipartFile file) {
         User user = jwtService.getUser(authentication);
         Media media = fileStorageManager.saveOne(file, authentication);
 
@@ -261,7 +259,7 @@ public class UserService implements UserDetailsService {
         return assembler.toModel(repository.save(user));
     }
 
-    EntityModel<User> uploadCoverPicture(Authentication authentication, MultipartFile file) {
+    public EntityModel<User> uploadCoverPicture(Authentication authentication, MultipartFile file) {
         User user = jwtService.getUser(authentication);
         Media media = fileStorageManager.saveOne(file, authentication);
 

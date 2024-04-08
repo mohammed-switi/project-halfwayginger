@@ -41,19 +41,21 @@ public class UserController {
         return ResponseEntity.ok(service.one(id));
     }
 
-    @PatchMapping("/{id}")
+    @PatchMapping()
     public ResponseEntity<?> updateUserPartially(Authentication authentication,
-            @RequestBody UserRequestPatchDTO newUser) throws UserNotFoundException {
-        return service.updateUserPartially(newUser, authentication);
+            @RequestBody UserRequestPatchDTO newUser) {
+        EntityModel<User> entityModel = service.updateUserPartially(newUser, authentication);
+        return ResponseEntity.ok(entityModel);
+
     }
 
-    @PatchMapping("/profilePicture")
+    @PostMapping("/profilePicture")
     public ResponseEntity<?> changeProfilePicture(Authentication auth,
             @RequestParam("file") MultipartFile file) throws UserNotFoundException {
         return ResponseEntity.ok(service.uploadProfilePicture(auth, file));
     }
 
-    @PatchMapping("/coverPicture")
+    @PostMapping("/coverPicture")
     public ResponseEntity<?> changeCoverPicture(Authentication auth,
             @RequestParam("file") MultipartFile file) throws UserNotFoundException {
         return ResponseEntity.ok(service.uploadCoverPicture(auth, file));
@@ -71,7 +73,8 @@ public class UserController {
     }
 
     @PutMapping("/links/{userLinkTo}/response")
-    public ResponseEntity<EntityModel<UserLinks>> respondToLinkage(Authentication authentication, @PathVariable Long userLinkTo,
+    public ResponseEntity<EntityModel<UserLinks>> respondToLinkage(Authentication authentication,
+            @PathVariable Long userLinkTo,
             @RequestBody Boolean answer) {
         return ResponseEntity.ok(ulService.acceptLink(authentication, userLinkTo, answer));
     }
@@ -94,9 +97,9 @@ public class UserController {
         return service.getUserArticle(articleId, authentication);
     }
 
-
     @GetMapping("/researchpapers")
-    public ResponseEntity<CollectionModel<EntityModel<ResearchPaper>>> getUserResearchPapers(Authentication authentication)
+    public ResponseEntity<CollectionModel<EntityModel<ResearchPaper>>> getUserResearchPapers(
+            Authentication authentication)
             throws UserNotFoundException {
         return ResponseEntity.ok(service.getUserResearchPapers(authentication));
     }
@@ -109,7 +112,8 @@ public class UserController {
     }
 
     @GetMapping("/notifications")
-    public ResponseEntity<CollectionModel<EntityModel<Notification>>>getUserNotifications(Authentication authentication)
+    public ResponseEntity<CollectionModel<EntityModel<Notification>>> getUserNotifications(
+            Authentication authentication)
             throws UserNotFoundException {
         return ResponseEntity.ok(service.getUserNotifications(authentication));
     }

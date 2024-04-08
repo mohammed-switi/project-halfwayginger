@@ -21,12 +21,16 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Arrays;
 import java.util.List;
@@ -35,6 +39,8 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.mockito.ArgumentMatchers.any;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = UserController.class)
 @AutoConfigureMockMvc(addFilters = false)
@@ -69,7 +75,7 @@ public class UserControllerTest {
         private Article article;
 
         private ResearchPaper researchPaper;
-        private UserRequestPatchDTO  userRequestPatchDTO;
+        private UserRequestPatchDTO userRequestPatchDTO;
 
         @BeforeEach
         public void init() {
@@ -105,43 +111,43 @@ public class UserControllerTest {
                                 // .links(Arrays.asList(anotherUser))
                                 .build();
 
-                userLinks=UserLinks.builder()
-                        .id(1L)
-                        .linksTo(user)
-                        .linksFrom(anotherUser)
-                        .accepted(true)
-                        .build();
-                article=Article.builder()
-                        .title("I Don't BELONG")
-                        .subject("SOMETHIGN I DONT WANNA TALK ABOUT")
-                        .content("NO CONTENT")
-                        .build();
+                userLinks = UserLinks.builder()
+                                .id(1L)
+                                .linksTo(user)
+                                .linksFrom(anotherUser)
+                                .accepted(true)
+                                .build();
+                article = Article.builder()
+                                .title("I Don't BELONG")
+                                .subject("SOMETHIGN I DONT WANNA TALK ABOUT")
+                                .content("NO CONTENT")
+                                .build();
 
-                researchPaper=ResearchPaper.builder()
-                        .publisher(user)
-                        .title("NOT INTERESTED")
-                        .content("NOT INCLUDED")
-                        .description("DOESNT MATTER")
-                        .language(ResearchLanguage.CHINESE)
-                        .noOfPages(200).build();
+                researchPaper = ResearchPaper.builder()
+                                .publisher(user)
+                                .title("NOT INTERESTED")
+                                .content("NOT INCLUDED")
+                                .description("DOESNT MATTER")
+                                .language(ResearchLanguage.CHINESE)
+                                .noOfPages(200).build();
 
-                userRequestPatchDTO= UserRequestPatchDTO.builder()
-                        .firstName("SADDAM")
-                        .lastName("HESSIEN")
-                        .bio("LEADER")
-                        .email("SADDAMLOL@Iraq.gov")
-                        .username("SESO")
-                        .password("Seso!2@Usababe")
-                        .phoneNumber("0503290022")
-                        .fieldOfWork("Biscuits")
-                        .build();
+                userRequestPatchDTO = UserRequestPatchDTO.builder()
+                                .firstName("SADDAM")
+                                .lastName("HESSIEN")
+                                .bio("LEADER")
+                                .email("SADDAMLOL@Iraq.gov")
+                                .username("SESO")
+                                .password("Seso!2@Usababe")
+                                .phoneNumber("0503290022")
+                                .fieldOfWork("Biscuits")
+                                .build();
         }
 
         @Test
         public void UserController_GET_AllUsers_ReturnAllUsers() throws Exception {
 
-                when(userService.all()).
-                        thenReturn(CollectionModel.of(Arrays.asList(EntityModel.of(user),EntityModel.of(anotherUser))));
+                when(userService.all()).thenReturn(
+                                CollectionModel.of(Arrays.asList(EntityModel.of(user), EntityModel.of(anotherUser))));
 
                 ResultActions response = mockMvc.perform(get("/users")
                                 .accept("application/hal+json")
@@ -172,173 +178,173 @@ public class UserControllerTest {
         public void UserController_GET_UserLinks_returnUsers() throws Exception {
 
                 when(userLinksService.getUserLinks(SecurityContextHolder.getContext().getAuthentication()))
-                        .thenReturn(CollectionModel.of(Arrays.asList(EntityModel.of(userLinks))));
+                                .thenReturn(CollectionModel.of(Arrays.asList(EntityModel.of(userLinks))));
 
-                ResultActions response= mockMvc.perform(get("/users/links")
-                        .accept("application/hal+json")
+                ResultActions response = mockMvc.perform(get("/users/links")
+                                .accept("application/hal+json")
                                 .characterEncoding("utf-8"))
-                        .andDo(print());
-
+                                .andDo(print());
 
                 response.andExpect(MockMvcResultMatchers.status().isOk())
-                        .andDo(MockMvcResultHandlers.print());
-
+                                .andDo(MockMvcResultHandlers.print());
 
         }
 
         @Test
         public void UserController_GET_UserArticles_returnArticlesList() throws Exception {
 
-
                 when(userService.getUserArticles(SecurityContextHolder.getContext().getAuthentication()))
-                        .thenReturn(CollectionModel.of(List.of(EntityModel.of(article))));
+                                .thenReturn(CollectionModel.of(List.of(EntityModel.of(article))));
 
-                ResultActions response= mockMvc.perform(get("/users/articles")
+                ResultActions response = mockMvc.perform(get("/users/articles")
                                 .accept("application/hal+json")
                                 .characterEncoding("utf-8"))
-                        .andDo(print());
-
+                                .andDo(print());
 
                 response.andExpect(MockMvcResultMatchers.status().isOk())
-                        .andDo(MockMvcResultHandlers.print());
-
+                                .andDo(MockMvcResultHandlers.print());
 
         }
 
         @Test
         public void UserController_GET_UserArticle_ReturnOneArticle() throws Exception {
-                when(userService.getUserArticle(1L,SecurityContextHolder.getContext().getAuthentication()))
-                        .thenReturn(EntityModel.of(article));
+                when(userService.getUserArticle(1L, SecurityContextHolder.getContext().getAuthentication()))
+                                .thenReturn(EntityModel.of(article));
 
-                ResultActions response= mockMvc.perform(get("/users/articles/{articleId}",1L)
+                ResultActions response = mockMvc.perform(get("/users/articles/{articleId}", 1L)
                                 .accept("application/hal+json")
                                 .characterEncoding("utf-8"))
-                        .andDo(print());
-
+                                .andDo(print());
 
                 response.andExpect(MockMvcResultMatchers.status().isOk())
-                        .andDo(MockMvcResultHandlers.print());
+                                .andDo(MockMvcResultHandlers.print());
 
         }
-
-
-
 
         @Test
         public void UserController_GET_UserResearchPapers_returnResearchPapersList() throws Exception {
 
-
                 when(userService.getUserResearchPapers(SecurityContextHolder.getContext().getAuthentication()))
-                        .thenReturn(CollectionModel.of(List.of(EntityModel.of(researchPaper))));
+                                .thenReturn(CollectionModel.of(List.of(EntityModel.of(researchPaper))));
 
-                ResultActions response= mockMvc.perform(get("/users/researchpapers")
+                ResultActions response = mockMvc.perform(get("/users/researchpapers")
                                 .accept("application/hal+json")
                                 .characterEncoding("utf-8"))
-                        .andDo(print());
-
+                                .andDo(print());
 
                 response.andExpect(MockMvcResultMatchers.status().isOk())
-                        .andDo(MockMvcResultHandlers.print());
-
+                                .andDo(MockMvcResultHandlers.print());
 
         }
-
-
-
-
-
-
 
         @Test
         public void UserController_GET_UserResearchPaper_ReturnOneResearchPaper() throws Exception {
-                when(userService.getUserResearchPaper(1L,SecurityContextHolder.getContext().getAuthentication()))
-                        .thenReturn(EntityModel.of(researchPaper));
+                when(userService.getUserResearchPaper(1L, SecurityContextHolder.getContext().getAuthentication()))
+                                .thenReturn(EntityModel.of(researchPaper));
 
-                ResultActions response= mockMvc.perform(get("/users/researchpapers/{researchPaperId}",1L)
+                ResultActions response = mockMvc.perform(get("/users/researchpapers/{researchPaperId}", 1L)
                                 .accept("application/hal+json")
                                 .characterEncoding("utf-8"))
-                        .andDo(print());
-
+                                .andDo(print());
 
                 response.andExpect(MockMvcResultMatchers.status().isOk())
-                        .andDo(MockMvcResultHandlers.print());
+                                .andDo(MockMvcResultHandlers.print());
 
         }
 
-
         @Test
         public void UserController_PUT_RespondToLinkage_returnUserLink() throws Exception {
-                Boolean answer= true;
+                Boolean answer = true;
 
-                when(userLinksService.acceptLink(SecurityContextHolder.getContext().getAuthentication(),1L,Boolean.TRUE))
-                        .thenReturn(EntityModel.of(userLinks));
+                when(userLinksService.acceptLink(SecurityContextHolder.getContext().getAuthentication(), 1L,
+                                Boolean.TRUE))
+                                .thenReturn(EntityModel.of(userLinks));
 
-                ResultActions response= mockMvc.perform(put("/users/links/{userLinkTo}/response",1L)
+                ResultActions response = mockMvc.perform(put("/users/links/{userLinkTo}/response", 1L)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(answer))
                                 .accept("application/hal+json")
                                 .characterEncoding("utf-8"))
-                        .andDo(print());
-
+                                .andDo(print());
 
                 response.andExpect(MockMvcResultMatchers.status().isOk())
-                        .andDo(MockMvcResultHandlers.print());
-
+                                .andDo(MockMvcResultHandlers.print());
 
         }
-//TODO Obada
-//        @Test
-//        public void UserController_PATCH_updateUserPartially_ReturnUpdatedUser(){
-//
-//                when(userService.updateUserPartially(userRequestPatchDTO,1L))
-//                        .thenReturn(EntityModel.of(user));
-//
-//                ResultActions response= mockMvc.perform(put("/users/links/{userLinkTo}/response",1L)
-//
-//                                .accept("application/hal+json")
-//                                .characterEncoding("utf-8"))
-//                        .andDo(print());
-//
-//
-//                response.andExpect(MockMvcResultMatchers.status().isOk())
-//                        .andDo(MockMvcResultHandlers.print());
-//
-//
-//        }
+
+        // TODO Obada
+        @Test
+        public void UserController_PATCH_updateUserPartially_ReturnUpdatedUser() throws Exception {
+                UserRequestPatchDTO userRequestDTO = new UserRequestPatchDTO();
+                userRequestDTO.setFirstName("SADDAM");
+
+                when(userService.updateUserPartially(
+                                userRequestDTO, SecurityContextHolder.getContext()
+                                                .getAuthentication()))
+                                .thenReturn(EntityModel.of(user));
+
+                mockMvc.perform(patch("/users")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(
+                                                userRequestDTO))
+                                .accept("application/hal+json")
+                                .characterEncoding("utf-8"))
+                                .andDo(print()).andExpect(MockMvcResultMatchers.status().isOk())
+                                .andDo(MockMvcResultHandlers.print());
+
+        }
+
         @Test
         public void UserController_PUT_LinkUser_ReturnUserLLinked() throws Exception {
 
+                when(userLinksService.linkUser(SecurityContextHolder.getContext().getAuthentication(), 1L))
+                                .thenReturn(EntityModel.of(userLinks));
 
-                when(userLinksService.linkUser(SecurityContextHolder.getContext().getAuthentication(),1L))
-                        .thenReturn(EntityModel.of(userLinks));
-
-                ResultActions response= mockMvc.perform(put("/users/links/{userLinkTo}",1L)
+                ResultActions response = mockMvc.perform(put("/users/links/{userLinkTo}", 1L)
                                 .accept("application/hal+json")
                                 .characterEncoding("utf-8"))
-                        .andDo(print());
-
+                                .andDo(print());
 
                 response.andExpect(MockMvcResultMatchers.status().isOk())
-                        .andDo(MockMvcResultHandlers.print());
-
+                                .andDo(MockMvcResultHandlers.print());
 
         }
 
+        @Test
+        public void UserController_PATCH_ProfilePicture_ReturnUser() throws Exception {
+                // Mocking the service method
+                when(userService.uploadProfilePicture(any(Authentication.class), any(MultipartFile.class)))
+                                .thenReturn(EntityModel.of(user));
 
+                // Creating a mock multipart file
+                MockMultipartFile file = new MockMultipartFile("file", "test.jpg", MediaType.IMAGE_JPEG_VALUE,
+                                "test".getBytes());
 
+                // Performing the request
+                ResultActions response = mockMvc.perform(multipart("/users/profilePicture")
+                                .file(file)
+                                .accept("application/hal+json")
+                                .characterEncoding("utf-8"))
+                                .andDo(print());
+
+                // Verifying the response
+                response.andExpect(status().isOk())
+                                .andDo(print());
+        }
 
         @Test
         public void UserController_Delete_UserLink_NOContent() throws Exception {
 
-                doNothing().when(userLinksService).unLink(SecurityContextHolder.getContext().getAuthentication(),1L);
+                doNothing().when(userLinksService).unLink(SecurityContextHolder.getContext().getAuthentication(), 1L);
 
                 ResultActions response = mockMvc.perform(delete("/users/links/{userLinkTO}", 1)
                                 .accept("application/json"))
-                        .andDo(print());
+                                .andDo(print());
 
                 response.andExpect(MockMvcResultMatchers.status().isNoContent())
-                        .andDo(MockMvcResultHandlers.print());
+                                .andDo(MockMvcResultHandlers.print());
         }
+
         @Test
         public void UserController_Delete_User_NOContent() throws Exception {
 
