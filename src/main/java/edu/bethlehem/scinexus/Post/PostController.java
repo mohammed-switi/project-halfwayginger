@@ -1,19 +1,25 @@
 package edu.bethlehem.scinexus.Post;
 
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
-import java.util.List;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
-import edu.bethlehem.scinexus.SecurityConfig.JwtService;
-import edu.bethlehem.scinexus.SecurityConfig.UserDetailsImpl;
-import jakarta.annotation.Resource;
+import org.jetbrains.annotations.NotNull;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.NotNull;
-import org.springframework.http.*;
-import org.springframework.hateoas.*;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -39,9 +45,11 @@ public class PostController {
       @Valid @RequestBody @NotNull PostRequestDTO newPostRequestDTO) {
 
     EntityModel<Post> entityModel = postService.createPost(authentication, newPostRequestDTO);
-    return new ResponseEntity<>(entityModel,HttpStatus.CREATED);
-    //This Line Is commented Because of an Issue in testing, but Fixed it with the previous line and both provides same result
-  //  return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
+    return new ResponseEntity<>(entityModel, HttpStatus.CREATED);
+    // This Line Is commented Because of an Issue in testing, but Fixed it with the
+    // previous line and both provides same result
+    // return
+    // ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
   }
 
   @PostMapping("/{journalId}/reshare")
@@ -49,9 +57,11 @@ public class PostController {
       @Valid @RequestBody @NotNull PostRequestDTO newPostRequestDTO, @PathVariable Long journalId) {
 
     EntityModel<Post> entityModel = postService.createResharePost(authentication, newPostRequestDTO, journalId);
-    return new ResponseEntity<>(entityModel,HttpStatus.CREATED);
-    //This Line Is commented Because of an Issue in testing, but Fixed it with the previous line and both provides same result
-//    return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
+    return new ResponseEntity<>(entityModel, HttpStatus.CREATED);
+    // This Line Is commented Because of an Issue in testing, but Fixed it with the
+    // previous line and both provides same result
+    // return
+    // ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
   }
 
   // @PutMapping("/{id}")
@@ -71,9 +81,10 @@ public class PostController {
       @RequestBody @NotNull PostRequestPatchDTO newPostRequestDTO) {
 
     EntityModel<Post> entityModel = postService.updatePostPartially(postId, newPostRequestDTO);
-    return new ResponseEntity<>(entityModel,HttpStatus.CREATED);
+    return new ResponseEntity<>(entityModel, HttpStatus.CREATED);
 
-   // return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
+    // return
+    // ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
   }
 
   @DeleteMapping("/{id}")

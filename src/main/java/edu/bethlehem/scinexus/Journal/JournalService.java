@@ -1,23 +1,11 @@
 package edu.bethlehem.scinexus.Journal;
 
-import edu.bethlehem.scinexus.Authorization.AuthorizationManager;
-import edu.bethlehem.scinexus.DatabaseLoading.DataLoader;
-import edu.bethlehem.scinexus.JPARepository.JournalRepository;
-import edu.bethlehem.scinexus.Interaction.Interaction;
-import edu.bethlehem.scinexus.Interaction.InteractionModelAssembler;
-import edu.bethlehem.scinexus.Media.Media;
-import edu.bethlehem.scinexus.Media.MediaNotFoundException;
-import edu.bethlehem.scinexus.JPARepository.MediaRepository;
-import edu.bethlehem.scinexus.Notification.NotificationService;
-import edu.bethlehem.scinexus.Opinion.Opinion;
-import edu.bethlehem.scinexus.Opinion.OpinionModelAssembler;
-import edu.bethlehem.scinexus.User.UserService;
-import edu.bethlehem.scinexus.SecurityConfig.JwtService;
-import edu.bethlehem.scinexus.User.User;
-import edu.bethlehem.scinexus.User.UserNotFoundException;
-import edu.bethlehem.scinexus.JPARepository.UserRepository;
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,13 +16,24 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
+import edu.bethlehem.scinexus.Authorization.AuthorizationManager;
+import edu.bethlehem.scinexus.DatabaseLoading.DataLoader;
+import edu.bethlehem.scinexus.Interaction.Interaction;
+import edu.bethlehem.scinexus.Interaction.InteractionModelAssembler;
+import edu.bethlehem.scinexus.JPARepository.JournalRepository;
+import edu.bethlehem.scinexus.JPARepository.MediaRepository;
+import edu.bethlehem.scinexus.JPARepository.UserRepository;
+import edu.bethlehem.scinexus.Media.Media;
+import edu.bethlehem.scinexus.Media.MediaNotFoundException;
+import edu.bethlehem.scinexus.Notification.NotificationService;
+import edu.bethlehem.scinexus.Opinion.Opinion;
+import edu.bethlehem.scinexus.Opinion.OpinionModelAssembler;
+import edu.bethlehem.scinexus.SecurityConfig.JwtService;
+import edu.bethlehem.scinexus.User.User;
+import edu.bethlehem.scinexus.User.UserNotFoundException;
+import edu.bethlehem.scinexus.User.UserService;
+import lombok.Data;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -144,9 +143,6 @@ public class JournalService {
         // Add journal to the contributor's contributed journals and save
         contributorUser.getContributedJournals().remove(journal);
         userRepository.save(contributorUser);
-
-        // Return response with created journal entity
-        EntityModel<Journal> entityModel = assembler.toModel(journal);
 
     }
 

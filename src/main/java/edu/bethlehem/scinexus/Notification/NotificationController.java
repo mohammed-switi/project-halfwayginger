@@ -1,10 +1,11 @@
 package edu.bethlehem.scinexus.Notification;
 
-import edu.bethlehem.scinexus.JPARepository.NotificationRepository;
-import org.springframework.http.*;
-
-import org.springframework.hateoas.*;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
 
@@ -13,7 +14,6 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/notifications")
 
 public class NotificationController {
-
 
   private final NotificationService service;
 

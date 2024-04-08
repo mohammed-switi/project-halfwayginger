@@ -17,6 +17,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.Builder.Default;
 
 @Entity
 @Getter
@@ -43,7 +44,7 @@ public class UserResearchPaperRequest {
     @MapsId("researchPaperId")
     @JoinColumn(name = "research_paper_id")
     private ResearchPaper researchPaper;
-
+    @Default
     private boolean isAccepted = false;
 
 }

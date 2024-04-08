@@ -78,6 +78,54 @@
         <a th:href="@{/oauth2/authorization/github}">Login with GitHub</a>
         <a th:href="@{/oauth2/authorization/google}">Login with Google</a>
     </div>
+
 </div>
+
+
+<script th:inline="javascript">
+
+    document.addEventListener("DOMContentLoaded", function() {
+        document.querySelector("loginForm").addEventListener("submit", function (event) {
+            event.preventDefault(); // Prevent form submission
+            var formData = new FormData(event.target);
+            var responseClone;
+            fetch("/api/v1/auth/login", {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => {
+                    responseClone = response.clone();
+                    console.log("this is response "+ responseClone)
+                    return response.json() ;
+                })  // <-- Added 'return' statement here
+                .then(data => {
+                    console.log("this is data : "+data)
+                    if (data.jwtToken) {
+                        // Store token in localStorage
+                        localStorage.setItem('token', data.jwtToken);
+                        // Redirect or perform other actions
+                        window.location.href = "/index"; // Redirect to dashboard or any other page
+                    } else {
+                        // Handle login failure
+                        alert("Login failed");
+                    }
+                },
+                 function (rejectionReason) { // 3
+                console.log('Error parsing JSON from response:', rejectionReason, responseClone); // 4
+                responseClone.text() // 5
+                    .then(function (bodyText) {
+                        console.log('Received the following instead of valid JSON:', bodyText); // 6
+                    }
+                )})
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert("An error occurred during login");
+                });
+
+        });
+    });
+
+</script>
+
 </body>
 </html>

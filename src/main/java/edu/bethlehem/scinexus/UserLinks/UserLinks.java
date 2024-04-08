@@ -1,16 +1,18 @@
 package edu.bethlehem.scinexus.UserLinks;
 
 import edu.bethlehem.scinexus.User.User;
-import jakarta.persistence.Embeddable;
-import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.MapsId;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.Builder.Default;
 
 @Getter
 @Setter
@@ -31,6 +33,7 @@ public class UserLinks {
     @JoinColumn(name = "linksFrom")
     User linksFrom;
 
+    @Default
     Boolean accepted = false;
 
     public UserLinks(User linksTo, User linksFrom) {

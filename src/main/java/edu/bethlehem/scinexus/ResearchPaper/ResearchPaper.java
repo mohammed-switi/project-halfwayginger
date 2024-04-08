@@ -1,26 +1,29 @@
 package edu.bethlehem.scinexus.ResearchPaper;
 
-import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
-import lombok.Builder.Default;
-import lombok.experimental.SuperBuilder;
-import edu.bethlehem.scinexus.Journal.Journal;
-import edu.bethlehem.scinexus.User.User;
-import edu.bethlehem.scinexus.UserResearchPaper.UserResearchPaperRequest;
-
 import java.util.List;
 import java.util.Set;
 
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import edu.bethlehem.scinexus.Journal.Journal;
+import edu.bethlehem.scinexus.User.User;
+import edu.bethlehem.scinexus.UserResearchPaper.UserResearchPaperRequest;
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.Builder.Default;
+import lombok.experimental.SuperBuilder;
 
 @Data
 @Entity
@@ -47,6 +50,7 @@ public class ResearchPaper extends Journal {
     private String subject;
 
     // @NotNull(message = "The Research Paper Number Of Pages Can't Be Null")
+    @Default
     private Integer noOfPages = 0;
 
     @OneToMany

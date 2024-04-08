@@ -1,8 +1,5 @@
 package edu.bethlehem.scinexus.Authorization;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import edu.bethlehem.scinexus.Auth.UserNotAuthorizedException;
 import edu.bethlehem.scinexus.Interaction.Interaction;
 import edu.bethlehem.scinexus.JPARepository.InteractionRepository;
 import edu.bethlehem.scinexus.Journal.Journal;
@@ -17,13 +14,9 @@ import edu.bethlehem.scinexus.Opinion.Opinion;
 import edu.bethlehem.scinexus.Opinion.OpinionNotFoundException;
 import edu.bethlehem.scinexus.SecurityConfig.JwtService;
 import edu.bethlehem.scinexus.JPARepository.OpinionRepository;
-import edu.bethlehem.scinexus.JPARepository.UserLinksRepository;
 import edu.bethlehem.scinexus.User.Role;
 import edu.bethlehem.scinexus.User.User;
-import edu.bethlehem.scinexus.User.UserNotFoundException;
-import edu.bethlehem.scinexus.JPARepository.UserRepository;
 import edu.bethlehem.scinexus.UserLinks.UserLinksService;
-import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
@@ -31,23 +24,17 @@ import org.springframework.security.authorization.AuthorizationDecision;
 import org.springframework.security.web.access.intercept.RequestAuthorizationContext;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
-import java.util.Map;
-
 @Component
 @RequiredArgsConstructor
 public class AuthorizationManager {
 
     private final JournalRepository journalRepository;
-    private final UserRepository userRepository;
     private final NotificationRepository notificationRepository;
     private final OpinionRepository opinionRepository;
-    private final UserLinksRepository userLinksRepository;
     private final InteractionRepository interactionRepository;
     private final MediaRepository mediaRepository;
     private final UserLinksService ulService;
     private final JwtService jwtService;
-    private final EntityManager entityManager;
 
     // Enhanced Version Of Code
     public boolean isJournalOwner(Long journalId, User user) {
@@ -56,7 +43,9 @@ public class AuthorizationManager {
         return journal.getPublisher().getId().equals(user.getId());
     }
 
-    public org.springframework.security.authorization.AuthorizationManager<RequestAuthorizationContext> readJournals() {
+    public org.springframework.security.authorization.AuthorizationManager<RequestAuthorizationContext> readJournals() throws JournalNotFoundException {
+
+
         return (authentication, object) -> {
             Long journalId = Long.parseLong(object.getVariables().get("journalId"));
             Journal journal = journalRepository.findById(journalId)

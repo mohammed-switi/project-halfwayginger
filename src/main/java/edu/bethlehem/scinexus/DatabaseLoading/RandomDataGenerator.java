@@ -10,14 +10,13 @@ import org.springframework.stereotype.Component;
 
 import java.security.SecureRandom;
 
-import java.util.Locale;
 import java.util.Random;
 
 @Component
 public class RandomDataGenerator {
 
     private final SecureRandom secureRandom = new SecureRandom();
-    private final Faker faker = new Faker(new Locale("en-US"));
+    private final Faker faker = new Faker();
 
     private static final String LOWERCASE_CHARACTERS = "abcdefghijklmnopqrstuvwxyz";
     private static final String UPPERCASE_CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -26,16 +25,9 @@ public class RandomDataGenerator {
 
     private static final int MIN_USERNAME_LENGTH = 4;
     private static final int MAX_USERNAME_LENGTH = 15;
-    private static final int MIN_NAME_LENGTH = 2;
-    private static final int MAX_NAME_LENGTH = 30;
+
     private static final int MIN_PASSWORD_LENGTH = 8;
     private static final int MAX_PASSWORD_LENGTH = 20;
-    private static final int MIN_BIO_LENGTH = 0;
-    private static final int MAX_BIO_LENGTH = 220; // Adjusted to meet the criteria
-    private static final int MIN_PHONE_NUMBER_LENGTH = 10;
-    private static final int MAX_PHONE_NUMBER_LENGTH = 10;
-    private static final int MIN_FIELD_OF_WORK_LENGTH = 0;
-    private static final int MAX_FIELD_OF_WORK_LENGTH = 320;
 
     public String generateRandomUsername() {
         return generateRandomString(MIN_USERNAME_LENGTH, MAX_USERNAME_LENGTH, LOWERCASE_CHARACTERS);
@@ -81,14 +73,13 @@ public class RandomDataGenerator {
         return phoneNumber;
     }
 
-    public String generateRandomRealUsername(){
+    public String generateRandomRealUsername() {
         return faker.name().username();
     }
 
-    public String generateRandomCharacterName(){
+    public String generateRandomCharacterName() {
         return faker.gameOfThrones().character();
     }
-
 
     public String generateRandomFieldOfWork() {
         return faker.job().field();
@@ -127,16 +118,5 @@ public class RandomDataGenerator {
         }
         return stringBuilder.toString();
     }
-
-    private String generateRandomNumericString(int minLength, int maxLength) {
-        StringBuilder stringBuilder = new StringBuilder();
-        int length = minLength + secureRandom.nextInt(maxLength - minLength + 1);
-        for (int i = 0; i < length; i++) {
-            int randomIndex = secureRandom.nextInt(NUMERIC_CHARACTERS.length());
-            stringBuilder.append(NUMERIC_CHARACTERS.charAt(randomIndex));
-        }
-        return stringBuilder.toString();
-    }
-
 
 }

@@ -34,10 +34,14 @@
             color: #495057;
         }
 
+
         .list-group-item {
             background-color: transparent;
             border-color: #dee2e6;
             color: #495057;
+        }
+        .col-lg-8 {
+            margin-left: 250px; /* Width of the sidebar */
         }
 
         .list-group-item:hover {
@@ -47,7 +51,10 @@
         /* Main content custom styles */
         .container-fluid {
             margin-top: 60px;
+            position: relative;
         }
+
+
 
         .mt-4 {
             margin-top: 1.5rem !important;
@@ -88,14 +95,74 @@
 </div>
 
 <!-- Main Content -->
+<!-- Main Content -->
 <div class="container-fluid">
-    <h1 class="mt-4">Dashboard</h1>
-    <p>Welcome to your dashboard!</p>
+    <div class="row">
+        <div class="col-lg-8 offset-lg-4">
+            <h1 class="mt-4">Dashboard</h1>
+            <p>Welcome to your dashboard!</p>
+            <div id="user">Hello Mr. : </div>
+        </div>
+    </div>
 </div>
 
 <!-- Bootstrap JS -->
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+
+
+
+
+
+<script type="text/javascript">
+
+    // fetch("/api/v1/auth/info")
+    //     .then(response => {
+    //         if (!response.ok) {
+    //             throw new Error('Network response was not ok');
+    //         }
+    //         return response.json();
+    //     })
+    //     .then(data => {
+    //
+    //         document.getElementById("user").innerHTML = 'Hello Mr. ' + data.name;
+    //     })
+    //     .catch(error => {
+    //         console.error('There was a problem with the fetch operation:', error);
+    //     });
+
+  //  Retrieve token from localStorage
+    var token = localStorage.getItem('token');
+    if (token) {
+        // Token exists, you can use it in subsequent requests
+        console.log("Token:", token);
+
+        // Example: Send a GET request with the token in the Authorization header
+        fetch("/api/v1/auth/info", {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer ' + token
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                // Handle response data as needed
+                console.log("Data:", data);
+
+                document.getElementById('user').innerText = 'Hello Mr. ' + data.name;
+
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    } else {
+        // Token doesn't exist, handle the case where user is not authenticated
+        console.log("Token not found, user is not authenticated.");
+        // Redirect to login page or perform other actions
+     //   window.location.href = "/api/v1/auth/login"; // Redirect to login page
+    }
+</script>
 </body>
 </html>

@@ -1,20 +1,32 @@
 package edu.bethlehem.scinexus.SecurityConfig;
 
+import java.io.IOException;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.bethlehem.scinexus.SecurityConfig.UserDetailsImpl;
+import edu.bethlehem.scinexus.Error.GeneralErrorResponse;
+import edu.bethlehem.scinexus.Error.GeneralException;
+import org.springframework.lang.NonNull;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
+
 import edu.bethlehem.scinexus.User.UserNotFoundException;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -24,6 +36,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Date;
 
 @Component
 @RequiredArgsConstructor
@@ -31,8 +44,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
 
-
     private final UserDetailsService userDetailsService;
+
+    private final ObjectMapper objectMapper;
 
     @Override
     protected void doFilterInternal(
@@ -70,14 +84,26 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 filterChain.doFilter(request, response);
             }
-        } catch (UserNotFoundException exception) {
+        }catch (GeneralException ex){
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            response.getWriter().write("User Not Found ");
+
+            GeneralErrorResponse errorResponse = GeneralErrorResponse
+                    .builder()
+                    .status(ex.getHttpStatus().value())
+                    .message("This is Form the General Exception While Security Filtering : " + ex.getMessage())
+                    .timestamp(new Date(System.currentTimeMillis()))
+                    .throwable(ex.getCause())
+                    .build();
+            response.getWriter().write(objectMapper.writeValueAsString(errorResponse));
+        }
+        catch (InternalAuthenticationServiceException exception){
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            response.getWriter().write("An Error Has occurred " + exception.getLocalizedMessage());
 
         } catch (SignatureException | MalformedJwtException exception) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getWriter().write("Invalid JWT Token Signature");
-        }catch (ExpiredJwtException exception){
+        } catch (ExpiredJwtException exception) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getWriter().write("Expired JWT Token");
         }

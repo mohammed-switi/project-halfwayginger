@@ -1,18 +1,19 @@
 package edu.bethlehem.scinexus.ResearchPaper;
 
 import edu.bethlehem.scinexus.Journal.JournalRequestPatchDTO;
-import edu.bethlehem.scinexus.Journal.JournalRequestDTO;
 import edu.bethlehem.scinexus.Journal.Visibility;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
-import lombok.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 @SuperBuilder
 @Data
 @NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class ResearchPaperRequestPatchDTO extends JournalRequestPatchDTO {
 
     @Enumerated(EnumType.STRING)

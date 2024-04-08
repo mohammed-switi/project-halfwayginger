@@ -1,20 +1,10 @@
 package edu.bethlehem.scinexus.Post;
 
-import edu.bethlehem.scinexus.Journal.Journal;
-import edu.bethlehem.scinexus.Journal.JournalController;
-import edu.bethlehem.scinexus.Journal.JournalNotFoundException;
-import edu.bethlehem.scinexus.Journal.Visibility;
-import edu.bethlehem.scinexus.JPARepository.JournalRepository;
-import edu.bethlehem.scinexus.JPARepository.PostRepository;
-import edu.bethlehem.scinexus.Notification.NotificationService;
-import edu.bethlehem.scinexus.User.UserService;
-import edu.bethlehem.scinexus.SecurityConfig.JwtService;
-import edu.bethlehem.scinexus.User.Role;
-import edu.bethlehem.scinexus.User.User;
-import edu.bethlehem.scinexus.User.UserNotFoundException;
-import edu.bethlehem.scinexus.JPARepository.UserRepository;
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
+import java.lang.reflect.Method;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,12 +14,20 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
-
-import java.lang.reflect.Method;
-import java.util.List;
-import java.util.stream.Collectors;
+import edu.bethlehem.scinexus.JPARepository.JournalRepository;
+import edu.bethlehem.scinexus.JPARepository.PostRepository;
+import edu.bethlehem.scinexus.JPARepository.UserRepository;
+import edu.bethlehem.scinexus.Journal.Journal;
+import edu.bethlehem.scinexus.Journal.JournalController;
+import edu.bethlehem.scinexus.Journal.JournalNotFoundException;
+import edu.bethlehem.scinexus.Journal.Visibility;
+import edu.bethlehem.scinexus.Notification.NotificationService;
+import edu.bethlehem.scinexus.SecurityConfig.JwtService;
+import edu.bethlehem.scinexus.User.User;
+import edu.bethlehem.scinexus.User.UserNotFoundException;
+import edu.bethlehem.scinexus.User.UserService;
+import lombok.Data;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor

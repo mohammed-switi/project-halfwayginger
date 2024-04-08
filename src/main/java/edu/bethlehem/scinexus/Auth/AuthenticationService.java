@@ -4,7 +4,6 @@ import edu.bethlehem.scinexus.Auth.Email.EmailSender;
 import edu.bethlehem.scinexus.Auth.EmailToken.ConfirmationToken;
 import edu.bethlehem.scinexus.Auth.EmailToken.ConfirmationTokenService;
 import edu.bethlehem.scinexus.Auth.EmailToken.EmailConfirmationException;
-import edu.bethlehem.scinexus.Post.PostService;
 import edu.bethlehem.scinexus.SecurityConfig.JwtService;
 import edu.bethlehem.scinexus.User.*;
 
@@ -82,20 +81,20 @@ public class AuthenticationService {
 
                 userRepository.save(user);
 
-                String token = UUID.randomUUID().toString();
-
-                ConfirmationToken confirmationToken = ConfirmationToken.builder()
-                                .token(token)
-                                .createdAt(LocalDateTime.now())
-                                .expiresAt(LocalDateTime.now().plusMinutes(15))
-                                .user(user)
-                                .build();
-
-                confirmationTokenService.saveConfirmationToken(confirmationToken);
-                String link = "http://localhost:8080/api/v1/auth/confirm?token=" + token;
-
-                emailSender.send(request.getEmail(),
-                                buildEmail(request.getFirstName(), link));
+//                String token = UUID.randomUUID().toString();
+//
+//                ConfirmationToken confirmationToken = ConfirmationToken.builder()
+//                                .token(token)
+//                                .createdAt(LocalDateTime.now())
+//                                .expiresAt(LocalDateTime.now().plusMinutes(15))
+//                                .user(user)
+//                                .build();
+//
+//                confirmationTokenService.saveConfirmationToken(confirmationToken);
+//                String link = "http://localhost:8080/api/v1/auth/confirm?token=" + token;
+//
+//                emailSender.send(request.getEmail(),
+//                                buildEmail(request.getFirstName(), link));
 
                 // Remember to Delete the following Lines, because the JWT Token Must Be
                 // Returned When Authenticating

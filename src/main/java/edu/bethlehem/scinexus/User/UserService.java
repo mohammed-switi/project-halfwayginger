@@ -1,25 +1,18 @@
 package edu.bethlehem.scinexus.User;
 
-import edu.bethlehem.scinexus.MongoRepository.UserMongoRepository;
-import edu.bethlehem.scinexus.JPARepository.UserRepository;
-import edu.bethlehem.scinexus.JPARepository.UserResearchPaperRequestRepository;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-import lombok.RequiredArgsConstructor;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
-import java.util.stream.Collectors;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -28,26 +21,24 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import edu.bethlehem.scinexus.Article.Article;
-import edu.bethlehem.scinexus.Notification.Notification;
-import edu.bethlehem.scinexus.Notification.NotificationModelAssembler;
-import edu.bethlehem.scinexus.JPARepository.NotificationRepository;
 import edu.bethlehem.scinexus.Article.ArticleModelAssembler;
-import edu.bethlehem.scinexus.JPARepository.ArticleRepository;
 import edu.bethlehem.scinexus.File.FileStorageService;
 import edu.bethlehem.scinexus.JPARepository.ArticleRepository;
-import edu.bethlehem.scinexus.ResearchPaper.ResearchPaper;
-import edu.bethlehem.scinexus.ResearchPaper.ResearchPaperModelAssembler;
-import edu.bethlehem.scinexus.ResearchPaper.ResearchPaperNotFoundException;
+import edu.bethlehem.scinexus.JPARepository.MediaRepository;
+import edu.bethlehem.scinexus.JPARepository.NotificationRepository;
 import edu.bethlehem.scinexus.JPARepository.ResearchPaperRepository;
+import edu.bethlehem.scinexus.JPARepository.UserRepository;
 import edu.bethlehem.scinexus.Media.Media;
 import edu.bethlehem.scinexus.Media.MediaNotFoundException;
-import edu.bethlehem.scinexus.JPARepository.MediaRepository;
+import edu.bethlehem.scinexus.MongoRepository.UserMongoRepository;
+import edu.bethlehem.scinexus.Notification.Notification;
+import edu.bethlehem.scinexus.Notification.NotificationModelAssembler;
 import edu.bethlehem.scinexus.ResearchPaper.ResearchPaper;
-import edu.bethlehem.scinexus.ResearchPaper.ResearchPaperController;
 import edu.bethlehem.scinexus.ResearchPaper.ResearchPaperModelAssembler;
 import edu.bethlehem.scinexus.SecurityConfig.JwtService;
-import edu.bethlehem.scinexus.UserResearchPaper.ResearchPaperRequestKey;
-import edu.bethlehem.scinexus.UserResearchPaper.UserResearchPaperRequest;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -58,7 +49,6 @@ public class UserService implements UserDetailsService {
     private final UserRepository repository;
     private final UserMongoRepository mongoRepository;
     private final ArticleRepository articleRepository;
-    private final ResearchPaperRepository researchPaperRepository;
     private final MediaRepository mediaRepository;
     private final NotificationRepository notificationRepository;
     private final ResearchPaperRepository researchPapersRepository;
@@ -66,7 +56,6 @@ public class UserService implements UserDetailsService {
     private final NotificationModelAssembler notificationAssembler;
     private final UserModelAssembler assembler;
     private final ArticleModelAssembler articleAssembler;
-    private final UserResearchPaperRequestRepository userResearchPaperRequestRepository;
 
     @Autowired
     FileStorageService fileStorageManager;
@@ -104,7 +93,7 @@ public class UserService implements UserDetailsService {
         return assembler.toModel(user);
     }
 
-    public ResponseEntity<?> updateUserPartially(UserRequestPatchDTO editUser, Authentication auth) {
+    public EntityModel<User> updateUserPartially(UserRequestPatchDTO editUser, Authentication auth) {
         User user = jwtService.getUser(auth);
         logger.debug("partially updating user with id: " + user.getId());
 
@@ -142,7 +131,7 @@ public class UserService implements UserDetailsService {
         logger.trace("Updated user with id: " + user.getId());
         EntityModel<User> entityModel = assembler.toModel(repository.save(user));
         logger.trace("returning updated user with id: " + user.getId());
-        return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
+        return entityModel;
 
     }
 
@@ -158,6 +147,7 @@ public class UserService implements UserDetailsService {
         return CollectionModel.of(articles, linkTo(methodOn(UserController.class).all()).withSelfRel());
 
     }
+
     public EntityModel<Article> getUserArticle(Long articleId, Authentication authentication) {
         logger.debug("returning user articles");
         Long userId = jwtService.extractId(authentication);
@@ -168,8 +158,6 @@ public class UserService implements UserDetailsService {
                 .toModel(articleRepository.findByIdAndPublisherId(articleId, userId));
 
     }
-
-
 
     public CollectionModel<EntityModel<ResearchPaper>> getUserResearchPapers(Authentication authentication) {
         logger.debug("returning user ResearchPapers");
@@ -237,7 +225,6 @@ public class UserService implements UserDetailsService {
         return repository.enableAppUser(email);
     }
 
-
     CollectionModel<EntityModel<Notification>> getUserNotifications(Authentication authentication) {
         logger.debug("returning user Notifications");
 
@@ -253,7 +240,7 @@ public class UserService implements UserDetailsService {
 
     }
 
-    EntityModel<User> uploadProfilePicture(Authentication authentication, MultipartFile file) {
+    public EntityModel<User> uploadProfilePicture(Authentication authentication, MultipartFile file) {
         User user = jwtService.getUser(authentication);
         Media media = fileStorageManager.saveOne(file, authentication);
 
@@ -261,7 +248,7 @@ public class UserService implements UserDetailsService {
         return assembler.toModel(repository.save(user));
     }
 
-    EntityModel<User> uploadCoverPicture(Authentication authentication, MultipartFile file) {
+    public EntityModel<User> uploadCoverPicture(Authentication authentication, MultipartFile file) {
         User user = jwtService.getUser(authentication);
         Media media = fileStorageManager.saveOne(file, authentication);
 

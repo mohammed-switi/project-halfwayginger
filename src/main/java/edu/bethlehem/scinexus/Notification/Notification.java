@@ -11,6 +11,7 @@ import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Builder.Default;
 
 @Data
 @Entity
@@ -37,6 +38,7 @@ public class Notification {
 
     @Enumerated(EnumType.STRING)
     @NotNull(message = "The Notification Content Shouldn't Be Null")
+    @Default
     private Status status = Status.UNSEEN;
 
     @ManyToOne

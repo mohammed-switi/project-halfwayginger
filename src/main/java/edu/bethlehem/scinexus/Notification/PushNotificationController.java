@@ -1,17 +1,18 @@
 package edu.bethlehem.scinexus.Notification;
 
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.util.List;
+
 import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Flux;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
+import lombok.AllArgsConstructor;
+import reactor.core.publisher.Flux;
 
 @RestController
 @RequestMapping("/push-notifications")
-@Slf4j
 @AllArgsConstructor
 public class PushNotificationController {
 

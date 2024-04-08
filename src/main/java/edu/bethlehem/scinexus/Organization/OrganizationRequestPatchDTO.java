@@ -1,16 +1,12 @@
 package edu.bethlehem.scinexus.Organization;
 
 import edu.bethlehem.scinexus.User.OrganizationType;
-import edu.bethlehem.scinexus.User.Position;
-import edu.bethlehem.scinexus.User.UserRequestDTO;
 import edu.bethlehem.scinexus.User.UserRequestPatchDTO;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
@@ -18,6 +14,7 @@ import lombok.experimental.SuperBuilder;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class OrganizationRequestPatchDTO extends UserRequestPatchDTO {
 
     @Enumerated(EnumType.STRING)
