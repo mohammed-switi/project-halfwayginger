@@ -1,15 +1,8 @@
 package edu.bethlehem.scinexus.repository;
 
+import java.util.List;
+import java.util.Optional;
 
-import edu.bethlehem.scinexus.Article.Article;
-import edu.bethlehem.scinexus.Interaction.InteractionType;
-import edu.bethlehem.scinexus.JPARepository.ArticleRepository;
-import edu.bethlehem.scinexus.JPARepository.NotificationRepository;
-import edu.bethlehem.scinexus.JPARepository.UserRepository;
-import edu.bethlehem.scinexus.Journal.Visibility;
-import edu.bethlehem.scinexus.Notification.Notification;
-import edu.bethlehem.scinexus.Notification.Status;
-import edu.bethlehem.scinexus.User.*;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,8 +11,16 @@ import org.springframework.boot.jdbc.EmbeddedDatabaseConnection;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
-import java.util.List;
-import java.util.Optional;
+import edu.bethlehem.scinexus.Article.Article;
+import edu.bethlehem.scinexus.JPARepository.ArticleRepository;
+import edu.bethlehem.scinexus.JPARepository.NotificationRepository;
+import edu.bethlehem.scinexus.JPARepository.UserRepository;
+import edu.bethlehem.scinexus.Journal.Visibility;
+import edu.bethlehem.scinexus.Notification.Notification;
+import edu.bethlehem.scinexus.Notification.Status;
+import edu.bethlehem.scinexus.User.Position;
+import edu.bethlehem.scinexus.User.Role;
+import edu.bethlehem.scinexus.User.User;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
@@ -61,16 +62,14 @@ public class NotificationRepositoryTests {
                 .publisher(user)
                 .build();
 
-
-
         articleRepository.save(article);
     }
 
     @Test
     public void NotificationRepository_SaveAll_ReturnNotification() {
         Notification notification = Notification.builder()
-                .content("Content")  // Assuming opinion is null for this test
-                .status(Status.RECEIVED)  // Assuming journal is null for this test
+                .content("Content") // Assuming opinion is null for this test
+                .status(Status.RECEIVED) // Assuming journal is null for this test
                 .user(user)
                 .build();
 
@@ -83,8 +82,8 @@ public class NotificationRepositoryTests {
     @Test
     public void NotificationRepository_GetAll_ReturnMoreThanOneNotification() {
         Notification notification = Notification.builder()
-                .content("Content")  // Assuming opinion is null for this test
-                .status(Status.RECEIVED)  // Assuming journal is null for this test
+                .content("Content") // Assuming opinion is null for this test
+                .status(Status.RECEIVED) // Assuming journal is null for this test
                 .user(user)
                 .build();
 
@@ -99,8 +98,8 @@ public class NotificationRepositoryTests {
     @Test
     public void NotificationRepository_FindByID_GetById() {
         Notification notification = Notification.builder()
-                .content("Content")  // Assuming opinion is null for this test
-                .status(Status.RECEIVED)  // Assuming journal is null for this test
+                .content("Content") // Assuming opinion is null for this test
+                .status(Status.RECEIVED) // Assuming journal is null for this test
                 .user(user)
                 .build();
 
@@ -114,8 +113,8 @@ public class NotificationRepositoryTests {
     @Test
     public void NotificationRepository_FindByStatus_ReturnNotificationNotNull() {
         Notification notification = Notification.builder()
-                .content("Content")  // Assuming opinion is null for this test
-                .status(Status.RECEIVED)  // Assuming journal is null for this test
+                .content("Content") // Assuming opinion is null for this test
+                .status(Status.RECEIVED) // Assuming journal is null for this test
                 .user(user)
                 .build();
 
@@ -130,15 +129,14 @@ public class NotificationRepositoryTests {
     @Test
     public void NotificationRepository_UpdatedUser_ReturnNotificationNotNull() {
         Notification notification = Notification.builder()
-                .content("Content")  // Assuming opinion is null for this test
-                .status(Status.RECEIVED)  // Assuming journal is null for this test
+                .content("Content") // Assuming opinion is null for this test
+                .status(Status.RECEIVED) // Assuming journal is null for this test
                 .user(user)
                 .build();
 
-
-        Notification savedNotification =  notificationRepository.save(notification);
-            savedNotification.setStatus(Status.SEEN);
-            savedNotification.setContent("UPDATED");
+        Notification savedNotification = notificationRepository.save(notification);
+        savedNotification.setStatus(Status.SEEN);
+        savedNotification.setContent("UPDATED");
 
         Notification updatedNotification = notificationRepository.save(savedNotification);
 
@@ -149,8 +147,8 @@ public class NotificationRepositoryTests {
     @Test
     public void NotificationRepository_DeleteUser_ReturnNotificationNotNull() {
         Notification notification = Notification.builder()
-                .content("Content")  // Assuming opinion is null for this test
-                .status(Status.RECEIVED)  // Assuming journal is null for this test
+                .content("Content") // Assuming opinion is null for this test
+                .status(Status.RECEIVED) // Assuming journal is null for this test
                 .user(user)
                 .build();
 

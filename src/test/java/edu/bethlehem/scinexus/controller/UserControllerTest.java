@@ -1,15 +1,19 @@
 package edu.bethlehem.scinexus.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.bethlehem.scinexus.Article.Article;
-import edu.bethlehem.scinexus.Auth.AuthenticationService;
-import edu.bethlehem.scinexus.JPARepository.UserRepository;
-import edu.bethlehem.scinexus.ResearchPaper.ResearchLanguage;
-import edu.bethlehem.scinexus.ResearchPaper.ResearchPaper;
-import edu.bethlehem.scinexus.SecurityConfig.JwtAuthenticationFilter;
-import edu.bethlehem.scinexus.User.*;
-import edu.bethlehem.scinexus.UserLinks.UserLinks;
-import edu.bethlehem.scinexus.UserLinks.UserLinksService;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.util.Arrays;
+import java.util.List;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,31 +25,37 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Arrays;
-import java.util.List;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.mockito.ArgumentMatchers.any;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import edu.bethlehem.scinexus.Article.Article;
+import edu.bethlehem.scinexus.Auth.AuthenticationService;
+import edu.bethlehem.scinexus.JPARepository.UserRepository;
+import edu.bethlehem.scinexus.ResearchPaper.ResearchLanguage;
+import edu.bethlehem.scinexus.ResearchPaper.ResearchPaper;
+import edu.bethlehem.scinexus.SecurityConfig.JwtAuthenticationFilter;
+import edu.bethlehem.scinexus.User.OrganizationType;
+import edu.bethlehem.scinexus.User.Position;
+import edu.bethlehem.scinexus.User.Role;
+import edu.bethlehem.scinexus.User.User;
+import edu.bethlehem.scinexus.User.UserController;
+import edu.bethlehem.scinexus.User.UserRequestPatchDTO;
+import edu.bethlehem.scinexus.User.UserService;
+import edu.bethlehem.scinexus.UserLinks.UserLinks;
+import edu.bethlehem.scinexus.UserLinks.UserLinksService;
 
 @WebMvcTest(controllers = UserController.class)
 @AutoConfigureMockMvc(addFilters = false)
 @ExtendWith(MockitoExtension.class)
-
+@SuppressWarnings("unused")
 public class UserControllerTest {
 
         @Autowired
@@ -272,7 +282,6 @@ public class UserControllerTest {
 
         }
 
-        // TODO Obada
         @Test
         public void UserController_PATCH_updateUserPartially_ReturnUpdatedUser() throws Exception {
                 UserRequestPatchDTO userRequestDTO = new UserRequestPatchDTO();

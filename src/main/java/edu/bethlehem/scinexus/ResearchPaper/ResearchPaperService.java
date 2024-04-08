@@ -1,15 +1,9 @@
 package edu.bethlehem.scinexus.ResearchPaper;
 
-import edu.bethlehem.scinexus.JPARepository.ResearchPaperRepository;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-import lombok.RequiredArgsConstructor;
-
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 import java.lang.reflect.Method;
-import java.util.List;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -20,21 +14,22 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
-import edu.bethlehem.scinexus.Article.ArticleController;
 import edu.bethlehem.scinexus.JPARepository.InteractionRepository;
-import edu.bethlehem.scinexus.Notification.NotificationService;
 import edu.bethlehem.scinexus.JPARepository.OpinionRepository;
+import edu.bethlehem.scinexus.JPARepository.ResearchPaperRepository;
+import edu.bethlehem.scinexus.JPARepository.UserRepository;
+import edu.bethlehem.scinexus.JPARepository.UserResearchPaperRequestRepository;
+import edu.bethlehem.scinexus.Notification.NotificationService;
 import edu.bethlehem.scinexus.Organization.OrganizationNotFoundException;
 import edu.bethlehem.scinexus.SecurityConfig.JwtService;
 import edu.bethlehem.scinexus.User.Role;
 import edu.bethlehem.scinexus.User.User;
 import edu.bethlehem.scinexus.User.UserNotFoundException;
-import edu.bethlehem.scinexus.JPARepository.UserRepository;
-import edu.bethlehem.scinexus.JPARepository.UserResearchPaperRequestRepository;
-import edu.bethlehem.scinexus.User.UserRequestDTO;
-import edu.bethlehem.scinexus.User.UserRequestPatchDTO;
 import edu.bethlehem.scinexus.UserResearchPaper.ResearchPaperRequestKey;
 import edu.bethlehem.scinexus.UserResearchPaper.UserResearchPaperRequest;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor

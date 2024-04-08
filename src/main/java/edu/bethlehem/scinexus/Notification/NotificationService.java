@@ -1,6 +1,8 @@
 package edu.bethlehem.scinexus.Notification;
 
-import java.lang.reflect.Method;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,7 +10,6 @@ import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import edu.bethlehem.scinexus.JPARepository.NotificationRepository;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
@@ -16,20 +17,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
-import edu.bethlehem.scinexus.Organization.OrganizationNotFoundException;
-import edu.bethlehem.scinexus.ResearchPaper.ResearchPaperService;
-import edu.bethlehem.scinexus.Notification.Notification;
-import edu.bethlehem.scinexus.Notification.NotificationNotFoundException;
 import edu.bethlehem.scinexus.JPARepository.NotificationRepository;
-import edu.bethlehem.scinexus.Notification.NotificationRequestDTO;
+import edu.bethlehem.scinexus.JPARepository.UserLinksRepository;
+import edu.bethlehem.scinexus.JPARepository.UserRepository;
 import edu.bethlehem.scinexus.SecurityConfig.JwtService;
 import edu.bethlehem.scinexus.User.User;
 import edu.bethlehem.scinexus.User.UserNotFoundException;
-import edu.bethlehem.scinexus.JPARepository.UserRepository;
 import edu.bethlehem.scinexus.UserLinks.UserLinks;
-import edu.bethlehem.scinexus.JPARepository.UserLinksRepository;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
 import reactor.core.scheduler.Schedulers;

@@ -1,6 +1,5 @@
 package edu.bethlehem.scinexus.Academic;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.*;
@@ -9,7 +8,6 @@ import org.springframework.hateoas.*;
 import org.springframework.web.bind.annotation.*;
 
 import edu.bethlehem.scinexus.User.User;
-import edu.bethlehem.scinexus.JPARepository.UserRepository;
 
 @RestController
 @RequiredArgsConstructor
@@ -24,8 +22,7 @@ public class AcademicController {
     return ResponseEntity.ok(service.findAcademicById(academicId));
   }
 
-   public @GetMapping()
-    ResponseEntity<CollectionModel<EntityModel<User>>> all() {
+  public @GetMapping() ResponseEntity<CollectionModel<EntityModel<User>>> all() {
 
     return ResponseEntity.ok(service.findAllAcademics());
   }
@@ -41,7 +38,7 @@ public class AcademicController {
   @PatchMapping("/{id}")
   public ResponseEntity<?> updateUserPartially(@PathVariable(value = "id") Long academicId,
       @RequestBody AcademicRequestPatchDTO newAcademic) {
-    return new ResponseEntity<>(service.updateAcademicPartially(academicId, newAcademic),HttpStatus.CREATED);
+    return new ResponseEntity<>(service.updateAcademicPartially(academicId, newAcademic), HttpStatus.CREATED);
   }
 
   // We will be deleteing a user

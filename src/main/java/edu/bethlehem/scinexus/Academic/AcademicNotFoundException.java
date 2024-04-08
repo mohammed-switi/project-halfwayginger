@@ -1,7 +1,6 @@
 package edu.bethlehem.scinexus.Academic;
 
 import edu.bethlehem.scinexus.Error.GeneralException;
-import lombok.Getter;
 
 import org.springframework.http.HttpStatus;
 

@@ -1,33 +1,32 @@
 package edu.bethlehem.scinexus.repository;
 
-import edu.bethlehem.scinexus.DatabaseLoading.DataLoader;
-import edu.bethlehem.scinexus.JPARepository.UserRepository;
-import edu.bethlehem.scinexus.User.*;
+import java.util.List;
+import java.util.Optional;
+
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.jdbc.EmbeddedDatabaseConnection;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
 
-import java.awt.*;
-import java.util.List;
-import java.util.Optional;
-
+import edu.bethlehem.scinexus.JPARepository.UserRepository;
+import edu.bethlehem.scinexus.User.OrganizationType;
+import edu.bethlehem.scinexus.User.Position;
+import edu.bethlehem.scinexus.User.Role;
+import edu.bethlehem.scinexus.User.Status;
+import edu.bethlehem.scinexus.User.User;
 
 @AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
 @DataJpaTest
 public class UserRepositoryTests {
 
-
     @Autowired
     private UserRepository userRepository;
 
     @Test
-    public void UserRepository_SaveAll_ReturnUser(){
-        User user =User.builder()
+    public void UserRepository_SaveAll_ReturnUser() {
+        User user = User.builder()
                 .firstName("Mohammed")
                 .lastName("Sowaity")
                 .username("mohammed")
@@ -41,15 +40,15 @@ public class UserRepositoryTests {
                 .fieldOfWork("Software")
                 .build();
 
-        User savedUser=userRepository.save(user);
+        User savedUser = userRepository.save(user);
 
         Assertions.assertThat(savedUser).isNotNull();
         Assertions.assertThat(savedUser.getId()).isGreaterThan(0);
     }
 
     @Test
-    public void userRepository_GetAll_ReturnMoreThanOneUser(){
-        User user =User.builder()
+    public void userRepository_GetAll_ReturnMoreThanOneUser() {
+        User user = User.builder()
                 .firstName("Mohammed")
                 .lastName("Sowaity")
                 .username("mohammed1")
@@ -63,7 +62,7 @@ public class UserRepositoryTests {
                 .fieldOfWork("Software")
                 .build();
 
-        User user2 =User.builder()
+        User user2 = User.builder()
                 .firstName("Obadah")
                 .lastName("Tahboub")
                 .username("obaada")
@@ -77,18 +76,17 @@ public class UserRepositoryTests {
                 .fieldOfWork("IT")
                 .build();
 
-        userRepository.saveAll(List.of(user,user2));
+        userRepository.saveAll(List.of(user, user2));
 
-        List<User> getUsers=userRepository.findAll();
+        List<User> getUsers = userRepository.findAll();
 
         Assertions.assertThat(getUsers).isNotNull();
         Assertions.assertThat(getUsers.size()).isEqualTo(2);
     }
 
-
     @Test
-    public void UserRepository_FindByID_GetById(){
-        User user =User.builder()
+    public void UserRepository_FindByID_GetById() {
+        User user = User.builder()
                 .firstName("Nasreen")
                 .lastName("Tafish")
                 .username("tafoosha")
@@ -104,18 +102,15 @@ public class UserRepositoryTests {
                 .build();
         userRepository.save(user);
 
-        User findByidUser=userRepository.findById(user.getId()).get();
-
+        User findByidUser = userRepository.findById(user.getId()).get();
 
         Assertions.assertThat(findByidUser).isNotNull();
 
     }
 
-
-
     @Test
-    public void UserRepository_FindByStatus_ReturnUserNotNull(){
-        User user =User.builder()
+    public void UserRepository_FindByStatus_ReturnUserNotNull() {
+        User user = User.builder()
                 .firstName("Salem")
                 .lastName("Ismail")
                 .username("som3a")
@@ -133,17 +128,16 @@ public class UserRepositoryTests {
 
         userRepository.save(user);
 
-        User statusUser=userRepository.findByStatus(Status.ONLINE).get();
+        User statusUser = userRepository.findByStatus(Status.ONLINE).get();
 
         Assertions.assertThat(statusUser).isNotNull();
         Assertions.assertThat(statusUser.getStatus()).isEqualTo(Status.ONLINE);
 
-
     }
 
     @Test
-    public void UserRepository_UpdatedUser_ReturnUserNotNull(){
-        User user =User.builder()
+    public void UserRepository_UpdatedUser_ReturnUserNotNull() {
+        User user = User.builder()
                 .firstName("Mousa")
                 .lastName("Mehsed")
                 .username("hased")
@@ -161,25 +155,21 @@ public class UserRepositoryTests {
 
         userRepository.save(user);
 
-        User savedUser= userRepository.findById(user.getId()).get();
+        User savedUser = userRepository.findById(user.getId()).get();
 
         savedUser.setStatus(Status.OFFLINE);
         savedUser.setFirstName("JSAM");
 
-
-
-        User updatedUser= userRepository.save(savedUser);
-
+        User updatedUser = userRepository.save(savedUser);
 
         Assertions.assertThat(updatedUser.getFirstName()).isNotNull();
         Assertions.assertThat(updatedUser.getStatus()).isNotNull();
 
-
     }
 
     @Test
-    public void UserRepository_DeleteUser_ReturnUserNotNull(){
-        User user =User.builder()
+    public void UserRepository_DeleteUser_ReturnUserNotNull() {
+        User user = User.builder()
                 .firstName("MASHI")
                 .lastName("BAKI")
                 .username("LAKI")
@@ -199,11 +189,9 @@ public class UserRepositoryTests {
 
         userRepository.deleteById(user.getId());
 
-        Optional<User> deletedUser= userRepository.findById(user.getId());
+        Optional<User> deletedUser = userRepository.findById(user.getId());
 
         Assertions.assertThat(deletedUser).isEmpty();
-
-
 
     }
 

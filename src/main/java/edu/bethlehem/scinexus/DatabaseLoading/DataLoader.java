@@ -1,37 +1,42 @@
 package edu.bethlehem.scinexus.DatabaseLoading;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Random;
+import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Component;
+
 import edu.bethlehem.scinexus.Article.Article;
-import edu.bethlehem.scinexus.JPARepository.ArticleRepository;
 import edu.bethlehem.scinexus.Interaction.Interaction;
+import edu.bethlehem.scinexus.JPARepository.ArticleRepository;
 import edu.bethlehem.scinexus.JPARepository.InteractionRepository;
-import edu.bethlehem.scinexus.Journal.Journal;
 import edu.bethlehem.scinexus.JPARepository.JournalRepository;
-import edu.bethlehem.scinexus.Opinion.Opinion;
 import edu.bethlehem.scinexus.JPARepository.OpinionRepository;
-import edu.bethlehem.scinexus.Post.Post;
 import edu.bethlehem.scinexus.JPARepository.PostRepository;
-import edu.bethlehem.scinexus.JPARepository.UserRepository;
-import edu.bethlehem.scinexus.UserLinks.UserLinks;
-import edu.bethlehem.scinexus.UserLinks.UserLinksService;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-import edu.bethlehem.scinexus.ResearchPaper.ResearchLanguage;
-import edu.bethlehem.scinexus.ResearchPaper.ResearchPaper;
 import edu.bethlehem.scinexus.JPARepository.ResearchPaperRepository;
 import edu.bethlehem.scinexus.JPARepository.UserLinksRepository;
+import edu.bethlehem.scinexus.JPARepository.UserRepository;
+import edu.bethlehem.scinexus.Journal.Journal;
+import edu.bethlehem.scinexus.Opinion.Opinion;
+import edu.bethlehem.scinexus.Post.Post;
+import edu.bethlehem.scinexus.ResearchPaper.ResearchLanguage;
+import edu.bethlehem.scinexus.ResearchPaper.ResearchPaper;
 import edu.bethlehem.scinexus.User.OrganizationType;
 import edu.bethlehem.scinexus.User.Position;
 import edu.bethlehem.scinexus.User.Role;
 import edu.bethlehem.scinexus.User.User;
+import edu.bethlehem.scinexus.UserLinks.UserLinks;
+import edu.bethlehem.scinexus.UserLinks.UserLinksService;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Component;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-// [...]
-
-import java.util.*;
 
 @Component
 @RequiredArgsConstructor
@@ -267,7 +272,6 @@ public class DataLoader implements CommandLineRunner {
     private void generatePosts() {
         List<User> users = userRepository.findAll();
         List<Post> posts = new ArrayList<>();
-        Random random = new Random();
         for (User user : users) {
             for (int i = 0; i < 2; i++) {
 

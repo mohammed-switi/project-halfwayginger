@@ -5,22 +5,19 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 import java.util.List;
 
-import org.hibernate.mapping.Collection;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
-import edu.bethlehem.scinexus.Journal.JournalController;
+import edu.bethlehem.scinexus.JPARepository.UserLinksRepository;
+import edu.bethlehem.scinexus.JPARepository.UserRepository;
 import edu.bethlehem.scinexus.Notification.NotificationService;
 import edu.bethlehem.scinexus.SecurityConfig.JwtService;
 import edu.bethlehem.scinexus.User.User;
 import edu.bethlehem.scinexus.User.UserController;
 import edu.bethlehem.scinexus.User.UserNotFoundException;
-import edu.bethlehem.scinexus.JPARepository.UserLinksRepository;
-import edu.bethlehem.scinexus.JPARepository.UserRepository;
 import lombok.AllArgsConstructor;
 
 @Service

@@ -2,7 +2,6 @@ package edu.bethlehem.scinexus.File;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -10,13 +9,11 @@ import java.util.stream.Collectors;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import edu.bethlehem.scinexus.Journal.Journal;
-import edu.bethlehem.scinexus.Journal.JournalModelAssembler;
 import edu.bethlehem.scinexus.Journal.JournalNotFoundException;
 import edu.bethlehem.scinexus.JPARepository.JournalRepository;
 import edu.bethlehem.scinexus.Media.Media;
@@ -27,7 +24,6 @@ import edu.bethlehem.scinexus.User.User;
 import edu.bethlehem.scinexus.User.UserNotFoundException;
 import edu.bethlehem.scinexus.JPARepository.UserRepository;
 import lombok.AllArgsConstructor;
-import lombok.SneakyThrows;
 
 @Service
 @AllArgsConstructor
@@ -37,7 +33,6 @@ public class FileStorageService {
     private final JournalRepository journalRepository;
     private final UserRepository userRepository;
     private final MediaModelAssembler mediaAssembler;
-    private final JournalModelAssembler journalAssembler;
     private final JwtService jwtService;
 
     public Media saveOne(MultipartFile file, Authentication auth) {

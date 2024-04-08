@@ -1,15 +1,5 @@
 package edu.bethlehem.scinexus.Interaction;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import edu.bethlehem.scinexus.Journal.Journal;
-import edu.bethlehem.scinexus.Opinion.Opinion;
-import edu.bethlehem.scinexus.User.User;
-import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-
 import java.time.LocalDateTime;
 
 import org.hibernate.annotations.CreationTimestamp;
@@ -18,6 +8,21 @@ import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.type.SqlTypes;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
+import edu.bethlehem.scinexus.Journal.Journal;
+import edu.bethlehem.scinexus.Opinion.Opinion;
+import edu.bethlehem.scinexus.User.User;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
 
 @Data
 @Entity

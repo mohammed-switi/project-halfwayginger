@@ -1,37 +1,33 @@
 package edu.bethlehem.scinexus.Interaction;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
-import edu.bethlehem.scinexus.JPARepository.InteractionRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
-
 import edu.bethlehem.scinexus.DatabaseLoading.DataLoader;
+import edu.bethlehem.scinexus.JPARepository.InteractionRepository;
+import edu.bethlehem.scinexus.JPARepository.JournalRepository;
+import edu.bethlehem.scinexus.JPARepository.OpinionRepository;
+import edu.bethlehem.scinexus.JPARepository.UserRepository;
 import edu.bethlehem.scinexus.Journal.Journal;
 import edu.bethlehem.scinexus.Journal.JournalController;
 import edu.bethlehem.scinexus.Journal.JournalNotFoundException;
-import edu.bethlehem.scinexus.JPARepository.JournalRepository;
 import edu.bethlehem.scinexus.Notification.NotificationService;
 import edu.bethlehem.scinexus.Opinion.Opinion;
 import edu.bethlehem.scinexus.Opinion.OpinionController;
-
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
-
-import edu.bethlehem.scinexus.JPARepository.OpinionRepository;
 import edu.bethlehem.scinexus.SecurityConfig.JwtService;
 import edu.bethlehem.scinexus.User.User;
 import edu.bethlehem.scinexus.User.UserNotFoundException;
-import edu.bethlehem.scinexus.JPARepository.UserRepository;
 import lombok.RequiredArgsConstructor;
 
 @Service

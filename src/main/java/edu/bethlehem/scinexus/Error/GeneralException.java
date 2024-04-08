@@ -1,23 +1,23 @@
 package edu.bethlehem.scinexus.Error;
 
-import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
-public class GeneralException extends RuntimeException{
+public class GeneralException extends RuntimeException {
 
     private HttpStatus httpStatus;
-    public GeneralException(String message, HttpStatus httpStatus)
-    {    super(message);
 
-        this.httpStatus=httpStatus;
+    public GeneralException(String message, HttpStatus httpStatus) {
+        super(message);
+
+        this.httpStatus = httpStatus;
     }
-    public GeneralException(String message){
+
+    public GeneralException(String message) {
 
         super(message);
     }
 
-
-    public HttpStatus getHttpStatus(){
+    public HttpStatus getHttpStatus() {
         return httpStatus;
     }
 

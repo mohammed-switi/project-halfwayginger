@@ -1,13 +1,11 @@
 package edu.bethlehem.scinexus.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.bethlehem.scinexus.Article.*;
 import edu.bethlehem.scinexus.Auth.AuthenticationService;
 import edu.bethlehem.scinexus.Interaction.Interaction;
 import edu.bethlehem.scinexus.Interaction.InteractionType;
 import edu.bethlehem.scinexus.Journal.*;
 import edu.bethlehem.scinexus.Opinion.Opinion;
-import edu.bethlehem.scinexus.Post.*;
 import edu.bethlehem.scinexus.SecurityConfig.JwtAuthenticationFilter;
 import edu.bethlehem.scinexus.User.Position;
 import edu.bethlehem.scinexus.User.Role;
@@ -23,7 +21,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.Authentication;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
@@ -32,8 +29,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;

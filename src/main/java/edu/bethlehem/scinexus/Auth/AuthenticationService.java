@@ -4,7 +4,6 @@ import edu.bethlehem.scinexus.Auth.Email.EmailSender;
 import edu.bethlehem.scinexus.Auth.EmailToken.ConfirmationToken;
 import edu.bethlehem.scinexus.Auth.EmailToken.ConfirmationTokenService;
 import edu.bethlehem.scinexus.Auth.EmailToken.EmailConfirmationException;
-import edu.bethlehem.scinexus.Post.PostService;
 import edu.bethlehem.scinexus.SecurityConfig.JwtService;
 import edu.bethlehem.scinexus.User.*;
 

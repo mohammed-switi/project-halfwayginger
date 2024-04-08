@@ -1,13 +1,14 @@
 package edu.bethlehem.scinexus.Article;
 
 import edu.bethlehem.scinexus.Journal.JournalRequestPatchDTO;
-import jakarta.validation.constraints.NotBlank;
-import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.experimental.SuperBuilder;
 
 @SuperBuilder
 @Data
+@EqualsAndHashCode(callSuper = true)
+
 public class ArtilceRequestPatchDTO extends JournalRequestPatchDTO {
     // @NotBlank(message = "The Article Subject Shouldn't Be Empty")
     private String subject;

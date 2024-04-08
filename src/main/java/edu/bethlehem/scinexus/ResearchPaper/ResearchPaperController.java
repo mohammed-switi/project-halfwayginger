@@ -1,18 +1,26 @@
 package edu.bethlehem.scinexus.ResearchPaper;
 
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
-import java.util.List;
-
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.*;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.IanaLinkRelations;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.hateoas.*;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import edu.bethlehem.scinexus.UserResearchPaper.UserResearchPaperRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
@@ -33,7 +41,8 @@ public class ResearchPaperController {
 
     CollectionModel<EntityModel<ResearchPaper>> researchpapers = service.findAllResearchPapers();
 
-    return ResponseEntity.ok(CollectionModel.of(researchpapers, linkTo(methodOn(ResearchPaperController.class).all()).withSelfRel()));
+    return ResponseEntity
+        .ok(CollectionModel.of(researchpapers, linkTo(methodOn(ResearchPaperController.class).all()).withSelfRel()));
   }
 
   @PostMapping()
@@ -42,8 +51,9 @@ public class ResearchPaperController {
 
     EntityModel<ResearchPaper> entityModel = service.createResearchPaper(newResearchPaperDTO,
         authentication);
-  return new ResponseEntity<>(entityModel,HttpStatus.CREATED);
- //   return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
+    return new ResponseEntity<>(entityModel, HttpStatus.CREATED);
+    // return
+    // ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
   }
 
   @PostMapping("{researchPaperId}/validate")
@@ -54,8 +64,9 @@ public class ResearchPaperController {
     EntityModel<ResearchPaper> entityModel = service.validate(researchPaperId,
         authentication);
 
-    return new ResponseEntity<>(entityModel,HttpStatus.OK);
- //   return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
+    return new ResponseEntity<>(entityModel, HttpStatus.OK);
+    // return
+    // ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
   }
 
   @PostMapping("{researchPaperId}/access")
@@ -63,9 +74,10 @@ public class ResearchPaperController {
       Authentication authentication) {
     EntityModel<ResearchPaper> entityModel = service.requestAccessToResearchPaper(researchPaperId,
         authentication);
-    return new ResponseEntity<>(entityModel,HttpStatus.OK);
-//    return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF)
-//        .toUri()).body(entityModel);
+    return new ResponseEntity<>(entityModel, HttpStatus.OK);
+    // return
+    // ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF)
+    // .toUri()).body(entityModel);
   }
 
   @PostMapping("{researchPaperId}/access/{userId}")
@@ -93,8 +105,9 @@ public class ResearchPaperController {
       @RequestBody @NotNull ResearchPaperRequestPatchDTO newResearchPaperDTO) {
     EntityModel<ResearchPaper> entityModel = service.updateResearchPaperPartially(
         researchpaperId, newResearchPaperDTO);
-    return new ResponseEntity<>(entityModel,HttpStatus.CREATED);
-   // return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
+    return new ResponseEntity<>(entityModel, HttpStatus.CREATED);
+    // return
+    // ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
 
   }
 

@@ -1,45 +1,36 @@
 package edu.bethlehem.scinexus.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.bethlehem.scinexus.Auth.*;
-import edu.bethlehem.scinexus.SecurityConfig.JwtAuthenticationFilter;
-import edu.bethlehem.scinexus.SecurityConfig.JwtService;
-import edu.bethlehem.scinexus.User.OrganizationType;
-import edu.bethlehem.scinexus.User.Position;
-import edu.bethlehem.scinexus.User.Role;
-import jakarta.mail.internet.MimeMessage;
+import static org.mockito.BDDMockito.given;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 // import org.junit.runner.RunWith;
 import org.mockito.ArgumentMatchers;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import java.util.Arrays;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import edu.bethlehem.scinexus.Auth.AuthenticationController;
+import edu.bethlehem.scinexus.Auth.AuthenticationRequest;
+import edu.bethlehem.scinexus.Auth.AuthenticationResponse;
+import edu.bethlehem.scinexus.Auth.AuthenticationService;
+import edu.bethlehem.scinexus.Auth.RegisterRequest;
+import edu.bethlehem.scinexus.SecurityConfig.JwtAuthenticationFilter;
+import edu.bethlehem.scinexus.User.OrganizationType;
+import edu.bethlehem.scinexus.User.Position;
+import edu.bethlehem.scinexus.User.Role;
 
 @WebMvcTest(controllers = AuthenticationController.class)
 @AutoConfigureMockMvc(addFilters = false)
@@ -60,8 +51,6 @@ public class AuthenticationControllerTest {
 
         private RegisterRequest registerOrganizationRequest;
         private RegisterRequest registerAcademicRequest;
-
-        private AuthenticationResponse authenticationResponse;
 
         private AuthenticationRequest authenticationRequest;
 

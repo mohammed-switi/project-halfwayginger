@@ -1,10 +1,5 @@
 package edu.bethlehem.scinexus.Opinion;
 
-
-import edu.bethlehem.scinexus.Journal.Journal;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -23,8 +18,7 @@ public class OpinionDTO {
     @NotBlank(message = "The Opinion Content can't Be Empty")
     private String content;
 
-    @Min(value = 1,message = "Id can't be less than One")
+    @Min(value = 1, message = "Id can't be less than One")
     private Long journalId;
-
 
 }

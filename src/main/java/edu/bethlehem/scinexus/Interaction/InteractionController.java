@@ -1,14 +1,18 @@
 package edu.bethlehem.scinexus.Interaction;
 
-import edu.bethlehem.scinexus.JPARepository.InteractionRepository;
-import org.springframework.http.*;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.hateoas.*;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import edu.bethlehem.scinexus.JPARepository.JournalRepository;
-import edu.bethlehem.scinexus.JPARepository.OpinionRepository;
-import edu.bethlehem.scinexus.JPARepository.UserRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -17,10 +21,10 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/interactions")
 public class InteractionController {
 
-private final InteractionService service;
+  private final InteractionService service;
 
   @GetMapping("/{interactionId}")
- public ResponseEntity<EntityModel<Interaction>> one(@PathVariable Long interactionId) {
+  public ResponseEntity<EntityModel<Interaction>> one(@PathVariable Long interactionId) {
     // TBC
     return ResponseEntity.ok(service.findInteractionById(interactionId));
   }

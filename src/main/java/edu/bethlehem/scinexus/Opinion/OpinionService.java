@@ -1,15 +1,7 @@
 package edu.bethlehem.scinexus.Opinion;
 
-import edu.bethlehem.scinexus.DatabaseLoading.DataLoader;
-import edu.bethlehem.scinexus.JPARepository.OpinionRepository;
-import edu.bethlehem.scinexus.JPARepository.UserRepository;
-import edu.bethlehem.scinexus.Journal.JournalNotFoundException;
-import edu.bethlehem.scinexus.SecurityConfig.JwtService;
-import edu.bethlehem.scinexus.JPARepository.JournalRepository;
-import edu.bethlehem.scinexus.User.User;
-import edu.bethlehem.scinexus.User.UserNotFoundException;
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,8 +10,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import edu.bethlehem.scinexus.DatabaseLoading.DataLoader;
+import edu.bethlehem.scinexus.JPARepository.JournalRepository;
+import edu.bethlehem.scinexus.JPARepository.OpinionRepository;
+import edu.bethlehem.scinexus.JPARepository.UserRepository;
+import edu.bethlehem.scinexus.Journal.JournalNotFoundException;
+import edu.bethlehem.scinexus.SecurityConfig.JwtService;
+import lombok.Data;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @Data

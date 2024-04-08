@@ -6,7 +6,6 @@ import java.util.Arrays;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang3.ObjectUtils;
 
-import edu.bethlehem.scinexus.User.Role;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import lombok.extern.slf4j.Slf4j;

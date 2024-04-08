@@ -1,30 +1,40 @@
 package edu.bethlehem.scinexus.Media;
 
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import edu.bethlehem.scinexus.JPARepository.MediaRepository;
-import org.springframework.http.*;
-import org.springframework.security.core.Authentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
-import org.springframework.hateoas.*;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import edu.bethlehem.scinexus.File.FileStorageService;
-import edu.bethlehem.scinexus.User.User;
-import edu.bethlehem.scinexus.User.UserNotFoundException;
+import edu.bethlehem.scinexus.JPARepository.MediaRepository;
 import edu.bethlehem.scinexus.JPARepository.UserRepository;
 import edu.bethlehem.scinexus.SecurityConfig.JwtService;
+import edu.bethlehem.scinexus.User.User;
+import edu.bethlehem.scinexus.User.UserNotFoundException;
 import lombok.AllArgsConstructor;
 
 @RestController
@@ -73,7 +83,7 @@ public class MediaController {
     String[] filenames = this.getFiles();
     boolean contains = Arrays.asList(filenames).contains(filename);
     if (!contains) {
-      return new ResponseEntity("File Not Found", HttpStatus.NOT_FOUND);
+      return ResponseEntity.notFound().build();
     }
 
     // Setting up the filepath
@@ -89,9 +99,6 @@ public class MediaController {
     } catch (FileNotFoundException e) {
       throw new MediaNotFoundException(mediaId, HttpStatus.NOT_FOUND);
     }
-
-    // Creating a new instance of HttpHeaders Object
-    HttpHeaders headers = new HttpHeaders();
 
     // Setting up values for contentType and headerValue
     String contentType = "application/octet-stream";
