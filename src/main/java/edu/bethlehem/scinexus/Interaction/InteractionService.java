@@ -13,6 +13,7 @@ import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import edu.bethlehem.scinexus.DatabaseLoading.DataLoader;
 import edu.bethlehem.scinexus.JPARepository.InteractionRepository;
@@ -177,13 +178,7 @@ public class InteractionService {
 
         public void deleteInteraction(Long interactionId, Authentication authentication) {
                 logger.trace("Deleting Interaction");
-                User user = userRepository.findById(jwtService.extractId(
-                                authentication))
-                                .orElseThrow(
-                                                () -> new UserNotFoundException(
-                                                                "User is not found with username: "
-                                                                                + authentication.getName(),
-                                                                HttpStatus.NOT_FOUND));
+                User user = jwtService.getUser(authentication);
                 Interaction interaction = interactionRepository.findByIdAndInteractorUser(interactionId, user);
                 if (interaction == null)
 
@@ -194,6 +189,7 @@ public class InteractionService {
                         interaction.getJournal().removeInteraction();
                 if (interaction.getOpinion() != null)
                         interaction.getOpinion().removeInteraction();
+
                 interactionRepository.delete(interaction);
         }
 

@@ -27,28 +27,10 @@ public class AcademicController {
     return ResponseEntity.ok(service.findAllAcademics());
   }
 
-  // No need for any PUT Method
-  // @PutMapping("/{id}")
-  // ResponseEntity<?> editAcademic(@Valid @RequestBody AcademicRequestDTO
-  // newAcademic, @PathVariable Long id) {
-
-  // return ResponseEntity.ok(service.updateAcademic(id, newAcademic));
-  // }
-
   @PatchMapping("/{id}")
   public ResponseEntity<?> updateUserPartially(@PathVariable(value = "id") Long academicId,
       @RequestBody AcademicRequestPatchDTO newAcademic) {
     return new ResponseEntity<>(service.updateAcademicPartially(academicId, newAcademic), HttpStatus.CREATED);
   }
 
-  // We will be deleteing a user
-  // @DeleteMapping("/{id}")
-  // ResponseEntity<?> deleteAcademic(@PathVariable Long id) throws
-  // AcademicNotFoundException {
-
-  // service.deleteAcademic(id);
-
-  // return ResponseEntity.noContent().build();
-
-  // }
 }
