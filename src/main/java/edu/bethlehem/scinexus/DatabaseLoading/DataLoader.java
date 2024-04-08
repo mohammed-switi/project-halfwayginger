@@ -118,7 +118,7 @@ public class DataLoader implements CommandLineRunner {
         user.addJournal(article);
         logger.debug("Generating Base Article with " + article.toString());
 
-        userRepository.save(user);
+       userRepository.save(user);
     }
 
     private void generateLinks() {

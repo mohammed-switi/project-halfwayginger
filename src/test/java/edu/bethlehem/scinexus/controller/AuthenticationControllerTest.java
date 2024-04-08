@@ -143,8 +143,7 @@ public class AuthenticationControllerTest {
         @Test
         public void AuthenticationController_LoginRequest_ReturnAuthenticationResponse() throws Exception {
 
-                AuthenticationResponse authenticationResponse = new AuthenticationResponse("Dummy Jwt Token",
-                                "Dummy ConfirmationToken");
+                AuthenticationResponse authenticationResponse = new AuthenticationResponse("Dummy Jwt Token");
                 System.out.println(authenticationResponse);
                 given(authService.authenticate(ArgumentMatchers.any()))
                                 .willReturn(authenticationResponse);
@@ -157,8 +156,6 @@ public class AuthenticationControllerTest {
                 response.andExpect(MockMvcResultMatchers.status().isOk())
                                 .andExpect(MockMvcResultMatchers.jsonPath("$.jwtToken",
                                                 CoreMatchers.is(authenticationResponse.getJwtToken())))
-                                .andExpect(MockMvcResultMatchers.jsonPath("$.confirmationToken",
-                                                CoreMatchers.is(authenticationResponse.getConfirmationToken())))
 
                                 .andDo(MockMvcResultHandlers.print());
 
