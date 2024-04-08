@@ -1,24 +1,20 @@
-`<a name="readme-top"></a>`
-
-[LinkedIn][linkedin-url]
 
 <!-- PROJECT LOGO -->
 
 <br />
-<div align="midpoint">
+<div align="center">
+  <img src="https://github.com/S24-SWER313/project-halfwayginger/assets/56078065/f3a27144-f0e6-40f7-ab7a-663e5b509f9e" alt="Artboard 1" width="500">
+</div>
 
-![Artboard 1](https://github.com/S24-SWER313/project-halfwayginger/assets/56078065/f3a27144-f0e6-40f7-ab7a-663e5b509f9e)
-
-
-  <h3 align="center">SciNexus Project Readme</h3>
+<h3 align="center">SCINEXUS README</h3>
 
 <p align="center">
     <br />
 <!--     <a href="https://github.com/othneildrew/Best-README-Template"><strong>Explore the docs »</strong></a>
     <br /> -->
     <br />
-  </p>
-</div>
+</p>
+
 
 <!-- TABLE OF CONTENTS -->
 
@@ -80,6 +76,8 @@ We have implemented RESTFull API and maintained the flow of instructions with th
 * [![Google][google-icon]][google-url]
 * [![Github][github-icon]][github-url]
 * [![Bootstrap][Bootstrap.com]][Bootstrap-url]
+* [![Thymeleaf][thymeleaf-icon]][thymeleaf-url]
+
 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
@@ -92,7 +90,7 @@ This is a guide to help you set up your project locally. Follow these steps to g
 
 ### Prerequisites
 
-Runnung this project with full functionalities will require:
+Running this project with full functionalities will require:
 
 - [Docker](https://www.docker.com/)
 - [MySQL](https://www.mysql.com/)
@@ -111,7 +109,7 @@ git clone https://github.com/S24-SWER313/project-halfwayginger.git
 2. Install NPM packages
 
 ```sh
-npm install maildev
+npm install -g maildev
 ```
 
 4. Start The Docker Server
@@ -137,6 +135,8 @@ spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQLDialect
 spring.datasource.url=jdbc:mysql://localhost:3306/scinexusdatabase
 spring.datasource.password=1234
 ```
+7. **Email Verification**: 
+   When a user tries to register, the request will start loading to send an email verification. The user must then go to [localhost:1080](http://localhost:1080) to verify the email.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
