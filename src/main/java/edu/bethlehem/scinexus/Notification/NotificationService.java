@@ -152,8 +152,7 @@ public class NotificationService {
 
     public void notifyUser(User user, String content, WebMvcLinkBuilder hyperLink) {
         logger.trace("sending notification to user with id: " + user.getId());
-        Notification notification = new Notification();
-        notification.setContent(content);
+        Notification notification = new Notification(content, Status.UNSEEN);
         notification.setUser(user);
         notification.setHyperLinkString(hyperLink.toString());
 

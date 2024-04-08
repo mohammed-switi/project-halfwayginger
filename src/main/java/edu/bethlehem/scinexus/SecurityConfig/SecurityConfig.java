@@ -200,7 +200,7 @@ public class SecurityConfig {
 
                                                 // researchpapers
                                                 .requestMatchers(HttpMethod.GET,
-                                                                "/researchpapers/")
+                                                                "/researchpapers")
                                                 .access(authorizationManager.admin())
 
                                                 .requestMatchers(HttpMethod.DELETE,

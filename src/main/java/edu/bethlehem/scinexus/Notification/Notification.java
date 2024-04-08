@@ -29,21 +29,18 @@ public class Notification {
     @UpdateTimestamp
     private LocalDateTime updateDateTime;
 
-    @NotNull(message = "The Notification Content Shouldn't Be Null")
-    @NotBlank(message = "The Notification Content cannot Be Empty")
     private String content;
 
     // @NotBlank(message = "The hyperLinkString cannot Be Empty")
     private String hyperLinkString;
 
     @Enumerated(EnumType.STRING)
-    @NotNull(message = "The Notification Content Shouldn't Be Null")
     @Default
     private Status status = Status.UNSEEN;
 
     @ManyToOne
     @JoinColumn(name = "userId")
-    @NotNull(message = "The Notification Meant User Shouldn't Be Null")
+
     private User user;
 
     public Notification(String content, Status status) {

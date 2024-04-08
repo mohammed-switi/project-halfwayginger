@@ -75,8 +75,9 @@ public class OrganizationService {
             for (Method method : OrganizationRequestDTO.class.getMethods()) {
                 if (method.getName().startsWith("get") && method.getParameterCount() == 0) {
                     Object value = method.invoke(newOrganizationRequestDTO);
-
                     String propertyName = method.getName().substring(3); // remove "get"
+                    if (propertyName.equals("Class")) // Class is a reserved keyword in Java
+                        continue;
                     Method setter = User.class.getMethod("set" + propertyName, method.getReturnType());
                     setter.invoke(organization, value);
 
@@ -124,16 +125,18 @@ public class OrganizationService {
     }
 
     public void removeAcademic(Long academicId, Authentication auth) {
+        logger.trace("Removing Academic from Organization");
+
         User organization = getOrganization(auth);
         User academic = userRepository.findById(academicId)
                 .orElseThrow(() -> new UserNotFoundException(academicId));
         if (academic.getOrganization() == null)
             throw new UserNotFoundException("Academic is not accosiated with any organization", HttpStatus.CONFLICT);
-        if (academic.getOrganization().getId() == organization.getId())
+        if (academic.getOrganization().getId() != organization.getId())
             throw new UserNotFoundException("Academic is not accosiated with your organization", HttpStatus.FORBIDDEN);
 
         academic.setOrganization(null);
-      assembler.toModel(userRepository.save(academic));
+        assembler.toModel(userRepository.save(academic));
 
     }
 
