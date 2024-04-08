@@ -171,7 +171,7 @@ spring.datasource.password=1234
 - **Push Notifications**: Users receive timely push notifications to stay updated on relevant activities and interactions.
 
 ### Account Verification
-- **Email Verification**: To ensure the authenticity of users and maintain a trusted community, email verification is implemented as a mandatory step in the registration process.
+- **Email Verification**: To ensure the authenticity of users and maintain a trusted community, email verification is implemented as a mandatory step in the registration process. you can check that by [host]:1080/
 
 ### And More
 - **Additional Features**: The platform offers a range of other features designed to enhance user experience, facilitate collaboration, and promote knowledge sharing.
