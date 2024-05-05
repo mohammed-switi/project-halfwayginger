@@ -1,5 +1,7 @@
 package edu.bethlehem.scinexus.SecurityConfig;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
@@ -22,6 +24,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.cors.CorsConfiguration;
 
 import edu.bethlehem.scinexus.Authorization.AuthorizationManager;
 import edu.bethlehem.scinexus.User.UserService;
@@ -46,13 +49,20 @@ public class SecurityConfig {
                              // .exceptionHandling(customizer -> customizer.authenticationEntryPoint(new
                              // HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
                                 .csrf(AbstractHttpConfigurer::disable)
-
+                                .cors(cors -> cors.configurationSource(request -> {
+                                        var corsConfiguration = new CorsConfiguration();
+                                        corsConfiguration.setAllowedOrigins(List.of("http://localhost:5173"));
+                                        corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
+                                        corsConfiguration.setAllowedHeaders(List.of("*"));
+                                        corsConfiguration.setAllowCredentials(true);
+                                        return corsConfiguration;
+                                }))
                                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
                                                 .requestMatchers("/api/v1/auth/**").permitAll()
-//                                                .requestMatchers("/index.html").permitAll()
-                                                 .requestMatchers("/group-chat.html").permitAll()
+                                                // .requestMatchers("/index.html").permitAll()
+                                                .requestMatchers("/group-chat.html").permitAll()
 
-                                        .requestMatchers("/privateChat.html").permitAll()
+                                                .requestMatchers("/privateChat.html").permitAll()
                                                 .requestMatchers("/css/**").permitAll()
                                                 .requestMatchers("/js/**").permitAll()
                                                 .requestMatchers("/ws/**").permitAll()
@@ -233,14 +243,14 @@ public class SecurityConfig {
                                 .formLogin(loginConfig -> {
                                         loginConfig.loginPage("/api/v1/auth/login").permitAll();
                                         loginConfig.loginProcessingUrl("/api/v1/auth/login").permitAll();
-                                   //     loginConfig.successForwardUrl("/dashboard");
+                                        // loginConfig.successForwardUrl("/dashboard");
                                         loginConfig.usernameParameter("email");
                                         loginConfig.passwordParameter("password");
                                 })
                                 .oauth2ResourceServer(oauth2Config -> oauth2Config.jwt(jwt -> jwt.decoder(jwtDecoder)))//
                                 .oauth2Login(oauth2LoginConfig -> {
                                         oauth2LoginConfig.loginPage("/api/v1/auth/login").permitAll();
-                                        //oauth2LoginConfig.loginProcessingUrl("/api/v1/auth/login");
+                                        // oauth2LoginConfig.loginProcessingUrl("/api/v1/auth/login");
                                         oauth2LoginConfig.defaultSuccessUrl("/index", true);
                                 })
 
@@ -272,7 +282,5 @@ public class SecurityConfig {
                 auth.authenticationProvider(jwtAuthenticationProvider);
                 auth.userDetailsService(userDetailsService);
         }
-
-
 
 }
