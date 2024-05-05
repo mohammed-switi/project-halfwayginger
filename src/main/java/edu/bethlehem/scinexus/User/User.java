@@ -243,6 +243,17 @@ public class User implements UserDetailsImpl {
         journals.add(journal);
     }
 
+    public void addContributedJournal(Journal journal) {
+        if (contributedJournals == null) {
+            contributedJournals = new HashSet<>();
+        }
+        if (contributedJournals.contains(journal)) {
+            return;
+        }
+
+        contributedJournals.add(journal);
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Collections.singletonList(new SimpleGrantedAuthority(role.name()));

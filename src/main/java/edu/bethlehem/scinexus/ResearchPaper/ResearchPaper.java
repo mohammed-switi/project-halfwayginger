@@ -53,12 +53,12 @@ public class ResearchPaper extends Journal {
     @Default
     private Integer noOfPages = 0;
 
-    @OneToMany
+    @OneToMany(fetch = FetchType.EAGER)
     @JoinColumn(name = "research_paper_id")
     @JsonIgnore
     private Set<UserResearchPaperRequest> requestsForAccess;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "research_paper_validated_by_organization", joinColumns = @JoinColumn(name = "validated"), inverseJoinColumns = @JoinColumn(name = "validated_research_papers"))
     private List<User> validatedBy;
 

@@ -73,6 +73,7 @@ public class DataLoader implements CommandLineRunner {
         generateOpinions();
         generateInteractions();
         generatePosts();
+        generateRandomContributionsAndValidations();
 
         long endTime = System.currentTimeMillis();
         long totalTime = endTime - startTime;
@@ -104,7 +105,7 @@ public class DataLoader implements CommandLineRunner {
         user.setEmail("obada@gmail.com");
         user.setPassword(passwordEncoder.encode("Mohammed1234!"));
         user.setPhoneNumber("123.456.7890");
-        user.setRole(Role.ORGANIZATION);
+        user.setRole(Role.ADMIN);
         user.setType(OrganizationType.BUSINESS);
 
         logger.debug("Generating Base User with " + user.toString());
@@ -118,7 +119,7 @@ public class DataLoader implements CommandLineRunner {
         user.addJournal(article);
         logger.debug("Generating Base Article with " + article.toString());
 
-       userRepository.save(user);
+        userRepository.save(user);
     }
 
     private void generateLinks() {
@@ -275,7 +276,7 @@ public class DataLoader implements CommandLineRunner {
         for (User user : users) {
             for (int i = 0; i < 2; i++) {
 
-                Post post = new Post(dataGenerator.generateRandomUniversityName(), user);
+                Post post = new Post(dataGenerator.generateRandomWords(), user);
                 post.setInteractionsCount(0);
                 post.setOpinionsCount(0);
                 post.setVisibility(dataGenerator.generateRandomVisibility());
@@ -372,4 +373,20 @@ public class DataLoader implements CommandLineRunner {
         logger.debug(interactions.size() + " Interactions generated and saved successfully");
     }
 
+    public void generateRandomContributionsAndValidations() {
+        List<User> users = userRepository.findAll();
+        List<ResearchPaper> researchPapers = researchPaperRepository.findAll();
+        Random random = new Random();
+        for (User user : users) {
+            for (int i = 0; i < random.nextInt(10); i++) {
+                ResearchPaper journal = researchPapers.get(random.nextInt(researchPapers.size()));
+                // if (user.getRole() == Role.ACADEMIC)
+
+                user.addContributedJournal(journal);
+
+            }
+        }
+        userRepository.saveAll(users);
+        // journalRepository.saveAll(researchPapers);
+    }
 }
