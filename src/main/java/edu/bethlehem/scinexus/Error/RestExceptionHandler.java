@@ -1,13 +1,13 @@
 package edu.bethlehem.scinexus.Error;
 
-import edu.bethlehem.scinexus.Auth.Email.EmailException;
-import edu.bethlehem.scinexus.Journal.JournalNotFoundException;
-import edu.bethlehem.scinexus.User.UserNotFoundException;
-import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.UnsupportedJwtException;
-import io.jsonwebtoken.security.SignatureException;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.ConstraintViolationException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageConversionException;
@@ -23,8 +23,13 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
-import java.io.IOException;
-import java.util.*;
+import edu.bethlehem.scinexus.Auth.Email.EmailException;
+import edu.bethlehem.scinexus.User.UserNotFoundException;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.UnsupportedJwtException;
+import io.jsonwebtoken.security.SignatureException;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.ConstraintViolationException;
 
 @ControllerAdvice
 public class RestExceptionHandler {
@@ -43,7 +48,6 @@ public class RestExceptionHandler {
                 return new ResponseEntity<>(errorResponse, ex.getHttpStatus());
 
         }
-
 
         @ExceptionHandler(UserNotFoundException.class)
         public final ResponseEntity<Object> handleUserNotFoundException(UserNotFoundException ex) {

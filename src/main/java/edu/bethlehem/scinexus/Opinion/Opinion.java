@@ -100,6 +100,6 @@ public class Opinion {
     }
 
     public void addOpinion() {
-        opinionsCount++;
+        this.setOpinionsCount(this.opinionsCount += 1);
     }
 }
