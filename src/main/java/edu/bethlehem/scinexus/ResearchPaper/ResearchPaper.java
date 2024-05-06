@@ -10,6 +10,8 @@ import edu.bethlehem.scinexus.User.User;
 import edu.bethlehem.scinexus.UserResearchPaper.UserResearchPaperRequest;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
@@ -60,6 +62,7 @@ public class ResearchPaper extends Journal {
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "research_paper_validated_by_organization", joinColumns = @JoinColumn(name = "validated"), inverseJoinColumns = @JoinColumn(name = "validated_research_papers"))
+    @JsonBackReference
     private List<User> validatedBy;
 
     public ResearchPaper(String title, String content, String description, String subject, User publisher) {
@@ -68,6 +71,14 @@ public class ResearchPaper extends Journal {
         this.subject = subject;
         this.description = description;
 
+    }
+
+    public void addValidatedBy(User user) {
+        if (this.validatedBy == null) {
+            this.validatedBy = List.of(user);
+            return;
+        }
+        this.validatedBy.add(user);
     }
 
     // @Override

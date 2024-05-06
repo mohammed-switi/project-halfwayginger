@@ -1,6 +1,7 @@
 package edu.bethlehem.scinexus.User;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -128,14 +129,12 @@ public class User implements UserDetailsImpl {
     @JsonIgnore
     private String password;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne
     @JoinColumn(name = "profile_picture_id")
-    @JsonIgnore
     private Media profilePicture;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne
     @JoinColumn(name = "profile_cover_id")
-    @JsonIgnore
     private Media profileCover;
 
     @Size(min = 0, max = 220, message = "The bio should be in maximum 220 characters")
@@ -219,8 +218,11 @@ public class User implements UserDetailsImpl {
     // @NotNull(message = "You should Specify if Verified Or Not")
     private Boolean verified;
 
-    @ManyToMany(mappedBy = "validatedBy")
-    List<ResearchPaper> validated;
+    @ManyToMany(mappedBy = "validatedBy", fetch = FetchType.EAGER)
+    @Default
+    @JsonBackReference
+
+    private List<ResearchPaper> validated = new ArrayList<>();
 
     public User(String firstName, String username, String password, String email, Boolean locked, Boolean enabled) {
         this.firstName = firstName;
@@ -252,6 +254,17 @@ public class User implements UserDetailsImpl {
         }
 
         contributedJournals.add(journal);
+    }
+
+    public void addValidatedJournal(ResearchPaper journal) {
+        if (validated == null) {
+            validated = new ArrayList<>();
+        }
+        if (validated.contains(journal)) {
+            return;
+        }
+
+        validated.add(journal);
     }
 
     @Override

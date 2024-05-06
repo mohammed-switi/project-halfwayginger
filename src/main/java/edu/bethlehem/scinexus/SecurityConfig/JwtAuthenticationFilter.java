@@ -1,11 +1,10 @@
 package edu.bethlehem.scinexus.SecurityConfig;
 
 import java.io.IOException;
+import java.util.Date;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.bethlehem.scinexus.Error.GeneralErrorResponse;
-import edu.bethlehem.scinexus.Error.GeneralException;
 import org.springframework.lang.NonNull;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,7 +12,10 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import edu.bethlehem.scinexus.User.UserNotFoundException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import edu.bethlehem.scinexus.Error.GeneralErrorResponse;
+import edu.bethlehem.scinexus.Error.GeneralException;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.security.SignatureException;
@@ -22,21 +24,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.lang.NonNull;
-import org.springframework.security.authentication.InternalAuthenticationServiceException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
-import org.springframework.stereotype.Component;
-import org.springframework.web.filter.OncePerRequestFilter;
-
-import java.io.IOException;
-import java.util.Date;
 
 @Component
 @RequiredArgsConstructor
@@ -84,7 +71,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 filterChain.doFilter(request, response);
             }
-        }catch (GeneralException ex){
+        } catch (GeneralException ex) {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
 
             GeneralErrorResponse errorResponse = GeneralErrorResponse
@@ -95,8 +82,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     .throwable(ex.getCause())
                     .build();
             response.getWriter().write(objectMapper.writeValueAsString(errorResponse));
-        }
-        catch (InternalAuthenticationServiceException exception){
+        } catch (InternalAuthenticationServiceException exception) {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             response.getWriter().write("An Error Has occurred " + exception.getLocalizedMessage());
 
