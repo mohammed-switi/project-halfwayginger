@@ -38,13 +38,14 @@ public class AuthorizationManager {
 
     // Enhanced Version Of Code
     public boolean isJournalOwner(Long journalId, User user) {
+
         Journal journal = journalRepository.findById(journalId)
                 .orElseThrow(() -> new JournalNotFoundException(journalId, HttpStatus.NOT_FOUND));
         return journal.getPublisher().getId().equals(user.getId());
     }
 
-    public org.springframework.security.authorization.AuthorizationManager<RequestAuthorizationContext> readJournals() throws JournalNotFoundException {
-
+    public org.springframework.security.authorization.AuthorizationManager<RequestAuthorizationContext> readJournals()
+            throws JournalNotFoundException {
 
         return (authentication, object) -> {
             Long journalId = Long.parseLong(object.getVariables().get("journalId"));
@@ -52,6 +53,8 @@ public class AuthorizationManager {
                     .orElseThrow(() -> new JournalNotFoundException(journalId,
                             HttpStatus.NOT_FOUND));
             Long userId = jwtService.extractId(authentication.get());
+            if (jwtService.getUser(userId).getRole() == Role.ADMIN)
+                return new AuthorizationDecision(true);
             // check if the user is the publisher journal
             if (journal.getVisibility().equals(Visibility.PUBLIC)) {
                 return new AuthorizationDecision(true);
@@ -113,7 +116,8 @@ public class AuthorizationManager {
                             HttpStatus.NOT_FOUND));
             Long userId = jwtService.extractId(authentication.get());
             // check if the user is the publisher journal
-
+            if (jwtService.getUser(userId).getRole() == Role.ADMIN)
+                return new AuthorizationDecision(true);
             if (journal.getPublisher().getId().equals(userId)) {
 
                 return new AuthorizationDecision(true);
@@ -135,7 +139,8 @@ public class AuthorizationManager {
                             HttpStatus.NOT_FOUND));
             Long userId = jwtService.extractId(authentication.get());
             // check if the user is the publisher journal
-
+            if (jwtService.getUser(userId).getRole() == Role.ADMIN)
+                return new AuthorizationDecision(true);
             if (journal.getPublisher().getId().equals(userId)) {
                 return new AuthorizationDecision(true);
             }
@@ -155,7 +160,8 @@ public class AuthorizationManager {
                             interactionId),
                             HttpStatus.NOT_FOUND));
             Long userId = jwtService.extractId(authentication.get());
-
+            if (jwtService.getUser(userId).getRole() == Role.ADMIN)
+                return new AuthorizationDecision(true);
             if (interaction.getInteractorUser().getId().equals(userId))
                 return new AuthorizationDecision(true);
 
@@ -174,7 +180,8 @@ public class AuthorizationManager {
                             mediaId),
                             HttpStatus.NOT_FOUND));
             Long userId = jwtService.extractId(authentication.get());
-
+            if (jwtService.getUser(userId).getRole() == Role.ADMIN)
+                return new AuthorizationDecision(true);
             if (media.getOwner().getId().equals(userId))
                 return new AuthorizationDecision(true);
 
@@ -193,7 +200,8 @@ public class AuthorizationManager {
                             notificaitionId),
                             HttpStatus.NOT_FOUND));
             Long userId = jwtService.extractId(authentication.get());
-
+            if (jwtService.getUser(userId).getRole() == Role.ADMIN)
+                return new AuthorizationDecision(true);
             if (notification.getUser().getId().equals(userId))
                 return new AuthorizationDecision(true);
 
@@ -212,7 +220,8 @@ public class AuthorizationManager {
                             opinionId),
                             HttpStatus.NOT_FOUND));
             Long userId = jwtService.extractId(authentication.get());
-
+            if (jwtService.getUser(userId).getRole() == Role.ADMIN)
+                return new AuthorizationDecision(true);
             if (opinon.getOpinionOwner().getId().equals(userId))
                 return new AuthorizationDecision(true);
 
@@ -228,6 +237,8 @@ public class AuthorizationManager {
                     .orElseThrow(() -> new JournalNotFoundException(journalId,
                             HttpStatus.NOT_FOUND));
             Long userId = jwtService.extractId(authentication.get());
+            if (jwtService.getUser(userId).getRole() == Role.ADMIN)
+                return new AuthorizationDecision(true);
             // check if the user is the publisher journal
             if (journal.getPublisher().getId().equals(userId)) {
                 return new AuthorizationDecision(true);

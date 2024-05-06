@@ -1,12 +1,7 @@
 package edu.bethlehem.scinexus.Auth;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.bethlehem.scinexus.SecurityConfig.JwtService;
-import edu.bethlehem.scinexus.SecurityConfig.UserDetailsImpl;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
+import java.util.Collections;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,23 +10,24 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
-import org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import edu.bethlehem.scinexus.SecurityConfig.JwtService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.security.Principal;
-import java.util.Collections;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -84,32 +80,30 @@ public class AuthenticationController {
             @ModelAttribute("loginForm") AuthenticationRequest request) {
 
         // Validate request object (optional)
-        logger.trace("Now I am in the login end point "+ request.toString());
+        logger.trace("Now I am in the login end point " + request.toString());
 
         return ResponseEntity.ok(service.authenticate(request));
     }
+
     @PostMapping("/loginnow")
-    public ResponseEntity<AuthenticationResponse> processLoginnow(@ModelAttribute("loginForm")  AuthenticationRequest request) {
+    public ResponseEntity<AuthenticationResponse> processLoginnow(
+            @ModelAttribute("loginForm") AuthenticationRequest request) {
 
         // Validate request object (optional)
 
-        logger.trace("Now I am in the loginnow end point "+ request.toString());
+        logger.trace("Now I am in the loginnow end point " + request.toString());
 
         return ResponseEntity.ok(service.authenticate(request));
     }
-
-
 
     @GetMapping("/info")
     @ResponseBody
     public Map<String, Object> user(HttpServletRequest request) {
-        logger.trace("this is reqeust "+ request.toString());
+        logger.trace("this is reqeust " + request.toString());
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         // Access authentication information
 
-
         return Collections.singletonMap("name", authentication.getName());
     }
-
 
 }
