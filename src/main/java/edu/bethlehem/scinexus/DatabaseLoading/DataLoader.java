@@ -18,12 +18,14 @@ import edu.bethlehem.scinexus.Interaction.Interaction;
 import edu.bethlehem.scinexus.JPARepository.ArticleRepository;
 import edu.bethlehem.scinexus.JPARepository.InteractionRepository;
 import edu.bethlehem.scinexus.JPARepository.JournalRepository;
+import edu.bethlehem.scinexus.JPARepository.MediaRepository;
 import edu.bethlehem.scinexus.JPARepository.OpinionRepository;
 import edu.bethlehem.scinexus.JPARepository.PostRepository;
 import edu.bethlehem.scinexus.JPARepository.ResearchPaperRepository;
 import edu.bethlehem.scinexus.JPARepository.UserLinksRepository;
 import edu.bethlehem.scinexus.JPARepository.UserRepository;
 import edu.bethlehem.scinexus.Journal.Journal;
+import edu.bethlehem.scinexus.Media.Media;
 import edu.bethlehem.scinexus.Opinion.Opinion;
 import edu.bethlehem.scinexus.Post.Post;
 import edu.bethlehem.scinexus.ResearchPaper.ResearchLanguage;
@@ -45,6 +47,7 @@ public class DataLoader implements CommandLineRunner {
     private final UserRepository userRepository;
 
     private final ArticleRepository articleRepository;
+    private final MediaRepository mediaRepository;
 
     private final ResearchPaperRepository researchPaperRepository;
     private final JournalRepository journalRepository;
@@ -65,14 +68,15 @@ public class DataLoader implements CommandLineRunner {
     public void run(String... args) {
         logger.trace("Starting Random Data Generation: \n\n");
         long startTime = System.currentTimeMillis();
+        generateMedia();
         generateUser();
         generateRandomUsers(5);
         generateLinks();
         generateResearchPapers();
         generateArticles();
+        generatePosts();
         generateOpinions();
         generateInteractions();
-        generatePosts();
         generateRandomContributionsAndValidations();
 
         long endTime = System.currentTimeMillis();
@@ -154,9 +158,11 @@ public class DataLoader implements CommandLineRunner {
         logger.debug("Generating Random Users: \n\n");
         List<User> users = new ArrayList<>();
         Set<String> usedUsernames = new HashSet<>();
-
-        logger.trace("Generating Random User:" + count + " users will be generated");
+        // List<Media> medias = mediaRepository.findAll();
+        // Random r = new Random();
+        logger.trace("Generating Random User: " + count + " users will be generated");
         for (int i = 0; i < count; i++) {
+
             String username = generateUniqueUsername(usedUsernames);
             String firstName = dataGenerator.generateRandomFirstName();
             String lastName = dataGenerator.generateRandomLastName();
@@ -165,6 +171,9 @@ public class DataLoader implements CommandLineRunner {
             String bio = dataGenerator.generateRandomBio();
             String phoneNumber = dataGenerator.generateRandomPhoneNumber();
             String fieldOfWork = dataGenerator.generateRandomFieldOfWork();
+            Media media = new Media("svg", dataGenerator.generateRandomAvatarLink());
+            media.setFileName(dataGenerator.generateRandomAvatarLink());
+            media = mediaRepository.save(media);
 
             Role role = dataGenerator.generateRandomRole(); // Assuming role is constant for all users
             if (role == Role.ACADEMIC) {
@@ -181,6 +190,8 @@ public class DataLoader implements CommandLineRunner {
                 academic.setPosition(Position.PROFESSOR);
                 academic.setEducation(bio);
                 academic.setBadge(bio);
+                academic.setProfilePicture(media);
+                // academic.setProfileCover((medias.get(r.nextInt(medias.size()))));
                 users.add(academic);
             }
 
@@ -196,7 +207,8 @@ public class DataLoader implements CommandLineRunner {
                 organization.setBio(bio);
                 organization.setPhoneNumber(phoneNumber);
                 organization.setFieldOfWork(fieldOfWork);
-
+                organization.setProfilePicture(media);
+                // organization.setProfileCover((medias.get(r.nextInt(medias.size()))));
                 organization.setType(OrganizationType.BUSINESS);
                 organization.setVerified(true);
 
@@ -383,10 +395,21 @@ public class DataLoader implements CommandLineRunner {
                 // if (user.getRole() == Role.ACADEMIC)
 
                 user.addContributedJournal(journal);
-
+                user.addValidatedJournal(journal);
+                journal.addValidatedBy(user);
             }
         }
         userRepository.saveAll(users);
         // journalRepository.saveAll(researchPapers);
+    }
+
+    public void generateMedia() {
+        List<Media> medias = new ArrayList<>();
+        for (int i = 0; i < 100; i++) {
+            Media media = new Media("svg", dataGenerator.generateRandomAvatarLink());
+            media.setFileName(dataGenerator.generateRandomAvatarLink());
+            medias.add(media);
+        }
+        mediaRepository.saveAll(medias);
     }
 }

@@ -6,10 +6,11 @@ import edu.bethlehem.scinexus.Interaction.InteractionType;
 import edu.bethlehem.scinexus.Journal.Visibility;
 import edu.bethlehem.scinexus.User.Role;
 
+import org.springframework.data.mongodb.core.aggregation.ArithmeticOperators.Rand;
 import org.springframework.stereotype.Component;
 
 import java.security.SecureRandom;
-
+import java.util.ArrayList;
 import java.util.Random;
 
 @Component
@@ -117,6 +118,15 @@ public class RandomDataGenerator {
             stringBuilder.append(characters.charAt(randomIndex));
         }
         return stringBuilder.toString();
+    }
+
+    public String generateRandomAvatarLink() {
+        Random random = new Random();
+        String[] avatars = { "Sasha", "Bailey", "Kitty", "Annie", "Leo", "Chloe", "Simba", "Milo", "Gizmo", "Harley" };
+        String link = "https://api.dicebear.com/8.x/adventurer-neutral/svg?seed="
+                + avatars[random.nextInt(avatars.length)]
+                + "&backgroundColor=ecad80,f2d3b1,b6e3f4,c0aede,d1d4f9&backgroundType=gradientLinear";
+        return link;
     }
 
 }
