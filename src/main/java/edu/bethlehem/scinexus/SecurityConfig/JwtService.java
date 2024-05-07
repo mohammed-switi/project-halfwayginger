@@ -120,10 +120,11 @@ public class JwtService {
                 .add(extraClaims)
                 .subject(userDetails.getUsername())
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + (15*60*1000))) // The Jwt Expiry Date Will
-                                                                                           // be 24 Hours WhileT Testing,
-                                                                                           // Must Change to
-                                                                                           // 15 minutes When Turning in The Project
+                .expiration(new Date(System.currentTimeMillis() + (15 * 60 * 100000))) // The Jwt Expiry Date Will
+                                                                                       // be 24 Hours WhileT Testing,
+                                                                                       // Must Change to
+                                                                                       // 15 minutes When Turning in The
+                                                                                       // Project
                 .and()
                 .signWith(getSignInKey(), Jwts.SIG.HS256)
                 .compact();
