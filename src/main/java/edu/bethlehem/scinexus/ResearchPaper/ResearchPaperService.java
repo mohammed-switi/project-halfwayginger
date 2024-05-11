@@ -19,6 +19,11 @@ import edu.bethlehem.scinexus.JPARepository.OpinionRepository;
 import edu.bethlehem.scinexus.JPARepository.ResearchPaperRepository;
 import edu.bethlehem.scinexus.JPARepository.UserRepository;
 import edu.bethlehem.scinexus.JPARepository.UserResearchPaperRequestRepository;
+import edu.bethlehem.scinexus.Journal.Journal;
+import edu.bethlehem.scinexus.Journal.JournalNotFoundException;
+import edu.bethlehem.scinexus.Journal.MediaIdDTO;
+import edu.bethlehem.scinexus.Media.Media;
+import edu.bethlehem.scinexus.Media.MediaNotFoundException;
 import edu.bethlehem.scinexus.Notification.NotificationService;
 import edu.bethlehem.scinexus.Organization.OrganizationNotFoundException;
 import edu.bethlehem.scinexus.SecurityConfig.JwtService;
@@ -30,6 +35,8 @@ import edu.bethlehem.scinexus.UserResearchPaper.UserResearchPaperRequest;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
+import edu.bethlehem.scinexus.JPARepository.JournalRepository;
+import edu.bethlehem.scinexus.JPARepository.MediaRepository;
 
 @Service
 @RequiredArgsConstructor
@@ -37,6 +44,8 @@ public class ResearchPaperService {
 
     @PersistenceContext
     private EntityManager entityManager;
+    private final JournalRepository journalRepository;
+    private final MediaRepository mediaRepository;
     private final JwtService jwtService;
     private final ResearchPaperRepository researchPaperRepository;
     private final UserResearchPaperRequestRepository userResearchPaperRequestRepository;
@@ -230,4 +239,18 @@ public class ResearchPaperService {
         return assembler.toModel(researchPaperRepository.save(researchPaper));
     }
 
+    public EntityModel<ResearchPaper> attachMedia(Long journalId, MediaIdDTO mediaIds) {
+        ResearchPaper journal = researchPaperRepository.findById(journalId)
+                .orElseThrow(() -> new JournalNotFoundException(journalId, HttpStatus.NOT_FOUND));
+        for (Long mediaId : mediaIds.getMediaIds()) {
+            Media media = mediaRepository.findById(mediaId)
+                    .orElseThrow(() -> new MediaNotFoundException(mediaId, HttpStatus.NOT_FOUND));
+            if (media.getOwnerJournal() != null)
+                throw new MediaNotFoundException("media is already attached to a journal", HttpStatus.CONFLICT);
+            journal.setJouranlFile(media);
+            // media.setOwnerJournal(journal);
+        }
+        // mediaRepository.saveAll(journal.getMedias());
+        return assembler.toModel(researchPaperRepository.save(journal));
+    }
 }
