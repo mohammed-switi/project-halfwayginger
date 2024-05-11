@@ -6,11 +6,14 @@ import java.util.Set;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import edu.bethlehem.scinexus.Journal.Journal;
+import edu.bethlehem.scinexus.Media.Media;
 import edu.bethlehem.scinexus.User.User;
 import edu.bethlehem.scinexus.UserResearchPaper.UserResearchPaperRequest;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIdentityReference;
 
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -18,6 +21,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -59,6 +63,11 @@ public class ResearchPaper extends Journal {
     @JoinColumn(name = "research_paper_id")
     @JsonIgnore
     private Set<UserResearchPaperRequest> requestsForAccess;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "journal_id")
+    @JsonIdentityReference
+    private Media jouranlFile;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "research_paper_validated_by_organization", joinColumns = @JoinColumn(name = "validated"), inverseJoinColumns = @JoinColumn(name = "validated_research_papers"))

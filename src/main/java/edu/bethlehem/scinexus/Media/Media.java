@@ -58,4 +58,8 @@ public class Media {
 
     public Media() {
     }
+
+    public User getOwner() {
+        return null;
+    }
 }
