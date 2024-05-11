@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -109,13 +110,14 @@ public class AuthenticationService {
 
         public AuthenticationResponse authenticate(AuthenticationRequest request) {
 
+                try {
+                var user = userRepository.findByEmail(request.getEmail())
+                                .orElseThrow(() -> new UserNotFoundException("User Not Found Exception",
+                                                HttpStatus.NOT_FOUND));
                 Authentication authentication = authenticationManager.authenticate(
                                 new UsernamePasswordAuthenticationToken(
                                                 request.getEmail(),
                                                 request.getPassword()));
-                var user = userRepository.findByEmail(request.getEmail())
-                                .orElseThrow(() -> new UserNotFoundException("User Not Found Exception",
-                                                HttpStatus.NOT_FOUND));
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
                 logger.trace(String.format("User %s is Authenticated", user.toString()));
@@ -123,6 +125,9 @@ public class AuthenticationService {
                 return AuthenticationResponse.builder()
                                 .jwtToken(jwtToken)
                                 .build();
+                } catch (AuthenticationException e) {
+                        throw new PasswordDoesntMatchException();
+                }
         }
 
         @Transactional
