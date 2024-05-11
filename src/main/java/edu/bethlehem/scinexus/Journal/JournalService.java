@@ -21,6 +21,7 @@ import edu.bethlehem.scinexus.DatabaseLoading.DataLoader;
 import edu.bethlehem.scinexus.Interaction.Interaction;
 import edu.bethlehem.scinexus.Interaction.InteractionModelAssembler;
 import edu.bethlehem.scinexus.JPARepository.JournalRepository;
+import edu.bethlehem.scinexus.JPARepository.OpinionRepository;
 import edu.bethlehem.scinexus.JPARepository.MediaRepository;
 import edu.bethlehem.scinexus.JPARepository.UserRepository;
 import edu.bethlehem.scinexus.Media.Media;
@@ -40,6 +41,7 @@ import lombok.RequiredArgsConstructor;
 @Data
 public class JournalService {
 
+    private final OpinionRepository opinionRepository;
     private final JournalRepository journalRepository;
     private final UserRepository userRepository;
     private final MediaRepository mediaRepository;
@@ -152,7 +154,7 @@ public class JournalService {
         for (Long mediaId : mediaIds.getMediaIds()) {
             Media media = mediaRepository.findById(mediaId)
                     .orElseThrow(() -> new MediaNotFoundException(mediaId, HttpStatus.NOT_FOUND));
-            if (media.getOwnerJournal() == null)
+            if (media.getOwnerJournal() != null)
                 throw new MediaNotFoundException("media is already attached to a journal", HttpStatus.CONFLICT);
             journal.getMedias().add(media);
             media.setOwnerJournal(journal);
@@ -186,11 +188,21 @@ public class JournalService {
         return CollectionModel.of(interactions);
     }
 
+    // public CollectionModel<EntityModel<Opinion>> getJournalOpinions(Long
+    // journalId) {
+    // Journal journal = journalRepository.findById(journalId)
+    // .orElseThrow(() -> new JournalNotFoundException(journalId,
+    // HttpStatus.NOT_FOUND));
+    // List<EntityModel<Opinion>> opinions = journal.getOpinions()
+    // .stream()
+    // .map(opinionAssembler::toModel)
+    // .collect(Collectors.toList());
+    // return CollectionModel.of(opinions);
+    // }
     public CollectionModel<EntityModel<Opinion>> getJournalOpinions(Long journalId) {
-        Journal journal = journalRepository.findById(journalId)
-                .orElseThrow(() -> new JournalNotFoundException(journalId, HttpStatus.NOT_FOUND));
-        List<EntityModel<Opinion>> opinions = journal.getOpinions()
-                .stream()
+
+        List<EntityModel<Opinion>> opinions = opinionRepository.findByJournalId(journalId)
+                .parallelStream()
                 .map(opinionAssembler::toModel)
                 .collect(Collectors.toList());
         return CollectionModel.of(opinions);
