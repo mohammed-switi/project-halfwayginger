@@ -42,6 +42,7 @@ public class Media {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "journal")
+    @JsonIgnore
     // @NotNull(message = "The Media Owner Shouldn't Be Null")
     // @NotBlank(message = "The Media Owner Shouldn't Be Empty")
     private Journal ownerJournal;

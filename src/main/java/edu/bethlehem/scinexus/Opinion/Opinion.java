@@ -27,6 +27,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Data
 @Entity
@@ -55,7 +56,8 @@ public class Opinion {
                                        // opinion there is an error, and this is how I solved it
     @JoinColumn(name = "journal", updatable = false)
     // @NotNull(message = "The Opinion Reference Journal Shouldn't Be Null")
-    @JsonManagedReference
+    // @JsonManagedReference
+    @JsonIgnore
     private Journal journal;
 
     @ManyToOne(fetch = FetchType.LAZY)
