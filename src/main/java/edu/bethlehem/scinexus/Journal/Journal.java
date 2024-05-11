@@ -96,16 +96,16 @@ public class Journal implements Serializable {
     @JsonBackReference
     private Set<Interaction> interactions;
 
-    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "journal")
     @JdbcTypeCode(SqlTypes.JSON)
     @JsonBackReference
     private List<Opinion> opinions;
 
-    @OneToMany(fetch = FetchType.EAGER)
+    @OneToMany(fetch = FetchType.LAZY)
     @JdbcTypeCode(SqlTypes.JSON)
     @JoinColumn(name = "journal")
-    @JsonBackReference
+    // @JsonBackReference
     private List<Media> medias;
 
     // @ManyToMany(mappedBy = "contributors", fetch = FetchType.EAGER)
