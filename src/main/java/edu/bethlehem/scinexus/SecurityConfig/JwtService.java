@@ -46,6 +46,7 @@ public class JwtService {
             attributes = ((OAuth2AuthenticationToken) authentication).getPrincipal().getAttributes();
             logger.trace("The Auth Token Type is From OAuth2AuthenticationToken, the User who tries to authenticate is "
                     + attributes.toString());
+
             return Long.parseLong((String) attributes.get("id"));
 
         } else if (authentication instanceof JwtAuthenticationToken) {
