@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import edu.bethlehem.scinexus.Journal.Journal;
 import edu.bethlehem.scinexus.Media.Media;
@@ -37,6 +38,8 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @EqualsAndHashCode(callSuper = false)
 @DiscriminatorValue("research_paper")
+@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class)
+
 public class ResearchPaper extends Journal {
 
     @Enumerated(EnumType.STRING)
@@ -66,12 +69,12 @@ public class ResearchPaper extends Journal {
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "journal_id")
-    @JsonIdentityReference
     private Media jouranlFile;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "research_paper_validated_by_organization", joinColumns = @JoinColumn(name = "validated"), inverseJoinColumns = @JoinColumn(name = "validated_research_papers"))
-    @JsonBackReference
+    // @JsonBackReference
+    @JsonIdentityReference(alwaysAsId = true)
     private List<User> validatedBy;
 
     public ResearchPaper(String title, String content, String description, String subject, User publisher) {
