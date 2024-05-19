@@ -262,7 +262,7 @@ public class DataLoader implements CommandLineRunner {
         for (User user : users) {
             for (int i = 0; i < 2; i++) {
 
-                ResearchPaper researchPaper = new ResearchPaper(dataGenerator.generateRandomUniversityName(),
+                ResearchPaper researchPaper = new ResearchPaper(dataGenerator.generateRandomFieldOfWork(),
                         dataGenerator.generateRandomWords(), dataGenerator.generateRandomBio(),
                         dataGenerator.generateRandomFieldOfWork(), user);
                 researchPaper.setLanguage(ResearchLanguage.ENGLISH);
@@ -272,7 +272,7 @@ public class DataLoader implements CommandLineRunner {
                 researchPaper.setVisibility(dataGenerator.generateRandomVisibility());
                 researchPaper.setDescription(dataGenerator.generateRandomWords());
                 user.addJournal(researchPaper);
-
+                // researchPaper.addValidatedBy(user);
                 researchPapers.add(researchPaper);
             }
         }

@@ -12,7 +12,10 @@ import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.type.SqlTypes;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import edu.bethlehem.scinexus.Interaction.Interaction;
 import edu.bethlehem.scinexus.Media.Media;
@@ -51,6 +54,8 @@ import lombok.experimental.SuperBuilder;
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "journal_type")
+@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class)
+
 public class Journal implements Serializable {
 
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -87,6 +92,7 @@ public class Journal implements Serializable {
     @JoinColumn(name = "publisher", nullable = false, updatable = false)
     @JdbcTypeCode(SqlTypes.JSON)
     @JsonManagedReference
+
     private User publisher;
 
     // It was lazy
@@ -116,6 +122,7 @@ public class Journal implements Serializable {
     @ManyToMany(mappedBy = "contributedJournals", fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
     @JsonManagedReference
     @Default
+    @JsonIdentityReference(alwaysAsId = true)
     private Set<User> contributors = new HashSet<>();
 
     public void setPublisher(User publisher) {
