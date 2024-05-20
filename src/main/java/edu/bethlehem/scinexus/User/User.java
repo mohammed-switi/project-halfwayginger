@@ -71,7 +71,7 @@ import lombok.Builder.Default;
 @Builder
 @Getter
 @Setter
-@ToString
+// @ToString
 @Conditional(selected = "role", values = { "ACADEMIC" }, required = {
         "education", "badge", "position" })
 @Conditional(selected = "role", values = { "ORGANIZATION" }, required = {
@@ -224,7 +224,6 @@ public class User implements UserDetailsImpl {
     @Default
     @JsonBackReference
     @JsonIgnore
-
     private List<ResearchPaper> validated = new ArrayList<>();
 
     public User(String firstName, String username, String password, String email, Boolean locked, Boolean enabled) {
