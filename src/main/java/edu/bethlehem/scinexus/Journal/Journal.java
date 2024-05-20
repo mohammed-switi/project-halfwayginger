@@ -153,8 +153,4 @@ public class Journal implements Serializable {
         opinionsCount++;
     }
 
-    public void setOpinions() {
-
-    }
-
 }
