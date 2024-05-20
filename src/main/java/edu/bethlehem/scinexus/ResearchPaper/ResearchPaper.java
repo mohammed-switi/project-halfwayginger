@@ -1,5 +1,6 @@
 package edu.bethlehem.scinexus.ResearchPaper;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -75,7 +76,7 @@ public class ResearchPaper extends Journal {
     @JoinTable(name = "research_paper_validated_by_organization", joinColumns = @JoinColumn(name = "validated"), inverseJoinColumns = @JoinColumn(name = "validated_research_papers"))
     // @JsonBackReference
     @JsonIdentityReference(alwaysAsId = true)
-    private List<User> validatedBy;
+    private Set<User> validatedBy = new HashSet<>();
 
     public ResearchPaper(String title, String content, String description, String subject, User publisher) {
         super(content, publisher);
@@ -86,10 +87,7 @@ public class ResearchPaper extends Journal {
     }
 
     public void addValidatedBy(User user) {
-        if (this.validatedBy == null) {
-            this.validatedBy = List.of(user);
-            return;
-        }
+
         this.validatedBy.add(user);
     }
 
