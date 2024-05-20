@@ -165,6 +165,7 @@ public class DataLoader implements CommandLineRunner {
 
             String username = generateUniqueUsername(usedUsernames);
             String firstName = dataGenerator.generateRandomFirstName();
+            String universityName = dataGenerator.generateRandomUniversityName();
             String lastName = dataGenerator.generateRandomLastName();
             String email = dataGenerator.generateRandomEmail(firstName, lastName);
             String password = dataGenerator.generateRandomPassword();
@@ -199,7 +200,7 @@ public class DataLoader implements CommandLineRunner {
 
                 User organization = new User();
                 organization.setRole(Role.ORGANIZATION);
-                organization.setFirstName(firstName);
+                organization.setFirstName(universityName);
                 organization.setLastName(lastName);
                 organization.setUsername(username);
                 organization.setEmail(email);
@@ -255,12 +256,13 @@ public class DataLoader implements CommandLineRunner {
     }
 
     private void generateResearchPapers() {
-        List<User> users = userRepository.findAll();
+        List<User> users = userRepository.findAllByRole(Role.ACADEMIC);
+        List<User> organizations = userRepository.findAllByRole(Role.ORGANIZATION);
         List<ResearchPaper> researchPapers = new ArrayList<>();
         logger.trace("generating two Research Papers for " + users.size() + " users each");
         Random random = new Random();
         for (User user : users) {
-            for (int i = 0; i < 2; i++) {
+            for (int i = 0; i < 6; i++) {
 
                 ResearchPaper researchPaper = new ResearchPaper(dataGenerator.generateRandomFieldOfWork(),
                         dataGenerator.generateRandomWords(), dataGenerator.generateRandomBio(),
@@ -272,7 +274,10 @@ public class DataLoader implements CommandLineRunner {
                 researchPaper.setVisibility(dataGenerator.generateRandomVisibility());
                 researchPaper.setDescription(dataGenerator.generateRandomWords());
                 user.addJournal(researchPaper);
-                // researchPaper.addValidatedBy(user);
+                for (int j = 0; j < random.nextInt(3); j++) {
+                    User organization = organizations.get(random.nextInt(organizations.size()));
+                    researchPaper.addValidatedBy(organization);
+                }
                 researchPapers.add(researchPaper);
             }
         }
