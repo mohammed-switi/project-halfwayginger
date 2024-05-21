@@ -335,7 +335,7 @@ public class DataLoader implements CommandLineRunner {
 
                 reOpinion.setPapaOpinion(opinion);
                 opinion.addOpinion();
-
+                opinion.getJournal().addOpinion();
                 // reOpinion.addOpinion();
                 opinions2.add(reOpinion);
             }
