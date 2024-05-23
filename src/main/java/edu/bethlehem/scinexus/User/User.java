@@ -127,7 +127,6 @@ public class User implements UserDetailsImpl {
      * However The password vaildation will be in the RegisterRequest class
      */
     @NotNull(message = "Password is Mandatory")
-    @NotBlank(message = "Password is Mandatory")
     @JsonIgnore
     private String password;
 

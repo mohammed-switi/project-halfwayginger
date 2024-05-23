@@ -5,6 +5,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -17,6 +18,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -255,5 +257,97 @@ public class UserService implements UserDetailsService {
         user.setProfileCover(media);
         return assembler.toModel(repository.save(user));
     }
+
+//    public  User registerOrUpdateOAuth2User(OAuth2User oAuth2User){
+//        String email = oAuth2User.getAttribute("email");
+//        Optional<User> existingUser= repository.findByEmail(email);
+//
+//        User user;
+//
+//        if(existingUser.isPresent()){
+//            user = existingUser.get();
+//        }else {
+//            user = new User();
+//            user.setEmail(email);
+//            user.setFirstName(oAuth2User.getAttribute("given_name"));
+//            user.setLastName(oAuth2User.getAttribute("family_name"));
+//            user.setUsername(email);
+//            user.setPassword("");
+//            user.setPosition(Position.ASSISTANT_PROFESSOR);
+//            user.setBadge("HEllo");
+//            user.setEducation("HEllo");
+//            user.setPhoneNumber("0593015525");
+//            user.setEnabled(true);
+//            user.setLocked(false);
+//            user.setRole(Role.ACADEMIC);
+//            repository.save(user);
+//        }
+//
+//        return  user;
+//    }
+
+    public User registerOrUpdateOAuth2User(OAuth2User oAuth2User) {
+        String email = oAuth2User.getAttribute("email");
+        Optional<User> existingUser = repository.findByEmail(email);
+
+        User user;
+
+        // Check if the user exists
+        if (existingUser.isPresent()) {
+            user = existingUser.get();
+        } else {
+            user = new User();
+            user.setEmail(email);
+            user.setUsername(email);
+            user.setPassword("");
+            user.setPhoneNumber("0593015525");
+            user.setEnabled(true);
+            user.setLocked(false);
+
+            // Differentiate user data based on OAuth provider
+            if (isGitHubUser(oAuth2User)) {
+                user = processGitHubUser(user, oAuth2User);
+            } else if (isGoogleUser(oAuth2User)) {
+                user = processGoogleUser(user, oAuth2User);
+            }
+
+            repository.save(user);
+        }
+
+        return user;
+    }
+
+    private boolean isGitHubUser(OAuth2User oAuth2User) {
+        // Check if the user has specific GitHub attributes
+        return oAuth2User.getAttribute("login") != null;
+    }
+
+    private boolean isGoogleUser(OAuth2User oAuth2User) {
+        // Check if the user has specific Google attributes
+        return oAuth2User.getAttribute("sub") != null;
+    }
+
+    private User processGitHubUser(User user, OAuth2User oAuth2User) {
+        // Process GitHub-specific attributes
+        user.setFirstName(oAuth2User.getAttribute("name"));
+        user.setLastName(oAuth2User.getAttribute("name"));
+        user.setPosition(Position.ASSISTANT_PROFESSOR);
+        user.setBadge("GitHub Badge");
+        user.setEducation("GitHub Education");
+        user.setRole(Role.ACADEMIC); // Example: GitHub users are students
+        return user;
+    }
+
+    private User processGoogleUser(User user, OAuth2User oAuth2User) {
+        // Process Google-specific attributes
+        user.setFirstName(oAuth2User.getAttribute("given_name"));
+        user.setLastName(oAuth2User.getAttribute("family_name"));
+        user.setPosition(Position.ASSISTANT_PROFESSOR);
+        user.setBadge("Google Badge");
+        user.setEducation("Google Education");
+        user.setRole(Role.ACADEMIC); // Example: Google users are academics
+        return user;
+    }
+
 
 }

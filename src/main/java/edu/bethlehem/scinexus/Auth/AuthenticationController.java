@@ -1,6 +1,7 @@
 package edu.bethlehem.scinexus.Auth;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -42,7 +43,6 @@ public class AuthenticationController {
 
     @PostMapping("/register")
     public ResponseEntity<RegisterRequest> register(
-
             @Valid @RequestBody RegisterRequest request) {
         try {
             return new ResponseEntity<>(service.register(request), HttpStatus.CREATED);
@@ -51,6 +51,19 @@ public class AuthenticationController {
 
         }
 
+    }
+
+    @PostMapping("/oauth2/register")
+    public ResponseEntity<OAuthRegisterRequest> registerOAuth2(
+            @Valid @RequestBody OAuthRegisterRequest request) {
+
+        // Handle OAuth2 registration request
+        try {
+            // Your registration logic for OAuth2 requests
+            return new ResponseEntity<>(service.registerOAuth(request), HttpStatus.CREATED);
+        } catch (DataIntegrityViolationException exception) {
+            throw new RegisterRequestException(exception.getLocalizedMessage(), HttpStatus.CONFLICT);
+        }
     }
 
     @PostMapping("/authenticate")
@@ -85,25 +98,34 @@ public class AuthenticationController {
         return ResponseEntity.ok(service.authenticate(request));
     }
 
-    @PostMapping("/loginnow")
-    public ResponseEntity<AuthenticationResponse> processLoginnow(
-            @ModelAttribute("loginForm") AuthenticationRequest request) {
-
-        // Validate request object (optional)
-
-        logger.trace("Now I am in the loginnow end point " + request.toString());
-
-        return ResponseEntity.ok(service.authenticate(request));
+    @GetMapping("/verify-token")
+    public ResponseEntity verifiyToken(
+            Authentication authentication
+    ){
+        HashMap<String,Boolean> response = new HashMap<>();
+        response.put("isVerified",service.verifyToken(authentication));
+        return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/info")
-    @ResponseBody
-    public Map<String, Object> user(HttpServletRequest request) {
-        logger.trace("this is reqeust " + request.toString());
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        // Access authentication information
+//    @PostMapping("/loginnow")
+//    public ResponseEntity<AuthenticationResponse> processLoginnow(
+//            @ModelAttribute("loginForm") AuthenticationRequest request) {
+//
+//        // Validate request object (optional)
+//
+//        logger.trace("Now I am in the loginnow end point " + request.toString());
+//
+//        return ResponseEntity.ok(service.authenticate(request));
+//    }
 
-        return Collections.singletonMap("name", authentication.getName());
-    }
+//    @GetMapping("/info")
+//    @ResponseBody
+//    public Map<String, Object> user(HttpServletRequest request) {
+//        logger.trace("this is reqeust " + request.toString());
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        // Access authentication information
+//
+//        return Collections.singletonMap("name", authentication.getName());
+//    }
 
 }

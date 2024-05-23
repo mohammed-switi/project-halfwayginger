@@ -13,11 +13,14 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.oauth2.client.JdbcOAuth2AuthorizedClientService;
 import org.springframework.security.oauth2.client.JwtBearerOAuth2AuthorizedClientProvider;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientProvider;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.security.oauth2.client.endpoint.DefaultAuthorizationCodeTokenResponseClient;
 import org.springframework.security.oauth2.client.endpoint.OAuth2AccessTokenResponseClient;
 import org.springframework.security.oauth2.client.endpoint.OAuth2AuthorizationCodeGrantRequest;
+import org.springframework.security.oauth2.client.web.HttpSessionOAuth2AuthorizationRequestRepository;
 import org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationProvider;
@@ -26,9 +29,12 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.cors.CorsConfiguration;
 
+
 import edu.bethlehem.scinexus.Authorization.AuthorizationManager;
 import edu.bethlehem.scinexus.User.UserService;
 import lombok.RequiredArgsConstructor;
+
+import javax.sql.DataSource;
 
 @EnableWebSecurity
 @Configuration
@@ -42,7 +48,11 @@ public class SecurityConfig {
         private final JwtDecoder jwtDecoder;
         private final UserService userDetailsService;
         private final JwtAuthenticationProvider jwtAuthenticationProvider;
+        private final  OAuth2LoginSuccessHandler  oAuth2LoginSuccessHandler;
+        private final OAuth2LoginFailureHandler oAuth2LoginFailureHandler;
 
+    @Autowired
+    private DataSource dataSource;
         @Bean
         public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
                 httpSecurity // .cors(Customizer.withDefaults())
@@ -59,6 +69,8 @@ public class SecurityConfig {
                                 }))
                                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
                                                 .requestMatchers("/api/v1/auth/**").permitAll()
+                                                .requestMatchers("/auth/**").permitAll()
+                                                .requestMatchers("/oauth2/**").permitAll()
                                                 // .requestMatchers("/index.html").permitAll()
                                                 .requestMatchers("/group-chat.html").permitAll()
 
@@ -249,9 +261,12 @@ public class SecurityConfig {
                                 })
                                 .oauth2ResourceServer(oauth2Config -> oauth2Config.jwt(jwt -> jwt.decoder(jwtDecoder)))//
                                 .oauth2Login(oauth2LoginConfig -> {
-                                        oauth2LoginConfig.loginPage("/api/v1/auth/login").permitAll();
-                                        // oauth2LoginConfig.loginProcessingUrl("/api/v1/auth/login");
-                                        oauth2LoginConfig.defaultSuccessUrl("/index", true);
+                                    oauth2LoginConfig.loginPage("/api/v1/auth/login").permitAll();
+//
+                                    oauth2LoginConfig.successHandler(oAuth2LoginSuccessHandler);
+                                    oauth2LoginConfig.failureHandler(oAuth2LoginFailureHandler);
+
+//
                                 })
 
                                 .authenticationProvider(authenticationProvider)
@@ -260,6 +275,8 @@ public class SecurityConfig {
 
                 return httpSecurity.build();
         }
+
+
 
         @Bean
         public OAuth2AuthorizedClientProvider jwtBearer() {
@@ -282,5 +299,7 @@ public class SecurityConfig {
                 auth.authenticationProvider(jwtAuthenticationProvider);
                 auth.userDetailsService(userDetailsService);
         }
+
+
 
 }

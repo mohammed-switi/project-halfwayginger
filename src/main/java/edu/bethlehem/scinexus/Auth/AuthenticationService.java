@@ -108,6 +108,54 @@ public class AuthenticationService {
 
         }
 
+        public OAuthRegisterRequest registerOAuth(OAuthRegisterRequest request) {
+                User user;
+
+                if (request.getRole() == Role.ACADEMIC) {
+                        user = User.builder()
+                                .firstName(request.getFirstName())
+                                .lastName(request.getLastName())
+                                .username(request.getUsername())
+                                .email(request.getEmail())
+                                .phoneNumber(request.getPhoneNumber())
+                                .password("")
+                                .role(request.getRole())
+                                .bio(request.getBio())
+                                .fieldOfWork(request.getFieldOfWork())
+                                .education(request.getEducation())
+                                .badge(request.getBadge())
+                                .position(request.getPosition())
+                                .enabled(true)
+                                .locked(false)
+                                .build();
+
+                } else {
+                        user = User.builder()
+                                .firstName(request.getFirstName())
+                                .lastName(request.getLastName())
+                                .username(request.getUsername())
+                                .email(request.getEmail())
+                                .phoneNumber(request.getPhoneNumber())
+                                .password("")
+                                .role(request.getRole())
+                                .bio(request.getBio())
+                                .fieldOfWork(request.getFieldOfWork())
+                                .type(request.getType())
+                                .enabled(true)
+                                .locked(false)
+                                .build();
+                }
+                userRepository.save(user);
+
+                return request;
+        }
+
+
+        public Boolean verifyToken(Authentication authentication){
+
+                return userRepository.findById(service.extractId(authentication)).isPresent();
+        }
+
         public AuthenticationResponse authenticate(AuthenticationRequest request) {
 
                 try {
@@ -234,4 +282,6 @@ public class AuthenticationService {
                                 "\n" +
                                 "</div></div>";
         }
+
+
 }
