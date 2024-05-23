@@ -42,3 +42,7 @@ build/
 ### Logs ###
 *.log
 /logs/
+
+
+
+logs/application.log

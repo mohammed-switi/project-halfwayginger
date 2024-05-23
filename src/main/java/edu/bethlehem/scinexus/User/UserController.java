@@ -40,6 +40,11 @@ public class UserController {
         return ResponseEntity.ok(service.all());
     }
 
+    @GetMapping("/userinfo")
+    public ResponseEntity<EntityModel<User>> getUserInfo(Authentication authentication) {
+        return ResponseEntity.ok(service.getUserInfo(authentication));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<EntityModel<User>> one(@PathVariable Long id) {
 

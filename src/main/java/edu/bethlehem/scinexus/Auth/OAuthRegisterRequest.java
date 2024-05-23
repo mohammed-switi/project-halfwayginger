@@ -43,15 +43,19 @@ public class OAuthRegisterRequest {
 
     @NotNull(message = "Email is mandatory")
     @NotBlank(message = "Email Name is mandatory")
-    @Pattern(regexp = "^[a-zA-Z0-9]+[._-]*[a-zA-Z0-9]+@[a-zA-Z0-9]+\\.[a-zA-Z]{2,}(?:\\.[a-zA-Z]{2,})?$", message = "It must start with alphanumeric characters."
-            +
-            "It may contain dots, hyphens, and underscores." +
-            "It must have exactly one '@' symbol." +
-            "It may contain alphanumeric characters in the domain part." +
-            "It may have a maximum of two dots following the '@' symbol")
+    @Pattern(
+            regexp = "^[a-zA-Z0-9]+[._-]*[a-zA-Z0-9]*@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
+            message = "It must start with alphanumeric characters. " +
+                    "It may contain dots, hyphens, and underscores. " +
+                    "It must have exactly one '@' symbol. " +
+                    "It may contain alphanumeric characters in the domain part. " +
+                    "It may have one or more dots in the domain part."
+    )
     @Column(unique = true)
-    @Size(min = 3, max = 320, message = "The Email Address should be Between 3 and 320 Characters")
+    @Size(min = 3, max = 320, message = "The Email Address should be between 3 and 320 characters.")
     private String email;
+
+
 
     // This Regex states :
     // 1. the Password Must Be at least 8 Characters Long
