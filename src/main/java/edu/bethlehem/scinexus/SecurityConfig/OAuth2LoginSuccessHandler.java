@@ -62,7 +62,7 @@ public class OAuth2LoginSuccessHandler extends SavedRequestAwareAuthenticationSu
             response.addCookie(cookie);
 
 
-            String loginRedirectUrl = "http://localhost:5173/login";
+            String loginRedirectUrl = "http://localhost:5173/";
             logger.info("Redirect URL after successful authentication: " + loginRedirectUrl + " with JWT token: " + jwtToken);
             response.sendRedirect(loginRedirectUrl);
         } else {

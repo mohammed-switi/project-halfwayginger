@@ -350,4 +350,8 @@ public class UserService implements UserDetailsService {
     }
 
 
+    public EntityModel<User> getUserInfo(Authentication authentication) {
+        User user = jwtService.getUser(authentication);
+        return assembler.toModel(user);
+    }
 }
