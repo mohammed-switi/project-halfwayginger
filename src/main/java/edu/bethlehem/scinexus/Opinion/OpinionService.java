@@ -14,6 +14,7 @@ import edu.bethlehem.scinexus.DatabaseLoading.DataLoader;
 import edu.bethlehem.scinexus.JPARepository.JournalRepository;
 import edu.bethlehem.scinexus.JPARepository.OpinionRepository;
 import edu.bethlehem.scinexus.JPARepository.UserRepository;
+import edu.bethlehem.scinexus.Journal.Journal;
 import edu.bethlehem.scinexus.Journal.JournalNotFoundException;
 import edu.bethlehem.scinexus.SecurityConfig.JwtService;
 import lombok.Data;
@@ -57,7 +58,20 @@ public class OpinionService {
 
     public EntityModel<Opinion> postOpinion(OpinionDTO newOpinionDTO, Authentication auth) {
         logger.trace("Posting New Opinion");
+        Journal journal = journalRepository.findById(newOpinionDTO.getJournalId())
+                .orElseThrow(() -> new JournalNotFoundException(newOpinionDTO.getJournalId()));
+        journal.addOpinion();
         Opinion newOpinion = convertOpinionDtoToOpinionEntity(newOpinionDTO, auth);
+        return assembler.toModel(opinionRepository.save(newOpinion));
+    }
+
+    public EntityModel<Opinion> postOpinionToOpinion(OpinionDTO newOpinionDTO, Authentication auth) {
+        Opinion papaOpinion = opinionRepository.findById(newOpinionDTO.getJournalId())
+                .orElseThrow(() -> new OpinionNotFoundException(newOpinionDTO.getJournalId(), HttpStatus.NOT_FOUND));
+        papaOpinion.getJournal().addOpinion();
+        newOpinionDTO.setJournalId(papaOpinion.getJournal().getId());
+        Opinion newOpinion = convertOpinionDtoToOpinionEntity(newOpinionDTO, auth);
+        newOpinion.setPapaOpinion(papaOpinion);
         return assembler.toModel(opinionRepository.save(newOpinion));
     }
 

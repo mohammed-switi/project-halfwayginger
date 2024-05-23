@@ -9,6 +9,8 @@ node_modules/
 Uploads/
 *.log
 *.gz
+logs/
+application.log
 ### STS ###
 .apt_generated
 .classpath

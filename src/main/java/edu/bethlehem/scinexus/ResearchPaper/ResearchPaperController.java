@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import edu.bethlehem.scinexus.Journal.MediaIdDTO;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -118,5 +119,10 @@ public class ResearchPaperController {
 
     return ResponseEntity.noContent().build();
 
+  }
+
+  @PostMapping("{journalId}/media")
+  public ResponseEntity<?> attachMedia(@PathVariable Long journalId, @RequestBody MediaIdDTO mediaIds) {
+    return ResponseEntity.ok(service.attachMedia(journalId, mediaIds));
   }
 }

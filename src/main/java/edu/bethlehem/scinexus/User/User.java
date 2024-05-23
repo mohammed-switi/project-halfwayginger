@@ -18,6 +18,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.util.JSONPObject;
@@ -69,7 +71,7 @@ import lombok.Builder.Default;
 @Builder
 @Getter
 @Setter
-@ToString
+// @ToString
 @Conditional(selected = "role", values = { "ACADEMIC" }, required = {
         "education", "badge", "position" })
 @Conditional(selected = "role", values = { "ORGANIZATION" }, required = {
@@ -220,7 +222,7 @@ public class User implements UserDetailsImpl {
     @ManyToMany(mappedBy = "validatedBy", fetch = FetchType.EAGER)
     @Default
     @JsonBackReference
-
+    @JsonIgnore
     private List<ResearchPaper> validated = new ArrayList<>();
 
     public User(String firstName, String username, String password, String email, Boolean locked, Boolean enabled) {
@@ -231,6 +233,10 @@ public class User implements UserDetailsImpl {
         this.locked = locked;
         this.enabled = enabled;
 
+    }
+
+    public List<ResearchPaper> getValidated() {
+        return null;
     }
 
     public void addJournal(Journal journal) {

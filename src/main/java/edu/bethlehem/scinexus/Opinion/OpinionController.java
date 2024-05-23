@@ -48,6 +48,14 @@ public class OpinionController {
     return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
   }
 
+  @PostMapping("/subOpinion")
+  ResponseEntity<?> newOpinionToOpinion(@RequestBody @Valid OpinionDTO newOpinion, Authentication auth) {
+
+    EntityModel<Opinion> entityModel = opinionService.postOpinionToOpinion(newOpinion, auth);
+
+    return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
+  }
+
   // We Won't need a PUT method
   // @PutMapping("/{id}")
   // public ResponseEntity<?> editOpinion(@RequestBody @Valid OpinionDTO
