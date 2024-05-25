@@ -275,7 +275,7 @@ public class DataLoader implements CommandLineRunner {
                 researchPaper.setDescription(dataGenerator.generateRandomWords());
                 user.addJournal(researchPaper);
                 for (int j = 0; j < random.nextInt(3); j++) {
-                    User organization = organizations.get(random.nextInt(organizations.size()));
+                    User organization = organizations.get(Math.abs(random.nextInt(organizations.size())));
                     researchPaper.addValidatedBy(organization);
                 }
                 researchPapers.add(researchPaper);

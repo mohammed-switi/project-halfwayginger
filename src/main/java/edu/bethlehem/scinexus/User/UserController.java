@@ -59,6 +59,7 @@ public class UserController {
 
     }
 
+
     @PostMapping("/profilePicture")
     public ResponseEntity<?> changeProfilePicture(Authentication auth,
             @RequestParam("file") MultipartFile file) throws UserNotFoundException {
@@ -132,7 +133,6 @@ public class UserController {
     ResponseEntity<?> deleteUser(@PathVariable Long id) throws UserNotFoundException {
 
         return ResponseEntity.noContent().build();
-
     }
 
 }

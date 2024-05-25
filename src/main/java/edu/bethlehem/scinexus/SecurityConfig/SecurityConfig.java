@@ -62,7 +62,7 @@ public class SecurityConfig {
                                 .cors(cors -> cors.configurationSource(request -> {
                                         var corsConfiguration = new CorsConfiguration();
                                         corsConfiguration.setAllowedOrigins(List.of("http://localhost:5173"));
-                                        corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
+                                        corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH"));
                                         corsConfiguration.setAllowedHeaders(List.of("*"));
                                         corsConfiguration.setAllowCredentials(true);
                                         return corsConfiguration;
@@ -99,7 +99,7 @@ public class SecurityConfig {
                                                 .access(authorizationManager.admin())
 
                                                 .requestMatchers(HttpMethod.PATCH, "/academics/{userId}")
-                                                .access(authorizationManager.userHimSelfAndAdmin())
+                                               .access(authorizationManager.userHimSelfAndAdmin())
 
                                                 // Articles
                                                 .requestMatchers(HttpMethod.GET, "/articles")
@@ -205,7 +205,7 @@ public class SecurityConfig {
 
                                                 // Posts
                                                 .requestMatchers(HttpMethod.GET,
-                                                                "/posts/")
+                                                                "/posts")
                                                 .access(authorizationManager.admin())
 
                                                 .requestMatchers(HttpMethod.DELETE,

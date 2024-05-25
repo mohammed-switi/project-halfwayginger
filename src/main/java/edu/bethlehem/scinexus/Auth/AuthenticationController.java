@@ -54,7 +54,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/oauth2/register")
-    public ResponseEntity<OAuthRegisterRequest> registerOAuth2(
+    public ResponseEntity<OAuth2RegisterResponse> registerOAuth2(
             @Valid @RequestBody OAuthRegisterRequest request) {
 
         // Handle OAuth2 registration request

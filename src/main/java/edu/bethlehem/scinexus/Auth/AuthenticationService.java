@@ -108,7 +108,7 @@ public class AuthenticationService {
 
         }
 
-        public OAuthRegisterRequest registerOAuth(OAuthRegisterRequest request) {
+        public OAuth2RegisterResponse registerOAuth(OAuthRegisterRequest request) {
                 User user;
 
                 if (request.getRole() == Role.ACADEMIC) {
@@ -146,8 +146,8 @@ public class AuthenticationService {
                                 .build();
                 }
                 userRepository.save(user);
-
-                return request;
+                var jwtToken = service.generateToken(user);
+                return OAuth2RegisterResponse.builder().jwtToken(jwtToken).build();
         }
 
 

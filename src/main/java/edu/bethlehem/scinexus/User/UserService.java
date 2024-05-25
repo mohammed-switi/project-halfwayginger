@@ -6,6 +6,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -100,14 +101,13 @@ public class UserService implements UserDetailsService {
         logger.debug("partially updating user with id: " + user.getId());
 
         logger.trace("Got user with id: " + user.getId());
-        // User Properties
 
         try {
             for (Method method : UserRequestPatchDTO.class.getMethods()) {
                 if (method.getName().startsWith("get") && method.getParameterCount() == 0) {
                     Object value = method.invoke(editUser);
 
-                    if (value != null) {
+                    if (value != null && !isEmptyValue(value)) {
                         String propertyName = method.getName().substring(3); // remove "get"
                         logger.trace("Updating user property: " + propertyName);
                         if (propertyName.equals("Class")) // Class is a reserved keyword in Java
@@ -120,10 +120,13 @@ public class UserService implements UserDetailsService {
                                             HttpStatus.NOT_FOUND));
                             setter = User.class.getMethod("set" + propertyName, Media.class);
                             setter.invoke(user, media);
-
+                        } else if (propertyName.equals("ContactEmail") || propertyName.equals("ContactPhoneNumber") || propertyName.equals("Languages")) {
+                            setter = User.class.getMethod("set" + propertyName, method.getReturnType());
+                            setter.invoke(user, value);
+                        } else {
+                            setter = User.class.getMethod("set" + propertyName, method.getReturnType());
+                            setter.invoke(user, value);
                         }
-                        setter = User.class.getMethod("set" + propertyName, method.getReturnType());
-                        setter.invoke(user, value);
                     }
                 }
             }
@@ -134,7 +137,15 @@ public class UserService implements UserDetailsService {
         EntityModel<User> entityModel = assembler.toModel(repository.save(user));
         logger.trace("returning updated user with id: " + user.getId());
         return entityModel;
+    }
 
+    private boolean isEmptyValue(Object value) {
+        if (value instanceof String) {
+            return ((String) value).trim().isEmpty();
+        } else if (value instanceof Set) {
+            return ((Set<?>) value).isEmpty();
+        }
+        return false;
     }
 
     public CollectionModel<EntityModel<Article>> getUserArticles(Authentication authentication) {
