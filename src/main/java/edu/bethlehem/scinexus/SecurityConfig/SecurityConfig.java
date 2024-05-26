@@ -29,7 +29,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.cors.CorsConfiguration;
 
-
 import edu.bethlehem.scinexus.Authorization.AuthorizationManager;
 import edu.bethlehem.scinexus.User.UserService;
 import lombok.RequiredArgsConstructor;
@@ -48,11 +47,12 @@ public class SecurityConfig {
         private final JwtDecoder jwtDecoder;
         private final UserService userDetailsService;
         private final JwtAuthenticationProvider jwtAuthenticationProvider;
-        private final  OAuth2LoginSuccessHandler  oAuth2LoginSuccessHandler;
+        private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
         private final OAuth2LoginFailureHandler oAuth2LoginFailureHandler;
 
-    @Autowired
-    private DataSource dataSource;
+        @Autowired
+        private DataSource dataSource;
+
         @Bean
         public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
                 httpSecurity // .cors(Customizer.withDefaults())
@@ -62,7 +62,8 @@ public class SecurityConfig {
                                 .cors(cors -> cors.configurationSource(request -> {
                                         var corsConfiguration = new CorsConfiguration();
                                         corsConfiguration.setAllowedOrigins(List.of("http://localhost:5173"));
-                                        corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH"));
+                                        corsConfiguration.setAllowedMethods(
+                                                        List.of("GET", "POST", "PUT", "DELETE", "PATCH"));
                                         corsConfiguration.setAllowedHeaders(List.of("*"));
                                         corsConfiguration.setAllowCredentials(true);
                                         return corsConfiguration;
@@ -99,7 +100,7 @@ public class SecurityConfig {
                                                 .access(authorizationManager.admin())
 
                                                 .requestMatchers(HttpMethod.PATCH, "/academics/{userId}")
-                                               .access(authorizationManager.userHimSelfAndAdmin())
+                                                .access(authorizationManager.userHimSelfAndAdmin())
 
                                                 // Articles
                                                 .requestMatchers(HttpMethod.GET, "/articles")
@@ -261,12 +262,12 @@ public class SecurityConfig {
                                 })
                                 .oauth2ResourceServer(oauth2Config -> oauth2Config.jwt(jwt -> jwt.decoder(jwtDecoder)))//
                                 .oauth2Login(oauth2LoginConfig -> {
-                                    oauth2LoginConfig.loginPage("/api/v1/auth/login").permitAll();
-//
-                                    oauth2LoginConfig.successHandler(oAuth2LoginSuccessHandler);
-                                    oauth2LoginConfig.failureHandler(oAuth2LoginFailureHandler);
+                                        oauth2LoginConfig.loginPage("/api/v1/auth/login").permitAll();
+                                        //
+                                        oauth2LoginConfig.successHandler(oAuth2LoginSuccessHandler);
+                                        oauth2LoginConfig.failureHandler(oAuth2LoginFailureHandler);
 
-//
+                                        //
                                 })
 
                                 .authenticationProvider(authenticationProvider)
@@ -275,8 +276,6 @@ public class SecurityConfig {
 
                 return httpSecurity.build();
         }
-
-
 
         @Bean
         public OAuth2AuthorizedClientProvider jwtBearer() {
@@ -299,7 +298,5 @@ public class SecurityConfig {
                 auth.authenticationProvider(jwtAuthenticationProvider);
                 auth.userDetailsService(userDetailsService);
         }
-
-
 
 }

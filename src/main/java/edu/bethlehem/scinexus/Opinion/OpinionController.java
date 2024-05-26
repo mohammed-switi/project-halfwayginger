@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import edu.bethlehem.scinexus.Interaction.Interaction;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -31,6 +32,12 @@ public class OpinionController {
   public EntityModel<Opinion> one(@PathVariable Long opinionId) {
 
     return opinionService.getOneOpinion(opinionId);
+  }
+
+  @GetMapping("/{opinionId}/interactions")
+  public CollectionModel<EntityModel<Interaction>> interactions(@PathVariable Long opinionId) {
+
+    return opinionService.getInteractions(opinionId);
   }
 
   @GetMapping()

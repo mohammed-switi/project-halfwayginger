@@ -132,7 +132,7 @@ public class InteractionControllerTest {
 
                 interaction = Interaction.builder()
                                 .journal(journal)
-                                .type(InteractionType.LOVE)
+                                .type(InteractionType.INTRESTED)
                                 .createDateTime(LocalDateTime.now())
                                 .interactorUser(user)
                                 .opinion(opinion)
@@ -183,7 +183,7 @@ public class InteractionControllerTest {
         public void InteractionController_POST_CreateOpinionInteraction_ReturnInteraction() throws Exception {
 
                 InteractionRequestDTO interactionRequestDTO = InteractionRequestDTO.builder()
-                                .type(InteractionType.LOVE)
+                                .type(InteractionType.INTRESTED)
                                 .build();
 
                 EntityModel<Interaction> entityModel = EntityModel.of(new Interaction());
@@ -204,7 +204,7 @@ public class InteractionControllerTest {
         public void InteractionController_POST_CreateJournalInteraction_ReturnInteraction() throws Exception {
 
                 InteractionRequestDTO interactionRequestDTO = InteractionRequestDTO.builder()
-                                .type(InteractionType.LOVE)
+                                .type(InteractionType.INTRESTED)
                                 .build();
 
                 EntityModel<Interaction> entityModel = EntityModel.of(new Interaction());
@@ -228,7 +228,7 @@ public class InteractionControllerTest {
         public void InteractionController_Patch_UpdateInteractionPartially_ReturnInteraction() throws Exception {
 
                 InteractionRequestDTO interactionRequestDTO = InteractionRequestDTO.builder()
-                                .type(InteractionType.LOVE)
+                                .type(InteractionType.INTRESTED)
                                 .build();
 
                 when(interactionService.updateInteraction(1L, interactionRequestDTO))

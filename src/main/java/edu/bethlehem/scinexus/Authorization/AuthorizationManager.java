@@ -153,6 +153,10 @@ public class AuthorizationManager {
     @Bean
     public org.springframework.security.authorization.AuthorizationManager<RequestAuthorizationContext> interactionOwner() {
         return (authentication, context) -> {
+            User admin = jwtService.getUser(authentication.get());
+            if (admin.getRole() == Role.ADMIN)
+                return new AuthorizationDecision(true);
+
             Long interactionId = Long.parseLong(context.getVariables().get("interactionId"));
             Interaction interaction = interactionRepository.findById(
                     interactionId)

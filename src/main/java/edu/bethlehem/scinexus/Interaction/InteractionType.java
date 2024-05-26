@@ -1,5 +1,5 @@
 package edu.bethlehem.scinexus.Interaction;
 
 public enum InteractionType {
-    LIKE, LOVE
+    LIKE, INTRESTED, SMART, ANGRY, UP, DOWN, MIND_BLOWING, TAKING_NOTES
 }

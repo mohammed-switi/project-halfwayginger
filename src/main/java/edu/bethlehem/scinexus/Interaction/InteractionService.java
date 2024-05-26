@@ -163,7 +163,7 @@ public class InteractionService {
                 interaction.setJournal(journal);
                 interaction.setInteractorUser(user);
 
-                journal.addInteraction();
+                journal.setInteractionsCount(journal.getInteractionsCount() + 1);
                 journalRepository.save(journal);
 
                 notificationService.notifyUser(
@@ -176,6 +176,7 @@ public class InteractionService {
 
         }
 
+        @Transactional
         public void deleteInteraction(Long interactionId, Authentication authentication) {
                 logger.trace("Deleting Interaction");
                 User user = jwtService.getUser(authentication);
@@ -185,12 +186,16 @@ public class InteractionService {
                         throw new InteractionNotFoundException("Interaction with id: " + interactionId
                                         + " for user with Id: " + user.getId() + " is not Found", HttpStatus.NOT_FOUND);
 
-                if (interaction.getJournal() != null)
+                if (interaction.getJournal() != null) {
                         interaction.getJournal().removeInteraction();
+                }
                 if (interaction.getOpinion() != null)
                         interaction.getOpinion().removeInteraction();
-
+                interaction.setOpinion(null);
+                interaction.setJournal(null);
+                logger.trace("Interaction Deleted");
                 interactionRepository.delete(interaction);
+                logger.trace("Interaction Deleted For Sure");
         }
 
 }

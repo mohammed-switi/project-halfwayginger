@@ -118,7 +118,7 @@ public class JournalControllerTest {
 
                 interaction = Interaction.builder()
                                 .journal(journal)
-                                .type(InteractionType.LOVE)
+                                .type(InteractionType.INTRESTED)
                                 .createDateTime(LocalDateTime.now())
                                 .interactorUser(user)
                                 .opinion(opinion)

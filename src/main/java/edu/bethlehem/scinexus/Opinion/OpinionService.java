@@ -5,12 +5,15 @@ import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import edu.bethlehem.scinexus.DatabaseLoading.DataLoader;
+import edu.bethlehem.scinexus.Interaction.Interaction;
+import edu.bethlehem.scinexus.Interaction.InteractionModelAssembler;
 import edu.bethlehem.scinexus.JPARepository.JournalRepository;
 import edu.bethlehem.scinexus.JPARepository.OpinionRepository;
 import edu.bethlehem.scinexus.JPARepository.UserRepository;
@@ -29,6 +32,8 @@ public class OpinionService {
     private final OpinionRepository opinionRepository;
     private final JwtService jwtService;
     private final UserRepository userRepository;
+    private final InteractionModelAssembler interactionAssembler;
+
     private final OpinionModelAssembler assembler;
     Logger logger = LoggerFactory.getLogger(DataLoader.class);
 
@@ -75,16 +80,16 @@ public class OpinionService {
         return assembler.toModel(opinionRepository.save(newOpinion));
     }
 
-    // public EntityModel<Opinion> updateOpinion(Long id, OpinionDTO opinionDTO) {
-    // logger.trace("Updating Opinion");
-    // return opinionRepository.findById(id)
-    // .map(opinion -> {
-    // opinion.setContent(opinionDTO.getContent());
-    // return assembler.toModel(opinionRepository.save(opinion));
-    // })
-    // .orElseThrow(() -> new JournalNotFoundException(id));
-
-    // }
+    public CollectionModel<EntityModel<Interaction>> getInteractions(Long opinionId) {
+        Opinion opinion = opinionRepository.findById(
+                opinionId)
+                .orElseThrow(() -> new OpinionNotFoundException(opinionId, HttpStatus.NOT_FOUND));
+        List<EntityModel<Interaction>> interactions = opinion.getInteractions()
+                .stream()
+                .map(interactionAssembler::toModel)
+                .collect(Collectors.toList());
+        return CollectionModel.of(interactions);
+    }
 
     public EntityModel<Opinion> updateOpinionPartially(Long opinionId, OpinionPatchDTO opinionPatchDTO) {
         logger.trace("Partially Updating Opinion");

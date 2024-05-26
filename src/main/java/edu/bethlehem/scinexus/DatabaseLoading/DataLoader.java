@@ -192,6 +192,7 @@ public class DataLoader implements CommandLineRunner {
                 academic.setEducation(bio);
                 academic.setBadge(bio);
                 academic.setProfilePicture(media);
+                academic.setPosition(dataGenerator.getRandomPosition());
                 // academic.setProfileCover((medias.get(r.nextInt(medias.size()))));
                 users.add(academic);
             }

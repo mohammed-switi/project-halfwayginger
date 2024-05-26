@@ -118,14 +118,14 @@ public class NotificationService {
     public Flux<ServerSentEvent<List<Notification>>> getNotificationsByUserToID(Authentication auth) {
         Long userID = jwtService.extractId(auth);
         if (userID != null) {
-            return Flux.interval(Duration.ofSeconds(1))
+            return Flux.interval(Duration.ofSeconds(15))
                     .publishOn(Schedulers.boundedElastic())
                     .map(sequence -> ServerSentEvent.<List<Notification>>builder().id(String.valueOf(sequence))
                             .event("user-list-event").data(getNotifs(auth))
                             .build());
         }
 
-        return Flux.interval(Duration.ofSeconds(1)).map(sequence -> ServerSentEvent.<List<Notification>>builder()
+        return Flux.interval(Duration.ofSeconds(15)).map(sequence -> ServerSentEvent.<List<Notification>>builder()
                 .id(String.valueOf(sequence)).event("user").data(getNotifs(auth)).build());
     }
 

@@ -96,7 +96,7 @@ public class Journal implements Serializable {
     private User publisher;
 
     // It was lazy
-    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.EAGER)
     @JoinColumn(name = "journal")
     @JdbcTypeCode(SqlTypes.JSON)
     @JsonBackReference

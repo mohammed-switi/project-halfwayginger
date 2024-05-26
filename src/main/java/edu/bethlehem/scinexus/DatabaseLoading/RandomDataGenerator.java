@@ -5,6 +5,7 @@ import com.github.javafaker.Faker;
 import edu.bethlehem.scinexus.Interaction.InteractionType;
 import edu.bethlehem.scinexus.Journal.Visibility;
 import edu.bethlehem.scinexus.User.Role;
+import edu.bethlehem.scinexus.User.Position;
 
 import org.springframework.data.mongodb.core.aggregation.ArithmeticOperators.Rand;
 import org.springframework.stereotype.Component;
@@ -80,6 +81,13 @@ public class RandomDataGenerator {
 
     public String generateRandomCharacterName() {
         return faker.gameOfThrones().character();
+    }
+
+    public Position getRandomPosition() {
+        Position[] positions = Position.values();
+        Random random = new Random();
+        int randomIndex = random.nextInt(positions.length);
+        return positions[randomIndex];
     }
 
     public String generateRandomFieldOfWork() {
