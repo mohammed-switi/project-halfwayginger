@@ -142,7 +142,7 @@ public class DataLoader implements CommandLineRunner {
 
                 if (!ulService.areTheyLinked(linkFrom, linkTo) && linkFrom != linkTo) {
                     UserLinks ul = new UserLinks(linkTo, linkFrom);
-                    if (random.nextInt(2) == 1)
+//                    if (random.nextInt(2) == 1)
                         ul.setAccepted(true);
                     userLinksRepository.save(ul);
                 }

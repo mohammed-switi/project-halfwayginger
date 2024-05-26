@@ -4,11 +4,11 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 import java.lang.reflect.Method;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
+import edu.bethlehem.scinexus.JPARepository.*;
+import edu.bethlehem.scinexus.UserLinks.UserLinks;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,11 +26,6 @@ import org.springframework.web.multipart.MultipartFile;
 import edu.bethlehem.scinexus.Article.Article;
 import edu.bethlehem.scinexus.Article.ArticleModelAssembler;
 import edu.bethlehem.scinexus.File.FileStorageService;
-import edu.bethlehem.scinexus.JPARepository.ArticleRepository;
-import edu.bethlehem.scinexus.JPARepository.MediaRepository;
-import edu.bethlehem.scinexus.JPARepository.NotificationRepository;
-import edu.bethlehem.scinexus.JPARepository.ResearchPaperRepository;
-import edu.bethlehem.scinexus.JPARepository.UserRepository;
 import edu.bethlehem.scinexus.Media.Media;
 import edu.bethlehem.scinexus.Media.MediaNotFoundException;
 import edu.bethlehem.scinexus.MongoRepository.UserMongoRepository;
@@ -59,6 +54,7 @@ public class UserService implements UserDetailsService {
     private final NotificationModelAssembler notificationAssembler;
     private final UserModelAssembler assembler;
     private final ArticleModelAssembler articleAssembler;
+    private final UserLinksRepository userLinksRepository;
 
     @Autowired
     FileStorageService fileStorageManager;
@@ -365,4 +361,47 @@ public class UserService implements UserDetailsService {
         User user = jwtService.getUser(authentication);
         return assembler.toModel(user);
     }
+
+    public List<PeopleYouMayKnowResponseDTO> getPeopleYouMayKnow(Authentication authentication) {
+        Long userId = jwtService.extractId(authentication);
+        logger.trace("Extracted user ID: {}", userId);
+
+        User user = repository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found: " + userId));
+
+        List<UserLinks> mutualConnections = userLinksRepository.findMutualConnections(userId);
+        logger.trace("Got users by mutual connections: {}", mutualConnections);
+
+        List<PeopleYouMayKnowResponseDTO> responseDTOList = new ArrayList<>();
+        for (UserLinks userLink : mutualConnections) {
+            User otherUser = userLink.getLinksTo().equals(user) ? userLink.getLinksFrom() : userLink.getLinksTo();
+            logger.trace("Processing user: {}", otherUser);
+
+            int sharedSkills = calculateSharedSkills(user, otherUser);
+            PeopleYouMayKnowResponseDTO dto = PeopleYouMayKnowResponseDTO.builder()
+                    .name(otherUser.getFirstName() + " " + otherUser.getLastName())
+                    .sharedSkills(sharedSkills)
+                    .profilePicture(otherUser.getProfilePicture())
+                    .accepted(userLinksRepository.areUsersLinked(userId, otherUser.getId()))
+                    .id(otherUser.getId())
+                    .build();
+            logger.trace("Adding user to response DTO list: {}", dto);
+            responseDTOList.add(dto);
+        }
+
+        logger.trace("Final response DTO list: {}", responseDTOList);
+        return responseDTOList;
+    }
+
+    private int calculateSharedSkills(User user, User otherUser) {
+        logger.trace("Calculating shared skills between users: {} and {}", user.getId(), otherUser.getId());
+
+        long sharedSkillsCount = user.getSkills().stream()
+                .filter(otherUser.getSkills()::contains)
+                .count();
+
+        logger.trace("Shared skills count: {}", sharedSkillsCount);
+        return (int) sharedSkillsCount;
+    }
+
 }

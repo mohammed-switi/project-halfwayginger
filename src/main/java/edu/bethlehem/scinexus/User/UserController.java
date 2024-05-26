@@ -24,6 +24,8 @@ import edu.bethlehem.scinexus.UserLinks.UserLinks;
 import edu.bethlehem.scinexus.UserLinks.UserLinksService;
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/users")
@@ -133,6 +135,12 @@ public class UserController {
     ResponseEntity<?> deleteUser(@PathVariable Long id) throws UserNotFoundException {
 
         return ResponseEntity.noContent().build();
+    }
+
+
+    @GetMapping("/people-you-may-know")
+    public ResponseEntity<List<PeopleYouMayKnowResponseDTO>> getPeopleYouMayKnow(Authentication authentication) {
+        return ResponseEntity.ok(service.getPeopleYouMayKnow(authentication));
     }
 
 }
