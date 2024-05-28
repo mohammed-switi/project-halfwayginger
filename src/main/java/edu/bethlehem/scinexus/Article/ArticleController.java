@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
 
+import java.util.HashMap;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/articles")
@@ -50,4 +52,16 @@ public class ArticleController {
     service.deleteArticle(articleId);
     return ResponseEntity.noContent().build();
   }
+
+  @GetMapping("count/{id}")
+  public ResponseEntity<?> getResearchPaperCount(
+          @PathVariable Long id
+          , Authentication authentication
+  ) {
+
+    HashMap<String, Long> response = new HashMap<>();
+    response.put("count", service.getArticlesCount(id));
+    return ResponseEntity.ok(response);
+  }
+
 }

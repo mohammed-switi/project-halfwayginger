@@ -207,4 +207,6 @@ public class JournalService {
                 .collect(Collectors.toList());
         return CollectionModel.of(opinions);
     }
+
+
 }

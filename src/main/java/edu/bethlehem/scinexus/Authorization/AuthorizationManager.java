@@ -234,6 +234,16 @@ public class AuthorizationManager {
         };
     }
 
+
+    @Bean
+    public org.springframework.security.authorization.AuthorizationManager<RequestAuthorizationContext> countOwner() {
+        return (authentication, context) -> {
+
+            return new AuthorizationDecision(true);
+
+        };
+    }
+
     public org.springframework.security.authorization.AuthorizationManager<RequestAuthorizationContext> journalOwnerContributors() {
         return (authentication, object) -> {
             Long journalId = Long.parseLong(object.getVariables().get("journalId"));

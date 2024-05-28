@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authorization.AuthorizationDecision;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -25,6 +26,7 @@ import org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationF
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationProvider;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.intercept.RequestAuthorizationContext;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.cors.CorsConfiguration;
@@ -222,7 +224,11 @@ public class SecurityConfig {
                                                 .access(authorizationManager.readJournals())
 
                                                 // researchpapers
-                                                .requestMatchers(HttpMethod.GET,
+                                        .requestMatchers(HttpMethod.GET,
+                                                "/researchpapers/count")
+                                        .access( authorizationManager.countOwner())
+
+                                        .requestMatchers(HttpMethod.GET,
                                                                 "/researchpapers")
                                                 .access(authorizationManager.admin())
 
@@ -249,7 +255,7 @@ public class SecurityConfig {
                                                                 "/users")
                                                 .access(authorizationManager.admin())
 
-                                                .anyRequest().permitAll())
+                                                .anyRequest().authenticated())
 
                                 .sessionManagement(sessionConfigurer -> sessionConfigurer
                                                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))

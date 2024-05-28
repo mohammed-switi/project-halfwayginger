@@ -173,6 +173,12 @@ public class PostService {
         logger.debug("Post Deleted");
     }
 
+
+    public Long getPostsCount(Long id) {
+        Long count = postRepository.findByPublisherId(id).stream().count();
+
+        return  count;
+    }
     // private boolean isUserAuthorized(Authentication authentication, Post post) {
 
     // Long userRequestId = jwtService.extractId(authentication);

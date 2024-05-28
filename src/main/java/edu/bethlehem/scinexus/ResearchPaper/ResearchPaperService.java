@@ -4,6 +4,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 import java.lang.reflect.Method;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -252,5 +253,15 @@ public class ResearchPaperService {
         }
         // mediaRepository.saveAll(journal.getMedias());
         return assembler.toModel(researchPaperRepository.save(journal));
+    }
+
+
+    public Long getResearchPaperCount(Long userId) {
+
+
+       Long count = researchPaperRepository.findByPublisherId(userId).stream().count();
+
+
+       return  count;
     }
 }

@@ -21,6 +21,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import edu.bethlehem.scinexus.Article.Article;
@@ -211,14 +212,15 @@ public class UserService implements UserDetailsService {
 
     }
 
+    @Transactional
     public void deleteUser(Long userId) {
-        logger.debug("deleting user with id: " + userId);
-        User user = repository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("The user with id:" + userId + " is not found",
-                        HttpStatus.NOT_FOUND));
-        logger.trace("Got user with id: " + userId);
+//        logger.debug("deleting user with id: " + userId);
+//        User user = repository.findById(userId)
+//                .orElseThrow(() -> new UserNotFoundException("The user with id:" + userId + " is not found",
+//                        HttpStatus.NOT_FOUND));
+     logger.trace("Got user with id: " + userId);
 
-        repository.delete(user);
+        repository.deleteByIdCustom(userId);
         logger.trace("Deleted user with id: " + userId);
 
     }

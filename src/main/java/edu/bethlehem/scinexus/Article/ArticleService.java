@@ -156,4 +156,9 @@ public class ArticleService {
         articleRepository.delete(article);
     }
 
+    public Long getArticlesCount(Long id) {
+        Long count = articleRepository.findByPublisherId(id).stream().count();
+
+        return  count;
+    }
 }

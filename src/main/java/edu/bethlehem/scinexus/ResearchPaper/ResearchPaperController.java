@@ -3,6 +3,7 @@ package edu.bethlehem.scinexus.ResearchPaper;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
+import edu.bethlehem.scinexus.Journal.Journal;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.IanaLinkRelations;
@@ -22,6 +23,9 @@ import edu.bethlehem.scinexus.Journal.MediaIdDTO;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+
+import java.util.HashMap;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -125,4 +129,16 @@ public class ResearchPaperController {
   public ResponseEntity<?> attachMedia(@PathVariable Long journalId, @RequestBody MediaIdDTO mediaIds) {
     return ResponseEntity.ok(service.attachMedia(journalId, mediaIds));
   }
+
+  @GetMapping("count/{id}")
+  public ResponseEntity<?> getResearchPaperCount(
+          @PathVariable Long id
+          , Authentication authentication
+  ) {
+
+    HashMap<String, Long> response = new HashMap<>();
+    response.put("count", service.getResearchPaperCount(id));
+    return ResponseEntity.ok(response);
+  }
+
 }

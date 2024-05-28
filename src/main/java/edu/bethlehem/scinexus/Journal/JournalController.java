@@ -1,5 +1,6 @@
 package edu.bethlehem.scinexus.Journal;
 
+import lombok.Getter;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
@@ -70,5 +71,8 @@ public class JournalController {
     public ResponseEntity<?> deattachMedia(@PathVariable Long journalId, @RequestBody MediaIdDTO mediaIds) {
         return ResponseEntity.ok(service.deattachMedia(journalId, mediaIds));
     }
+
+
+
 
 }

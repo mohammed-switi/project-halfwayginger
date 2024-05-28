@@ -58,7 +58,7 @@ import lombok.Builder.Default;
 @Conditional(selected = "role", values = { "ACADEMIC" }, required = {
         "education", "badge", "position" })
 @Conditional(selected = "role", values = { "ORGANIZATION" }, required = {
-        "type" })
+        "type"  })
 @Table(name = "_user") // Specify the custom table name here
 
 public class User implements UserDetailsImpl {
@@ -187,6 +187,11 @@ public class User implements UserDetailsImpl {
     @Nullable
     @JsonIgnore
     private User organization;
+
+
+    private String organizationName;
+    private String OrganizationAddress;
+    private String location;
 
     @OneToMany(mappedBy = "user")
     @JsonIgnore

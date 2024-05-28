@@ -21,6 +21,8 @@ import org.springframework.web.bind.annotation.RestController;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
+import java.util.HashMap;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/posts")
@@ -92,6 +94,17 @@ public class PostController {
     postService.deletePost(id);
 
     return ResponseEntity.noContent().build();
+  }
+
+  @GetMapping("count/{id}")
+  public ResponseEntity<?> getResearchPaperCount(
+          @PathVariable Long id
+          , Authentication authentication
+  ) {
+
+    HashMap<String, Long> response = new HashMap<>();
+    response.put("count", postService.getPostsCount(id));
+    return ResponseEntity.ok(response);
   }
 
 }

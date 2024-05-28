@@ -102,8 +102,9 @@ public class AuthenticationController {
     public ResponseEntity verifiyToken(
             Authentication authentication
     ){
-        HashMap<String,Boolean> response = new HashMap<>();
-        response.put("isVerified",service.verifyToken(authentication));
+        HashMap<String,String> response = new HashMap<>();
+        response.put("isVerified",String.valueOf(service.verifyToken(authentication)));
+        response.put("role", service.getRole(authentication));
         return ResponseEntity.ok(response);
     }
 

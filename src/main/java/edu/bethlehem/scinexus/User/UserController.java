@@ -133,7 +133,7 @@ public class UserController {
 
     @DeleteMapping("/{id}")
     ResponseEntity<?> deleteUser(@PathVariable Long id) throws UserNotFoundException {
-
+            service.deleteUser(id);
         return ResponseEntity.noContent().build();
     }
 

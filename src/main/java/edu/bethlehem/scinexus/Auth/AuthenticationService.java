@@ -172,6 +172,7 @@ public class AuthenticationService {
                 var jwtToken = service.generateToken(user);
                 return AuthenticationResponse.builder()
                                 .jwtToken(jwtToken)
+                                   .role(user.getRole())
                                 .build();
                 } catch (AuthenticationException e) {
                         throw new PasswordDoesntMatchException();
@@ -284,4 +285,8 @@ public class AuthenticationService {
         }
 
 
+        public String getRole(Authentication authentication) {
+
+                return userRepository.findById(service.extractId(authentication)).get().getRole().toString();
+        }
 }
