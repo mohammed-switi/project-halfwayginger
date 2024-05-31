@@ -4,24 +4,39 @@ import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.messaging.converter.DefaultContentTypeResolver;
-import org.springframework.messaging.converter.MappingJackson2MessageConverter;
-import org.springframework.messaging.converter.MessageConverter;
+import org.springframework.messaging.converter.*;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
-import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
-import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
-import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
+import org.springframework.scheduling.TaskScheduler;
+import org.springframework.web.socket.WebSocketHandler;
+import org.springframework.web.socket.config.annotation.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.web.socket.server.support.DefaultHandshakeHandler;
+import org.springframework.web.socket.sockjs.transport.TransportHandler;
+import org.springframework.web.socket.sockjs.transport.handler.*;
 
 @Configuration
 @EnableWebSocketMessageBroker
+@EnableWebSocket
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
+
+
+    Logger logger = LoggerFactory.getLogger(WebSocketConfig.class);
+
+
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/ws").withSockJS();
+        registry.addEndpoint("/ws")
+//                .setAllowedOriginPatterns(http://localhost:5173")
+                .setAllowedOriginPatterns("http://localhost:5173")
+                .withSockJS();
+
+
     }
 
     @Override
@@ -42,4 +57,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
         return false;
     }
+
+
+
 }

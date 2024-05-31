@@ -38,6 +38,8 @@ public class AuthenticationService {
 
         private final ConfirmationTokenService confirmationTokenService;
 
+        private final UserDocumentService userDocumentService;
+
         private final EmailSender emailSender;
 
         Logger logger = LoggerFactory.getLogger(AuthenticationService.class);
@@ -80,7 +82,13 @@ public class AuthenticationService {
                                         .build();
                 }
 
-                userRepository.save(user);
+                User savedUser= userRepository.save(user);
+//                UserDocument userDocument = new UserDocument();
+//                userDocument.setUsername(user.getUsername());
+//                userDocument.setFullName(user.getFirstName() + " " + user.getLastName());
+//                userDocument.setStatus(Status.ONLINE);
+//                userDocument.setUserId(savedUser.getId());
+//                userDocumentService.saveUser(userDocument);
 
                 String token = UUID.randomUUID().toString();
 

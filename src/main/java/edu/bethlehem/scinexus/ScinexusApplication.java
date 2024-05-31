@@ -4,6 +4,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @SpringBootApplication
@@ -11,7 +12,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 // @EnableConfigurationProperties(RsaKeyConfigProperties.class)
 @EnableTransactionManagement
 @EnableMongoRepositories(basePackageClasses = MongoRepository.class)
-
+@EnableScheduling
 public class ScinexusApplication {
 
 	public static void main(String[] args) {

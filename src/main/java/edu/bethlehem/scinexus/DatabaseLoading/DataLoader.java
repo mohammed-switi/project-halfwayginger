@@ -44,6 +44,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class DataLoader implements CommandLineRunner {
 
+
     private final UserRepository userRepository;
 
     private final ArticleRepository articleRepository;

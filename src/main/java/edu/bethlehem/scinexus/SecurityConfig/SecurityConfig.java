@@ -34,6 +34,8 @@ import org.springframework.web.cors.CorsConfiguration;
 import edu.bethlehem.scinexus.Authorization.AuthorizationManager;
 import edu.bethlehem.scinexus.User.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import javax.sql.DataSource;
 
@@ -61,15 +63,19 @@ public class SecurityConfig {
                              // .exceptionHandling(customizer -> customizer.authenticationEntryPoint(new
                              // HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
                                 .csrf(AbstractHttpConfigurer::disable)
-                                .cors(cors -> cors.configurationSource(request -> {
-                                        var corsConfiguration = new CorsConfiguration();
-                                        corsConfiguration.setAllowedOrigins(List.of("http://localhost:5173"));
-                                        corsConfiguration.setAllowedMethods(
-                                                        List.of("GET", "POST", "PUT", "DELETE", "PATCH"));
-                                        corsConfiguration.setAllowedHeaders(List.of("*"));
-                                        corsConfiguration.setAllowCredentials(true);
-                                        return corsConfiguration;
-                                }))
+                //        .headers(header -> header.frameOptions(frameOptionsConfig -> frameOptionsConfig.disable()))
+//                                .cors(cors -> cors.configurationSource(request -> {
+//
+//                                        var corsConfiguration = new CorsConfiguration();
+//                                        corsConfiguration.setAllowedOrigins(List.of("http://localhost:5173"));
+//                                        corsConfiguration.setAllowedMethods(
+//                                                        List.of("GET", "POST", "PUT", "DELETE", "PATCH","OPTIONS"));
+//                                        corsConfiguration.setAllowedHeaders(List.of("*"));
+//                                        corsConfiguration.setAllowCredentials(true);
+//                                        return corsConfiguration;
+//                                }))
+                                  .cors(corsConfigurer -> corsConfigurer.configurationSource(corsConfigurationSource()))
+
                                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
                                                 .requestMatchers("/api/v1/auth/**").permitAll()
                                                 .requestMatchers("/auth/**").permitAll()
@@ -305,4 +311,16 @@ public class SecurityConfig {
                 auth.userDetailsService(userDetailsService);
         }
 
+        @Bean
+        public CorsConfigurationSource corsConfigurationSource() {
+                CorsConfiguration configuration = new CorsConfiguration();
+                configuration.setAllowedOrigins(List.of("http://localhost:5173"));
+                configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+                configuration.setAllowedHeaders(List.of("*"));
+                configuration.setAllowCredentials(true);
+
+                UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+                source.registerCorsConfiguration("/**", configuration);
+                return source;
+        }
 }

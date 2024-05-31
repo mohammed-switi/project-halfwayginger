@@ -9,6 +9,7 @@ services:
     environment:
       - MONGO_INITDB_ROOT_USERNAME=scinexus
       - MONGO_INITDB_ROOT_PASSWORD=scinexus
+
   mongo-express:
     image: mongo-express
     container_name: mongo_express
@@ -19,5 +20,7 @@ services:
       - ME_CONFIG_MONGODB_ADMINUSERNAME=scinexus
       - ME_CONFIG_MONGODB_ADMINPASSWORD=scinexus
       - ME_CONFIG_MONGODB_SERVER=mongodb
+      - ME_CONFIG_MONGODB_AUTH_DATABASE=admin
+
 volumes:
   mongo: {}

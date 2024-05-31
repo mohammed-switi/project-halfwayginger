@@ -46,7 +46,6 @@ public class UserService implements UserDetailsService {
     @PersistenceContext
     private EntityManager entityManager;
     private final UserRepository repository;
-    private final UserMongoRepository mongoRepository;
     private final ArticleRepository articleRepository;
     private final MediaRepository mediaRepository;
     private final NotificationRepository notificationRepository;
@@ -56,6 +55,7 @@ public class UserService implements UserDetailsService {
     private final UserModelAssembler assembler;
     private final ArticleModelAssembler articleAssembler;
     private final UserLinksRepository userLinksRepository;
+    private final UserDocumentService userDocumentService;
 
     @Autowired
     FileStorageService fileStorageManager;
@@ -193,23 +193,13 @@ public class UserService implements UserDetailsService {
                 .toModel(researchPapersRepository.findByIdAndPublisherId(researchPaperId, userId));
     }
 
-    public void saveUser(UserDocument user) {
-        user.setStatus(Status.ONLINE);
-        System.out.println("Saving ths uer from the Service:" + mongoRepository.save(user));
-    }
-
-    public void disconnect(UserDocument user) {
-        var storedUser = mongoRepository.findById(user.getNickName()).orElse(null);
-        if (storedUser != null) {
-            storedUser.setStatus(Status.OFFLINE);
-            mongoRepository.save(storedUser);
+    public void disconnectUser(String username) {
+        User user = repository.findByUsername(username).orElse(null);
+        if (user != null) {
+            user.setStatus(Status.OFFLINE);
+            repository.save(user);
+            userDocumentService.updateUserStatus(user.getUsername(), Status.OFFLINE);
         }
-
-    }
-
-    public List<UserDocument> findConnectedUser() {
-        return mongoRepository.findAllByStatus(Status.ONLINE);
-
     }
 
     @Transactional

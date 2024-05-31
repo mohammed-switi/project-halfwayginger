@@ -16,8 +16,10 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class UserDocument {
 
     @Id
-    private String nickName;
+    private String username;
     private String fullName;
     @Enumerated(EnumType.STRING)
     private Status status;
+
+    private Long userId;
 }
