@@ -1,5 +1,6 @@
 package edu.bethlehem.scinexus.JPARepository;
 
+import edu.bethlehem.scinexus.Article.Article;
 import edu.bethlehem.scinexus.Journal.Visibility;
 import edu.bethlehem.scinexus.Post.Post;
 import edu.bethlehem.scinexus.ResearchPaper.ResearchPaper;
@@ -10,8 +11,9 @@ import java.util.Optional;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
 
+    List<Post> findByPublisherId(Long userId);
+
     Optional<Post> findByVisibility(Visibility visibility);
 
-    List<Post> findByPublisherId(Long userId);
 
 }

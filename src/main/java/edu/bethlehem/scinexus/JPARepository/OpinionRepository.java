@@ -6,4 +6,7 @@ import java.util.List;
 
 public interface OpinionRepository extends JpaRepository<Opinion, Long> {
     List<Opinion> findByJournalId(Long journalId);
+
+    List<Opinion> deleteByPapaOpinionId(Long opinionId);
+
 }

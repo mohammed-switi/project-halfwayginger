@@ -33,7 +33,6 @@ public class Media {
 
     @NotNull(message = "The Media Path Shouldn't Be Null")
     @NotBlank(message = "The Media Path Shouldn't Be Empty")
-    @JsonIgnore
     private String path;
 
     @NotNull(message = "The Media fileName Shouldn't Be Null")

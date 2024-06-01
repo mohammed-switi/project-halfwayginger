@@ -27,11 +27,19 @@ import org.springframework.web.multipart.MultipartFile;
 import edu.bethlehem.scinexus.Article.Article;
 import edu.bethlehem.scinexus.Article.ArticleModelAssembler;
 import edu.bethlehem.scinexus.File.FileStorageService;
+import edu.bethlehem.scinexus.JPARepository.ArticleRepository;
+import edu.bethlehem.scinexus.JPARepository.MediaRepository;
+import edu.bethlehem.scinexus.JPARepository.NotificationRepository;
+import edu.bethlehem.scinexus.JPARepository.PostRepository;
+import edu.bethlehem.scinexus.JPARepository.ResearchPaperRepository;
+import edu.bethlehem.scinexus.JPARepository.UserRepository;
 import edu.bethlehem.scinexus.Media.Media;
 import edu.bethlehem.scinexus.Media.MediaNotFoundException;
 import edu.bethlehem.scinexus.MongoRepository.UserMongoRepository;
 import edu.bethlehem.scinexus.Notification.Notification;
 import edu.bethlehem.scinexus.Notification.NotificationModelAssembler;
+import edu.bethlehem.scinexus.Post.Post;
+import edu.bethlehem.scinexus.Post.PostModelAssembler;
 import edu.bethlehem.scinexus.ResearchPaper.ResearchPaper;
 import edu.bethlehem.scinexus.ResearchPaper.ResearchPaperModelAssembler;
 import edu.bethlehem.scinexus.SecurityConfig.JwtService;
@@ -46,14 +54,17 @@ public class UserService implements UserDetailsService {
     @PersistenceContext
     private EntityManager entityManager;
     private final UserRepository repository;
+    private final UserMongoRepository mongoRepository;
     private final ArticleRepository articleRepository;
     private final MediaRepository mediaRepository;
     private final NotificationRepository notificationRepository;
     private final ResearchPaperRepository researchPapersRepository;
+    private final PostRepository postRepository;
     private final ResearchPaperModelAssembler researchPapersAssembler;
     private final NotificationModelAssembler notificationAssembler;
     private final UserModelAssembler assembler;
     private final ArticleModelAssembler articleAssembler;
+    private final PostModelAssembler postAssembler;
     private final UserLinksRepository userLinksRepository;
     private final UserDocumentService userDocumentService;
 
@@ -117,7 +128,8 @@ public class UserService implements UserDetailsService {
                                             HttpStatus.NOT_FOUND));
                             setter = User.class.getMethod("set" + propertyName, Media.class);
                             setter.invoke(user, media);
-                        } else if (propertyName.equals("ContactEmail") || propertyName.equals("ContactPhoneNumber") || propertyName.equals("Languages")) {
+                        } else if (propertyName.equals("ContactEmail") || propertyName.equals("ContactPhoneNumber")
+                                || propertyName.equals("Languages")) {
                             setter = User.class.getMethod("set" + propertyName, method.getReturnType());
                             setter.invoke(user, value);
                         } else {
@@ -155,6 +167,19 @@ public class UserService implements UserDetailsService {
         logger.trace("Got user articles");
         logger.trace("returning user articles");
         return CollectionModel.of(articles, linkTo(methodOn(UserController.class).all()).withSelfRel());
+
+    }
+
+    public CollectionModel<EntityModel<Post>> getUserPosts(Authentication authentication) {
+        logger.debug("returning user posts");
+        Long userId = jwtService.extractId(authentication);
+        logger.trace("Got user with id: " + userId);
+        List<EntityModel<Post>> posts = postRepository.findByPublisherId(userId).stream()
+                .map(article -> postAssembler.toModel(article))
+                .collect(Collectors.toList());
+        logger.trace("Got user posts");
+        logger.trace("returning user posts");
+        return CollectionModel.of(posts, linkTo(methodOn(UserController.class).all()).withSelfRel());
 
     }
 
@@ -200,6 +225,12 @@ public class UserService implements UserDetailsService {
             repository.save(user);
             userDocumentService.updateUserStatus(user.getUsername(), Status.OFFLINE);
         }
+
+    }
+
+    public List<UserDocument> findConnectedUser() {
+        return mongoRepository.findAllByStatus(Status.ONLINE);
+
     }
 
     @Transactional

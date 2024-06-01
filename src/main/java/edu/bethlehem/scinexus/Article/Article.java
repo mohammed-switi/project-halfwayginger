@@ -17,14 +17,11 @@ import lombok.experimental.SuperBuilder;
 @DiscriminatorValue("article")
 public class Article extends Journal {
 
-
-    @NotNull(message = "The Article Subject Shouldn't Be Null")
-    @NotBlank(message = "The Article Subject Shouldn't Be Empty")
     private String subject;
 
-    @NotNull(message = "The Article title Shouldn't Be Null")
-    @NotBlank(message = "The Article title Shouldn't Be Empty")
     private String title;
+    @Column(length = 5000)
+    private String brief;
 
     public Article(String title, String content, String subject, User publisher) {
         super(content, publisher);

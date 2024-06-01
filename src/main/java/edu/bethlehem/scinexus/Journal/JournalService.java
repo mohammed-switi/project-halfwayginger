@@ -9,6 +9,10 @@ import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
@@ -87,13 +91,18 @@ public class JournalService {
     }
 
     // We Should Specify An Admin Authority To get All Journals
-    public CollectionModel<EntityModel<Journal>> findAllJournals() {
-        logger.trace("Finding All Journals");
-        return CollectionModel.of(journalRepository
-                .findAll()
-                .stream()
+    public CollectionModel<EntityModel<Journal>> findAllJournals(int pageNo, int pageSize) {
+        logger.trace("Finding All Journals by Page" + pageNo + " pageSize " + pageSize);
+        Sort sort = "ASC".equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by("content").ascending()
+                : Sort.by("createDateTime").descending();
+        Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
+
+        Page<Journal> journalPage = journalRepository.findAll(pageable);
+
+        List<EntityModel<Journal>> journalModels = journalPage.stream()
                 .map(assembler::toModel)
-                .collect(Collectors.toList()));
+                .collect(Collectors.toList());
+        return CollectionModel.of(journalModels);
 
     }
 

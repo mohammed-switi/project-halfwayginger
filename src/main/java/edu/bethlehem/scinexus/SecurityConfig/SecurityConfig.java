@@ -2,6 +2,8 @@ package edu.bethlehem.scinexus.SecurityConfig;
 
 import java.util.List;
 
+import javax.sql.DataSource;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
@@ -14,15 +16,11 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.oauth2.client.JdbcOAuth2AuthorizedClientService;
 import org.springframework.security.oauth2.client.JwtBearerOAuth2AuthorizedClientProvider;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientProvider;
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.security.oauth2.client.endpoint.DefaultAuthorizationCodeTokenResponseClient;
 import org.springframework.security.oauth2.client.endpoint.OAuth2AccessTokenResponseClient;
 import org.springframework.security.oauth2.client.endpoint.OAuth2AuthorizationCodeGrantRequest;
-import org.springframework.security.oauth2.client.web.HttpSessionOAuth2AuthorizationRequestRepository;
-import org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationProvider;
 import org.springframework.security.web.SecurityFilterChain;
@@ -36,8 +34,6 @@ import edu.bethlehem.scinexus.User.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
-import javax.sql.DataSource;
 
 @EnableWebSecurity
 @Configuration
@@ -59,11 +55,11 @@ public class SecurityConfig {
 
         @Bean
         public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-                httpSecurity // .cors(Customizer.withDefaults())
-                             // .exceptionHandling(customizer -> customizer.authenticationEntryPoint(new
-                             // HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
+
+                httpSecurity
+
                                 .csrf(AbstractHttpConfigurer::disable)
-                     //  .headers(header -> header.frameOptions(frameOptionsConfig -> frameOptionsConfig.disable()))
+                       .headers(header -> header.frameOptions(frameOptionsConfig -> frameOptionsConfig.disable()))
 //                                .cors(cors -> cors.configurationSource(request -> {
 //
 //                                        var corsConfiguration = new CorsConfiguration();
@@ -75,6 +71,7 @@ public class SecurityConfig {
 //                                        return corsConfiguration;
 //                                }))
                                   .cors(corsConfigurer -> corsConfigurer.configurationSource(corsConfigurationSource()))
+//                        .headers(headers -> headers.contentSecurityPolicy(contentSecurityPolicyConfig -> contentSecurityPolicyConfig.policyDirectives("frame-ancestors 'self' http://localhost:5173")))
 
                                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
                                                 .requestMatchers("/api/v1/auth/**").permitAll()
@@ -97,7 +94,7 @@ public class SecurityConfig {
                                                 .requestMatchers("/user.addUser").permitAll()
                                                 .requestMatchers("/user.disconnectUser").permitAll()
                                                 .requestMatchers("/connected-users").permitAll()
-
+                                                .requestMatchers("/medias/").permitAll()
                                                 .requestMatchers("/app/**").permitAll()
                                                 .requestMatchers("/actuator/**").permitAll()
                                                 .requestMatchers("/oauth2/authorization/google").permitAll()
@@ -184,8 +181,9 @@ public class SecurityConfig {
                                                 .requestMatchers(HttpMethod.GET,
                                                                 "/medias")
                                                 .access(authorizationManager.admin())
+                                        .requestMatchers(HttpMethod.GET, "/medias/{mediaId}/files").permitAll()
 
-                                                // Notifications
+                                        // Notifications
                                                 .requestMatchers(HttpMethod.GET,
                                                                 "/notifications/")
                                                 .access(authorizationManager.admin())

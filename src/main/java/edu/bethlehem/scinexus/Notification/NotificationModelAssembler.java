@@ -20,9 +20,7 @@ public class NotificationModelAssembler
                                                                 notification.getId()))
                                                 .withSelfRel(),
                                 linkTo(methodOn(NotificationController.class).all()).withRel(
-                                                "notifications"),
-                                linkTo(methodOn(PushNotificationController.class).streamLastMessage(null)).withRel(
-                                                "push-notification")
+                                                "notifications")
 
                 );
         }

@@ -17,7 +17,7 @@ public class JournalModelAssembler implements RepresentationModelAssembler<Journ
                                 linkTo(methodOn(
                                                 JournalController.class).one(journal.getId()))
                                                 .withSelfRel(),
-                                linkTo(methodOn(JournalController.class).all())
+                                linkTo(methodOn(JournalController.class).all(0,10))
                                                 .withRel("journals"),
                                 linkTo(methodOn(JournalController.class).addContributorNew(journal.getId(), null))
                                                 .withRel("addContributor"),

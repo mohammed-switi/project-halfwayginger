@@ -16,4 +16,5 @@ public class ArticleRequestPatchDTO extends JournalRequestPatchDTO {
 
     // @NotBlank(message = "The Article title Shouldn't Be Empty")
     private String title;
+    private String brief;
 }

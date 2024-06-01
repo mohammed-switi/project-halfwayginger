@@ -19,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import edu.bethlehem.scinexus.Article.Article;
 import edu.bethlehem.scinexus.Notification.Notification;
+import edu.bethlehem.scinexus.Post.Post;
 import edu.bethlehem.scinexus.ResearchPaper.ResearchPaper;
 import edu.bethlehem.scinexus.UserLinks.UserLinks;
 import edu.bethlehem.scinexus.UserLinks.UserLinksService;
@@ -61,7 +62,6 @@ public class UserController {
 
     }
 
-
     @PostMapping("/profilePicture")
     public ResponseEntity<?> changeProfilePicture(Authentication auth,
             @RequestParam("file") MultipartFile file) throws UserNotFoundException {
@@ -85,10 +85,15 @@ public class UserController {
         return ResponseEntity.ok(ulService.linkUser(authentication, userLinkTo));
     }
 
-    @PutMapping("/links/{userLinkTo}/response")
+    @GetMapping("/links/{userLinkTo}")
+    ResponseEntity<?> userLinkStatus(Authentication authentication, @PathVariable Long userLinkTo) {
+        return ResponseEntity.ok(ulService.userLinkStatus(authentication, userLinkTo));
+    }
+
+    @PutMapping("/links/{userLinkTo}/response/{answer}")
     public ResponseEntity<EntityModel<UserLinks>> respondToLinkage(Authentication authentication,
             @PathVariable Long userLinkTo,
-            @RequestBody Boolean answer) {
+            @PathVariable Boolean answer) {
         return ResponseEntity.ok(ulService.acceptLink(authentication, userLinkTo, answer));
     }
 
@@ -102,6 +107,12 @@ public class UserController {
     public ResponseEntity<CollectionModel<EntityModel<Article>>> getUserArticles(Authentication authentication)
             throws UserNotFoundException {
         return ResponseEntity.ok(service.getUserArticles(authentication));
+    }
+
+    @GetMapping("/posts")
+    public ResponseEntity<CollectionModel<EntityModel<Post>>> getUserposts(Authentication authentication)
+            throws UserNotFoundException {
+        return ResponseEntity.ok(service.getUserPosts(authentication));
     }
 
     @GetMapping("/articles/{articleId}")

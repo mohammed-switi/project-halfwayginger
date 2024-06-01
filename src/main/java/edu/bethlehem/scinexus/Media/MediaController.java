@@ -6,6 +6,10 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -78,57 +82,65 @@ public class MediaController {
     Media media = repository.findById(mediaId)
         .orElseThrow(() -> new MediaNotFoundException(mediaId, HttpStatus.NOT_FOUND));
     String filename = media.getFileName();
+
     // Checking whether the file requested for download exists or not
-    String fileUploadpath = System.getProperty("user.dir") + "/Uploads";
-    String[] filenames = this.getFiles();
-    boolean contains = Arrays.asList(filenames).contains(filename);
-    if (!contains) {
+    String fileUploadPath = System.getProperty("user.dir") + "/Uploads";
+    Path filePath = Paths.get(fileUploadPath, filename);
+    if (!Files.exists(filePath)) {
       return ResponseEntity.notFound().build();
     }
 
-    // Setting up the filepath
-    String filePath = fileUploadpath + File.separator + filename;
-
-    // Creating new file instance
-    File file = new File(filePath);
-
     // Creating a new InputStreamResource object
-    InputStreamResource resource = null;
+    InputStreamResource resource;
     try {
-      resource = new InputStreamResource(new FileInputStream(file));
+      resource = new InputStreamResource(new FileInputStream(filePath.toFile()));
     } catch (FileNotFoundException e) {
       throw new MediaNotFoundException(mediaId, HttpStatus.NOT_FOUND);
     }
 
     // Setting up values for contentType and headerValue
-    String contentType = "application/octet-stream";
-    String headerValue = "attachment; filename=\"" + resource.getFilename() +
-        "\"";
+    String contentType;
+    try {
+      contentType = Files.probeContentType(filePath);
+    } catch (IOException e) {
+      contentType = "application/octet-stream";
+    }
+
+    String headerValue = "inline; filename=\"" + filename + "\"";
 
     return ResponseEntity.ok()
         .contentType(MediaType.parseMediaType(contentType))
         .header(HttpHeaders.CONTENT_DISPOSITION, headerValue)
+        .header("X-FRAME-OPTIONS",
+            "ALLOW-FROM http://localhost:5173/")
         .body(resource);
+  }
 
+  // Assuming this is a method that returns the list of filenames in the upload
+  // directory
+
+  private String[] getFiles() {
+    File folder = new File(System.getProperty("user.dir") + "/Uploads");
+    return folder.list((dir, name) -> new File(dir, name).isFile());
   }
 
   // Getting list of filenames that have been uploaded
   // @RequestMapping(value = "/getFiles", method = RequestMethod.GET)
-  public String[] getFiles() {
-    String folderPath = System.getProperty("user.dir") + "/Uploads";
+  // public String[] getFiles() {
+  // String folderPath = System.getProperty("user.dir") + "/Uploads";
 
-    // Creating a new File instance
-    File directory = new File(folderPath);
+  // // Creating a new File instance
+  // File directory = new File(folderPath);
 
-    // list() method returns an array of strings
-    // naming the files and directories
-    // in the directory denoted by this abstract pathname
-    String[] filenames = directory.list();
+  // // list() method returns an array of strings
+  // // naming the files and directories
+  // // in the directory denoted by this abstract pathname
+  // String[] filenames = directory.list();
 
-    // returning the list of filenames
-    return filenames;
+  // // returning the list of filenames
+  // return filenames;
 
-  }
+  // }
 
   @DeleteMapping("/medias/{id}")
   ResponseEntity<?> deleteMedia(@PathVariable Long id) {

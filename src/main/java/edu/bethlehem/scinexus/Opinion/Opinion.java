@@ -27,6 +27,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Builder.Default;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Data
@@ -48,9 +50,11 @@ public class Opinion {
     private String content;
 
     @Min(value = 0)
-    private Integer interactionsCount;
+    @Default
+    private Integer interactionsCount = 0;
     @Min(value = 0)
-    private Integer opinionsCount;
+    @Default
+    private Integer opinionsCount = 0;
 
     @ManyToOne(fetch = FetchType.LAZY) // Fetch Type Has been Changed from Lazy To Eager, Because When I request one
                                        // opinion there is an error, and this is how I solved it
