@@ -10,11 +10,13 @@ import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.codec.ServerSentEvent;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
@@ -32,6 +34,8 @@ import reactor.core.scheduler.Schedulers;
 @Service
 @RequiredArgsConstructor
 public class NotificationService {
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
 
     private final JwtService jwtService;
     private final UserRepository userRepository;
@@ -118,6 +122,7 @@ public class NotificationService {
     public Flux<ServerSentEvent<List<Notification>>> getNotificationsByUserToID(Authentication auth) {
         Long userID = jwtService.extractId(auth);
         if (userID != null) {
+            System.out.println("User ID: " + userID);
             return Flux.interval(Duration.ofSeconds(15))
                     .publishOn(Schedulers.boundedElastic())
                     .map(sequence -> ServerSentEvent.<List<Notification>>builder().id(String.valueOf(sequence))
@@ -144,9 +149,11 @@ public class NotificationService {
             notification.setStatus(Status.UNSEEN);
             notification.setUser(notify);
             logger.debug("sending notifications to user with id: " + notify.getId());
+            // notify(notification, notify.getUsername());
             notifications.add(notification);
 
         }
+
         notificationRepository.saveAll(notifications);
     }
 
@@ -157,6 +164,23 @@ public class NotificationService {
         notification.setHyperLinkString(hyperLink.toString());
 
         notificationRepository.save(notification);
+    }
+
+    // The SimpMessagingTemplate is used to send Stomp over WebSocket messages.
+
+    /**
+     * Send notification to users subscribed on channel "/user/queue/notify".
+     * <p>
+     * The message will be sent only to the user with the given username.
+     *
+     * @param notification The notification message.
+     * @param username     The username for the user to send notification.
+     */
+    public void notify(Notification notification, String username) {
+        messagingTemplate.convertAndSendToUser(
+                username,
+                "/queue/notify",
+                notification);
     }
 
 }

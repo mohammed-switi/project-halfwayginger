@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
@@ -29,9 +30,10 @@ public class JournalController {
     }
 
     @GetMapping()
-    public ResponseEntity<CollectionModel<EntityModel<Journal>>> all() {
+    public ResponseEntity<CollectionModel<EntityModel<Journal>>> all(@RequestParam(defaultValue = "0") int pageNo,
+            @RequestParam(defaultValue = "10") int pageSize) {
 
-        return ResponseEntity.ok(service.findAllJournals());
+        return ResponseEntity.ok(service.findAllJournals(pageNo, pageSize));
     }
 
     @PatchMapping("/{journalId}/contributors/{contributorId}")

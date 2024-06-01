@@ -46,6 +46,7 @@ public class ArticleService {
                 .visibility(ArticleRequestDTO.getVisibility())
                 .title(ArticleRequestDTO.getTitle())
                 .subject(ArticleRequestDTO.getSubject())
+                .brief(ArticleRequestDTO.getBrief())
                 .publisher(getUserId(jwtService.extractId(authentication)))
                 .build();
     }

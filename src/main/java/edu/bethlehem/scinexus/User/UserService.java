@@ -29,6 +29,7 @@ import edu.bethlehem.scinexus.File.FileStorageService;
 import edu.bethlehem.scinexus.JPARepository.ArticleRepository;
 import edu.bethlehem.scinexus.JPARepository.MediaRepository;
 import edu.bethlehem.scinexus.JPARepository.NotificationRepository;
+import edu.bethlehem.scinexus.JPARepository.PostRepository;
 import edu.bethlehem.scinexus.JPARepository.ResearchPaperRepository;
 import edu.bethlehem.scinexus.JPARepository.UserRepository;
 import edu.bethlehem.scinexus.Media.Media;
@@ -36,6 +37,8 @@ import edu.bethlehem.scinexus.Media.MediaNotFoundException;
 import edu.bethlehem.scinexus.MongoRepository.UserMongoRepository;
 import edu.bethlehem.scinexus.Notification.Notification;
 import edu.bethlehem.scinexus.Notification.NotificationModelAssembler;
+import edu.bethlehem.scinexus.Post.Post;
+import edu.bethlehem.scinexus.Post.PostModelAssembler;
 import edu.bethlehem.scinexus.ResearchPaper.ResearchPaper;
 import edu.bethlehem.scinexus.ResearchPaper.ResearchPaperModelAssembler;
 import edu.bethlehem.scinexus.SecurityConfig.JwtService;
@@ -55,10 +58,12 @@ public class UserService implements UserDetailsService {
     private final MediaRepository mediaRepository;
     private final NotificationRepository notificationRepository;
     private final ResearchPaperRepository researchPapersRepository;
+    private final PostRepository postRepository;
     private final ResearchPaperModelAssembler researchPapersAssembler;
     private final NotificationModelAssembler notificationAssembler;
     private final UserModelAssembler assembler;
     private final ArticleModelAssembler articleAssembler;
+    private final PostModelAssembler postAssembler;
 
     @Autowired
     FileStorageService fileStorageManager;
@@ -120,7 +125,8 @@ public class UserService implements UserDetailsService {
                                             HttpStatus.NOT_FOUND));
                             setter = User.class.getMethod("set" + propertyName, Media.class);
                             setter.invoke(user, media);
-                        } else if (propertyName.equals("ContactEmail") || propertyName.equals("ContactPhoneNumber") || propertyName.equals("Languages")) {
+                        } else if (propertyName.equals("ContactEmail") || propertyName.equals("ContactPhoneNumber")
+                                || propertyName.equals("Languages")) {
                             setter = User.class.getMethod("set" + propertyName, method.getReturnType());
                             setter.invoke(user, value);
                         } else {
@@ -158,6 +164,19 @@ public class UserService implements UserDetailsService {
         logger.trace("Got user articles");
         logger.trace("returning user articles");
         return CollectionModel.of(articles, linkTo(methodOn(UserController.class).all()).withSelfRel());
+
+    }
+
+    public CollectionModel<EntityModel<Post>> getUserPosts(Authentication authentication) {
+        logger.debug("returning user posts");
+        Long userId = jwtService.extractId(authentication);
+        logger.trace("Got user with id: " + userId);
+        List<EntityModel<Post>> posts = postRepository.findByPublisherId(userId).stream()
+                .map(article -> postAssembler.toModel(article))
+                .collect(Collectors.toList());
+        logger.trace("Got user posts");
+        logger.trace("returning user posts");
+        return CollectionModel.of(posts, linkTo(methodOn(UserController.class).all()).withSelfRel());
 
     }
 
@@ -269,33 +288,33 @@ public class UserService implements UserDetailsService {
         return assembler.toModel(repository.save(user));
     }
 
-//    public  User registerOrUpdateOAuth2User(OAuth2User oAuth2User){
-//        String email = oAuth2User.getAttribute("email");
-//        Optional<User> existingUser= repository.findByEmail(email);
-//
-//        User user;
-//
-//        if(existingUser.isPresent()){
-//            user = existingUser.get();
-//        }else {
-//            user = new User();
-//            user.setEmail(email);
-//            user.setFirstName(oAuth2User.getAttribute("given_name"));
-//            user.setLastName(oAuth2User.getAttribute("family_name"));
-//            user.setUsername(email);
-//            user.setPassword("");
-//            user.setPosition(Position.ASSISTANT_PROFESSOR);
-//            user.setBadge("HEllo");
-//            user.setEducation("HEllo");
-//            user.setPhoneNumber("0593015525");
-//            user.setEnabled(true);
-//            user.setLocked(false);
-//            user.setRole(Role.ACADEMIC);
-//            repository.save(user);
-//        }
-//
-//        return  user;
-//    }
+    // public User registerOrUpdateOAuth2User(OAuth2User oAuth2User){
+    // String email = oAuth2User.getAttribute("email");
+    // Optional<User> existingUser= repository.findByEmail(email);
+    //
+    // User user;
+    //
+    // if(existingUser.isPresent()){
+    // user = existingUser.get();
+    // }else {
+    // user = new User();
+    // user.setEmail(email);
+    // user.setFirstName(oAuth2User.getAttribute("given_name"));
+    // user.setLastName(oAuth2User.getAttribute("family_name"));
+    // user.setUsername(email);
+    // user.setPassword("");
+    // user.setPosition(Position.ASSISTANT_PROFESSOR);
+    // user.setBadge("HEllo");
+    // user.setEducation("HEllo");
+    // user.setPhoneNumber("0593015525");
+    // user.setEnabled(true);
+    // user.setLocked(false);
+    // user.setRole(Role.ACADEMIC);
+    // repository.save(user);
+    // }
+    //
+    // return user;
+    // }
 
     public User registerOrUpdateOAuth2User(OAuth2User oAuth2User) {
         String email = oAuth2User.getAttribute("email");
@@ -359,7 +378,6 @@ public class UserService implements UserDetailsService {
         user.setRole(Role.ACADEMIC); // Example: Google users are academics
         return user;
     }
-
 
     public EntityModel<User> getUserInfo(Authentication authentication) {
         User user = jwtService.getUser(authentication);

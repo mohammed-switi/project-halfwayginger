@@ -137,7 +137,7 @@ public class JournalControllerTest {
         @Test
         public void JournalController_GET_AllJournals_ReturnAllJournals() throws Exception {
 
-                when(journalService.findAllJournals()).thenReturn(
+                when(journalService.findAllJournals(0, 10)).thenReturn(
                                 CollectionModel.of(List.of(EntityModel.of(journal), EntityModel.of(anotherJournal))));
 
                 ResultActions response = mockMvc.perform(get("/journals")

@@ -22,7 +22,9 @@ import edu.bethlehem.scinexus.Media.Media;
 import edu.bethlehem.scinexus.Opinion.Opinion;
 import edu.bethlehem.scinexus.User.User;
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorColumn;
+import jakarta.persistence.DiscriminatorType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -53,13 +55,20 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name = "journal_type")
+@DiscriminatorColumn(name = "journal_type", discriminatorType = DiscriminatorType.STRING)
 @JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class)
 
 public class Journal implements Serializable {
 
     @GeneratedValue(strategy = GenerationType.AUTO)
     private @Id Long id;
+
+    @Column(name = "journal_type", insertable = false, updatable = false)
+    private String journalType;
+
+    public String getJournalType() {
+        return journalType;
+    }
 
     @CreationTimestamp
     private LocalDateTime createDateTime;
@@ -77,8 +86,10 @@ public class Journal implements Serializable {
 
     @NotNull(message = "The Journal Content Shouldn't Be Null")
     @NotBlank(message = "The Journal Content Shouldn't Be Empty")
+    @Column(length = 10000)
     private String content;
 
+    private String keyPhrases;
     // add default value to be private
     @Enumerated(EnumType.STRING)
     @NotNull(message = "The Journal Visibility Shouldn't Be Null")
@@ -113,6 +124,7 @@ public class Journal implements Serializable {
     @JoinColumn(name = "journal")
     // @JsonBackReference
     private List<Media> medias;
+    private Integer viewsCount;
 
     // @ManyToMany(mappedBy = "contributors", fetch = FetchType.EAGER)
     // @JdbcTypeCode(SqlTypes.JSON)

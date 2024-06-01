@@ -52,13 +52,26 @@ public class UserLinksService {
             throw new UserNotFoundException("the users are already linked", HttpStatus.CONFLICT);
         if (linkFrom.getId() == linkToId)
             throw new UserNotFoundException("users cannot link to themselves", HttpStatus.CONFLICT);
-        UserLinks ul = new UserLinks(linkFrom, linkTo);
+        UserLinks ul = new UserLinks(linkTo, linkFrom);
         ulr.save(ul);
         notificationService.notifyUser(linkTo, linkFrom.getFirstName() + " has requested to Link with you",
                 linkTo(methodOn(
                         UserController.class).respondToLinkage(null, linkToId, null)));
 
         return ulAssembler.toModel(ulr.save(ul));
+
+    }
+
+    public EntityModel<UserLinks> userLinkStatus(Authentication auth, Long linkToId) {
+        User linkFrom = jwtService.getUser(auth);
+        User linkTo = jwtService.getUser(linkToId);
+
+        UserLinks ul = ulr.findByLinksFromAndLinksTo(linkFrom, linkTo);
+        if (ul == null)
+            ul = ulr.findByLinksFromAndLinksTo(linkTo, linkFrom);
+        if (ul == null)
+            throw new UserNotFoundException("there is no link", HttpStatus.NOT_FOUND);
+        return ulAssembler.toModel(ul);
 
     }
 
