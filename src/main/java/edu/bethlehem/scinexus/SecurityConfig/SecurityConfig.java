@@ -63,7 +63,7 @@ public class SecurityConfig {
                              // .exceptionHandling(customizer -> customizer.authenticationEntryPoint(new
                              // HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
                                 .csrf(AbstractHttpConfigurer::disable)
-                //        .headers(header -> header.frameOptions(frameOptionsConfig -> frameOptionsConfig.disable()))
+                     //  .headers(header -> header.frameOptions(frameOptionsConfig -> frameOptionsConfig.disable()))
 //                                .cors(cors -> cors.configurationSource(request -> {
 //
 //                                        var corsConfiguration = new CorsConfiguration();
