@@ -144,10 +144,9 @@ public class UserController {
 
     @DeleteMapping("/{id}")
     ResponseEntity<?> deleteUser(@PathVariable Long id) throws UserNotFoundException {
-            service.deleteUser(id);
+        service.deleteUser(id);
         return ResponseEntity.noContent().build();
     }
-
 
     @GetMapping("/people-you-may-know")
     public ResponseEntity<List<PeopleYouMayKnowResponseDTO>> getPeopleYouMayKnow(Authentication authentication) {

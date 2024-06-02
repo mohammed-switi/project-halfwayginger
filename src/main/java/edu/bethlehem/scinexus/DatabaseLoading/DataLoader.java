@@ -47,7 +47,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class DataLoader implements CommandLineRunner {
 
-
     private final UserRepository userRepository;
 
     private final ArticleRepository articleRepository;
@@ -149,7 +148,7 @@ public class DataLoader implements CommandLineRunner {
 
                 if (!ulService.areTheyLinked(linkFrom, linkTo) && linkFrom != linkTo) {
                     UserLinks ul = new UserLinks(linkTo, linkFrom);
-//                    if (random.nextInt(2) == 1)
+                    if (random.nextInt(2) == 1)
                         ul.setAccepted(true);
                     userLinksRepository.save(ul);
                 }
@@ -304,7 +303,7 @@ public class DataLoader implements CommandLineRunner {
         for (User user : users) {
             for (int i = 0; i < 2; i++) {
 
-                Post post = new Post(dataGenerator.generateRandomWords(), user);
+                Post post = new Post(dataGenerator.generateMaxLorem(10), user);
                 post.setInteractionsCount(0);
                 post.setOpinionsCount(0);
                 post.setVisibility(dataGenerator.generateRandomVisibility());
