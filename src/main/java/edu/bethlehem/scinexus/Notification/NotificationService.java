@@ -85,6 +85,16 @@ public class NotificationService {
         return CollectionModel.of(notifications, linkTo(methodOn(NotificationController.class).all()).withSelfRel());
     }
 
+    public CollectionModel<EntityModel<Notification>> findMyNotifications(Authentication auth) {
+        User user = jwtService.getUser(auth);
+        List<EntityModel<Notification>> notifications = notificationRepository
+                .findByUser(user)
+                .stream()
+                .map(assembler::toModel)
+                .collect(Collectors.toList());
+        return CollectionModel.of(notifications, linkTo(methodOn(NotificationController.class).all()).withSelfRel());
+    }
+
     public Notification saveNotification(Notification notification) {
         return notificationRepository.save(notification);
     }

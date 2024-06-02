@@ -2,6 +2,7 @@ package edu.bethlehem.scinexus.Notification;
 
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,6 +27,11 @@ public class NotificationController {
   @GetMapping()
   CollectionModel<EntityModel<Notification>> all() {
     return service.findAllNotifications();
+  }
+
+  @GetMapping("/mine")
+  CollectionModel<EntityModel<Notification>> mine(Authentication authentication) {
+    return service.findMyNotifications(authentication);
   }
 
   // @PostMapping("/{userId}")
