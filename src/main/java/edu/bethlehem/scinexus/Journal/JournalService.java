@@ -172,6 +172,15 @@ public class JournalService {
         return assembler.toModel(journalRepository.save(journal));
     }
 
+    CollectionModel<EntityModel<Journal>> search(String query) {
+        logger.trace("Searching Journals by Query: " + query);
+        List<EntityModel<Journal>> journals = journalRepository.findByContentLike("%" + query + "%")
+                .stream()
+                .map(assembler::toModel)
+                .collect(Collectors.toList());
+        return CollectionModel.of(journals);
+    }
+
     public EntityModel<Journal> deattachMedia(Long journalId, MediaIdDTO mediaIds) {
         Journal journal = journalRepository.findById(journalId)
                 .orElseThrow(() -> new JournalNotFoundException(journalId, HttpStatus.NOT_FOUND));
@@ -216,6 +225,5 @@ public class JournalService {
                 .collect(Collectors.toList());
         return CollectionModel.of(opinions);
     }
-
 
 }

@@ -48,7 +48,13 @@ public class AuthorizationManager {
             throws JournalNotFoundException {
 
         return (authentication, object) -> {
-            Long journalId = Long.parseLong(object.getVariables().get("journalId"));
+            Long journalId;
+            try {
+                journalId = Long.parseLong(object.getVariables().get("journalId"));
+
+            } catch (Exception e) {
+                return new AuthorizationDecision(true);
+            }
             Journal journal = journalRepository.findById(journalId)
                     .orElseThrow(() -> new JournalNotFoundException(journalId,
                             HttpStatus.NOT_FOUND));
@@ -233,7 +239,6 @@ public class AuthorizationManager {
 
         };
     }
-
 
     @Bean
     public org.springframework.security.authorization.AuthorizationManager<RequestAuthorizationContext> countOwner() {

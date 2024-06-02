@@ -74,7 +74,9 @@ public class JournalController {
         return ResponseEntity.ok(service.deattachMedia(journalId, mediaIds));
     }
 
-
-
+    @GetMapping("/search")
+    public ResponseEntity<?> search(@RequestParam String query) {
+        return ResponseEntity.ok(service.search(query));
+    }
 
 }

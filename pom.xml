@@ -42,7 +42,12 @@
 			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
 			<version>2.5.0</version>
 		</dependency>
-
+		<!-- https://mvnrepository.com/artifact/org.hibernate.search/hibernate-search-mapper-orm -->
+		<dependency>
+			<groupId>org.hibernate.search</groupId>
+			<artifactId>hibernate-search-mapper-orm</artifactId>
+			<version>7.1.1.Final</version>
+		</dependency>
 
 		<!--
 		https://mvnrepository.com/artifact/org.springframework.security/spring-security-oauth2-jose -->

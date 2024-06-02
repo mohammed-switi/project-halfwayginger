@@ -59,19 +59,22 @@ public class SecurityConfig {
                 httpSecurity
 
                                 .csrf(AbstractHttpConfigurer::disable)
-                       .headers(header -> header.frameOptions(frameOptionsConfig -> frameOptionsConfig.disable()))
-//                                .cors(cors -> cors.configurationSource(request -> {
-//
-//                                        var corsConfiguration = new CorsConfiguration();
-//                                        corsConfiguration.setAllowedOrigins(List.of("http://localhost:5173"));
-//                                        corsConfiguration.setAllowedMethods(
-//                                                        List.of("GET", "POST", "PUT", "DELETE", "PATCH","OPTIONS"));
-//                                        corsConfiguration.setAllowedHeaders(List.of("*"));
-//                                        corsConfiguration.setAllowCredentials(true);
-//                                        return corsConfiguration;
-//                                }))
-                                  .cors(corsConfigurer -> corsConfigurer.configurationSource(corsConfigurationSource()))
-//                        .headers(headers -> headers.contentSecurityPolicy(contentSecurityPolicyConfig -> contentSecurityPolicyConfig.policyDirectives("frame-ancestors 'self' http://localhost:5173")))
+                                .headers(header -> header.frameOptions(frameOptionsConfig -> frameOptionsConfig
+                                                .disable()))
+                                // .cors(cors -> cors.configurationSource(request -> {
+                                //
+                                // var corsConfiguration = new CorsConfiguration();
+                                // corsConfiguration.setAllowedOrigins(List.of("http://localhost:5173"));
+                                // corsConfiguration.setAllowedMethods(
+                                // List.of("GET", "POST", "PUT", "DELETE", "PATCH","OPTIONS"));
+                                // corsConfiguration.setAllowedHeaders(List.of("*"));
+                                // corsConfiguration.setAllowCredentials(true);
+                                // return corsConfiguration;
+                                // }))
+                                .cors(corsConfigurer -> corsConfigurer.configurationSource(corsConfigurationSource()))
+                                // .headers(headers -> headers.contentSecurityPolicy(contentSecurityPolicyConfig
+                                // -> contentSecurityPolicyConfig.policyDirectives("frame-ancestors 'self'
+                                // http://localhost:5173")))
 
                                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
                                                 .requestMatchers("/api/v1/auth/**").permitAll()
@@ -144,6 +147,10 @@ public class SecurityConfig {
                                                                 "/journals/{journalId}")
                                                 .access(authorizationManager.readJournals())
 
+                                                .requestMatchers(HttpMethod.GET,
+                                                                "/journals/**")
+                                                .access(authorizationManager.countOwner()) // this is open forevryone
+
                                                 .requestMatchers(HttpMethod.DELETE,
                                                                 "/journals/{journalId}/contributors/{contributorId}")
                                                 .access(authorizationManager.journalOwnerNew())
@@ -181,9 +188,9 @@ public class SecurityConfig {
                                                 .requestMatchers(HttpMethod.GET,
                                                                 "/medias")
                                                 .access(authorizationManager.admin())
-                                        .requestMatchers(HttpMethod.GET, "/medias/{mediaId}/files").permitAll()
+                                                .requestMatchers(HttpMethod.GET, "/medias/{mediaId}/files").permitAll()
 
-                                        // Notifications
+                                                // Notifications
                                                 .requestMatchers(HttpMethod.GET,
                                                                 "/notifications/")
                                                 .access(authorizationManager.admin())
@@ -228,11 +235,11 @@ public class SecurityConfig {
                                                 .access(authorizationManager.readJournals())
 
                                                 // researchpapers
-                                        .requestMatchers(HttpMethod.GET,
-                                                "/researchpapers/count")
-                                        .access( authorizationManager.countOwner())
+                                                .requestMatchers(HttpMethod.GET,
+                                                                "/researchpapers/count")
+                                                .access(authorizationManager.countOwner())
 
-                                        .requestMatchers(HttpMethod.GET,
+                                                .requestMatchers(HttpMethod.GET,
                                                                 "/researchpapers")
                                                 .access(authorizationManager.admin())
 
