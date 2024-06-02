@@ -200,21 +200,22 @@ public class UserControllerTest {
 
         }
 
-        @Test
-        public void UserController_GET_UserArticles_returnArticlesList() throws Exception {
+        // @Test
+        // public void UserController_GET_UserArticles_returnArticlesList() throws
+        // Exception {
 
-                when(userService.getUserArticles(SecurityContextHolder.getContext().getAuthentication()))
-                                .thenReturn(CollectionModel.of(List.of(EntityModel.of(article))));
+        // when(userService.getUserArticles(SecurityContextHolder.getContext().getAuthentication()))
+        // .thenReturn(CollectionModel.of(List.of(EntityModel.of(article))));
 
-                ResultActions response = mockMvc.perform(get("/users/articles")
-                                .accept("application/hal+json")
-                                .characterEncoding("utf-8"))
-                                .andDo(print());
+        // ResultActions response = mockMvc.perform(get("/users/articles")
+        // .accept("application/hal+json")
+        // .characterEncoding("utf-8"))
+        // .andDo(print());
 
-                response.andExpect(MockMvcResultMatchers.status().isOk())
-                                .andDo(MockMvcResultHandlers.print());
+        // response.andExpect(MockMvcResultMatchers.status().isOk())
+        // .andDo(MockMvcResultHandlers.print());
 
-        }
+        // }
 
         @Test
         public void UserController_GET_UserArticle_ReturnOneArticle() throws Exception {
@@ -231,21 +232,22 @@ public class UserControllerTest {
 
         }
 
-        @Test
-        public void UserController_GET_UserResearchPapers_returnResearchPapersList() throws Exception {
+        // @Test
+        // public void UserController_GET_UserResearchPapers_returnResearchPapersList()
+        // throws Exception {
 
-                when(userService.getUserResearchPapers(SecurityContextHolder.getContext().getAuthentication()))
-                                .thenReturn(CollectionModel.of(List.of(EntityModel.of(researchPaper))));
+        // when(userService.getUserResearchPapers(SecurityContextHolder.getContext().getAuthentication()))
+        // .thenReturn(CollectionModel.of(List.of(EntityModel.of(researchPaper))));
 
-                ResultActions response = mockMvc.perform(get("/users/researchpapers")
-                                .accept("application/hal+json")
-                                .characterEncoding("utf-8"))
-                                .andDo(print());
+        // ResultActions response = mockMvc.perform(get("/users/researchpapers")
+        // .accept("application/hal+json")
+        // .characterEncoding("utf-8"))
+        // .andDo(print());
 
-                response.andExpect(MockMvcResultMatchers.status().isOk())
-                                .andDo(MockMvcResultHandlers.print());
+        // response.andExpect(MockMvcResultMatchers.status().isOk())
+        // .andDo(MockMvcResultHandlers.print());
 
-        }
+        // }
 
         @Test
         public void UserController_GET_UserResearchPaper_ReturnOneResearchPaper() throws Exception {

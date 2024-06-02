@@ -83,8 +83,8 @@ public class UserLinksService {
         UserLinks ul = ulr.findByLinksFromAndLinksTo(linkFrom, linkTo);
         if (ul == null)
             throw new UserNotFoundException("You are not the one to accept the linkage", HttpStatus.UNAUTHORIZED);
-        if (ul.getAccepted())
-            throw new UserNotFoundException("The Linkage is already accepted");
+        // if (ul.getAccepted())
+        // throw new UserNotFoundException("The Linkage is already accepted");
         if (!answer) {
             ulr.delete(ul);
             return ulAssembler.toModel(ul);

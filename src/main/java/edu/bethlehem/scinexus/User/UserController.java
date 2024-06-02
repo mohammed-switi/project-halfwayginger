@@ -103,16 +103,17 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/articles")
-    public ResponseEntity<CollectionModel<EntityModel<Article>>> getUserArticles(Authentication authentication)
+    @GetMapping("{userId}/articles")
+    public ResponseEntity<CollectionModel<EntityModel<Article>>> getUserArticles(@PathVariable Long userId)
             throws UserNotFoundException {
-        return ResponseEntity.ok(service.getUserArticles(authentication));
+        return ResponseEntity.ok(service.getUserArticles(userId));
     }
 
-    @GetMapping("/posts")
-    public ResponseEntity<CollectionModel<EntityModel<Post>>> getUserposts(Authentication authentication)
+    @GetMapping("{userId}/posts")
+    public ResponseEntity<CollectionModel<EntityModel<Post>>> getUserposts(
+            @PathVariable Long userId)
             throws UserNotFoundException {
-        return ResponseEntity.ok(service.getUserPosts(authentication));
+        return ResponseEntity.ok(service.getUserPosts(userId));
     }
 
     @GetMapping("/articles/{articleId}")
@@ -121,11 +122,11 @@ public class UserController {
         return service.getUserArticle(articleId, authentication);
     }
 
-    @GetMapping("/researchpapers")
+    @GetMapping("{userId}/researchpapers")
     public ResponseEntity<CollectionModel<EntityModel<ResearchPaper>>> getUserResearchPapers(
-            Authentication authentication)
+            @PathVariable Long userId)
             throws UserNotFoundException {
-        return ResponseEntity.ok(service.getUserResearchPapers(authentication));
+        return ResponseEntity.ok(service.getUserResearchPapers(userId));
     }
 
     @GetMapping("/researchpapers/{researchPaperId}")

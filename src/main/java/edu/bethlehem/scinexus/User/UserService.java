@@ -157,9 +157,8 @@ public class UserService implements UserDetailsService {
         return false;
     }
 
-    public CollectionModel<EntityModel<Article>> getUserArticles(Authentication authentication) {
+    public CollectionModel<EntityModel<Article>> getUserArticles(Long userId) {
         logger.debug("returning user articles");
-        Long userId = jwtService.extractId(authentication);
         logger.trace("Got user with id: " + userId);
         List<EntityModel<Article>> articles = articleRepository.findByPublisherId(userId).stream()
                 .map(article -> articleAssembler.toModel(article))
@@ -170,9 +169,8 @@ public class UserService implements UserDetailsService {
 
     }
 
-    public CollectionModel<EntityModel<Post>> getUserPosts(Authentication authentication) {
+    public CollectionModel<EntityModel<Post>> getUserPosts(Long userId) {
         logger.debug("returning user posts");
-        Long userId = jwtService.extractId(authentication);
         logger.trace("Got user with id: " + userId);
         List<EntityModel<Post>> posts = postRepository.findByPublisherId(userId).stream()
                 .map(article -> postAssembler.toModel(article))
@@ -194,9 +192,8 @@ public class UserService implements UserDetailsService {
 
     }
 
-    public CollectionModel<EntityModel<ResearchPaper>> getUserResearchPapers(Authentication authentication) {
+    public CollectionModel<EntityModel<ResearchPaper>> getUserResearchPapers(Long userId) {
         logger.debug("returning user ResearchPapers");
-        Long userId = jwtService.extractId(authentication);
         logger.trace("Got user with id: " + userId);
         List<EntityModel<ResearchPaper>> researchPapers = researchPapersRepository.findByPublisherId(userId).stream()
                 .map(researchPapersAssembler::toModel)
@@ -235,11 +232,12 @@ public class UserService implements UserDetailsService {
 
     @Transactional
     public void deleteUser(Long userId) {
-//        logger.debug("deleting user with id: " + userId);
-//        User user = repository.findById(userId)
-//                .orElseThrow(() -> new UserNotFoundException("The user with id:" + userId + " is not found",
-//                        HttpStatus.NOT_FOUND));
-     logger.trace("Got user with id: " + userId);
+        // logger.debug("deleting user with id: " + userId);
+        // User user = repository.findById(userId)
+        // .orElseThrow(() -> new UserNotFoundException("The user with id:" + userId + "
+        // is not found",
+        // HttpStatus.NOT_FOUND));
+        logger.trace("Got user with id: " + userId);
 
         repository.deleteByIdCustom(userId);
         logger.trace("Deleted user with id: " + userId);
@@ -288,33 +286,33 @@ public class UserService implements UserDetailsService {
         return assembler.toModel(repository.save(user));
     }
 
-//    public  User registerOrUpdateOAuth2User(OAuth2User oAuth2User){
-//        String email = oAuth2User.getAttribute("email");
-//        Optional<User> existingUser= repository.findByEmail(email);
-//
-//        User user;
-//
-//        if(existingUser.isPresent()){
-//            user = existingUser.get();
-//        }else {
-//            user = new User();
-//            user.setEmail(email);
-//            user.setFirstName(oAuth2User.getAttribute("given_name"));
-//            user.setLastName(oAuth2User.getAttribute("family_name"));
-//            user.setUsername(email);
-//            user.setPassword("");
-//            user.setPosition(Position.ASSISTANT_PROFESSOR);
-//            user.setBadge("HEllo");
-//            user.setEducation("HEllo");
-//            user.setPhoneNumber("0593015525");
-//            user.setEnabled(true);
-//            user.setLocked(false);
-//            user.setRole(Role.ACADEMIC);
-//            repository.save(user);
-//        }
-//
-//        return  user;
-//    }
+    // public User registerOrUpdateOAuth2User(OAuth2User oAuth2User){
+    // String email = oAuth2User.getAttribute("email");
+    // Optional<User> existingUser= repository.findByEmail(email);
+    //
+    // User user;
+    //
+    // if(existingUser.isPresent()){
+    // user = existingUser.get();
+    // }else {
+    // user = new User();
+    // user.setEmail(email);
+    // user.setFirstName(oAuth2User.getAttribute("given_name"));
+    // user.setLastName(oAuth2User.getAttribute("family_name"));
+    // user.setUsername(email);
+    // user.setPassword("");
+    // user.setPosition(Position.ASSISTANT_PROFESSOR);
+    // user.setBadge("HEllo");
+    // user.setEducation("HEllo");
+    // user.setPhoneNumber("0593015525");
+    // user.setEnabled(true);
+    // user.setLocked(false);
+    // user.setRole(Role.ACADEMIC);
+    // repository.save(user);
+    // }
+    //
+    // return user;
+    // }
 
     public User registerOrUpdateOAuth2User(OAuth2User oAuth2User) {
         String email = oAuth2User.getAttribute("email");
@@ -378,7 +376,6 @@ public class UserService implements UserDetailsService {
         user.setRole(Role.ACADEMIC); // Example: Google users are academics
         return user;
     }
-
 
     public EntityModel<User> getUserInfo(Authentication authentication) {
         User user = jwtService.getUser(authentication);
