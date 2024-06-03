@@ -25,7 +25,9 @@ import edu.bethlehem.scinexus.UserLinks.UserLinks;
 import edu.bethlehem.scinexus.UserLinks.UserLinksService;
 import lombok.RequiredArgsConstructor;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -152,6 +154,14 @@ public class UserController {
     @GetMapping("/people-you-may-know")
     public ResponseEntity<List<PeopleYouMayKnowResponseDTO>> getPeopleYouMayKnow(Authentication authentication) {
         return ResponseEntity.ok(service.getPeopleYouMayKnow(authentication));
+    }
+
+    @GetMapping("/links/count")
+    public ResponseEntity<?> getLinksCount (Authentication authentication){
+
+        Map<String, String> map = new HashMap<>();
+        map.put("count", String.valueOf(ulService.getUserLinksCount(authentication)));
+        return ResponseEntity.ok(map);
     }
 
 }

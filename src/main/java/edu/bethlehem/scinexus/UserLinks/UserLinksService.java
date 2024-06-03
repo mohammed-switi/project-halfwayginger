@@ -5,6 +5,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 import java.util.List;
 
+import org.slf4j.Logger;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
@@ -114,6 +115,14 @@ public class UserLinksService {
         User user = jwtService.getUser(auth);
         List<UserLinks> links = ulr.findByLinksFromOrLinksTo(user, user);
         return ulAssembler.toCollectionModel(links);
+    }
+
+    public Long getUserLinksCount(Authentication auth) {
+        User user = jwtService.getUser(auth);
+        List<UserLinks> links = ulr.findByLinksFromOrLinksTo(user, user);
+        Long count = links.stream().count();
+
+        return (long) count;
     }
 
 }
