@@ -8,6 +8,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import edu.bethlehem.scinexus.User.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageConversionException;
@@ -34,6 +37,8 @@ import jakarta.validation.ConstraintViolationException;
 @ControllerAdvice
 public class RestExceptionHandler {
 
+        Logger logger = LoggerFactory.getLogger(RestExceptionHandler.class);
+
         @ExceptionHandler(GeneralException.class)
         ResponseEntity<GeneralErrorResponse> restExceptionHandler(GeneralException ex) {
 
@@ -44,6 +49,7 @@ public class RestExceptionHandler {
                                 .timestamp(new Date(System.currentTimeMillis()))
                                 .throwable(ex.getCause())
                                 .build();
+                logger.error(errorResponse.toString());
 
                 return new ResponseEntity<>(errorResponse, ex.getHttpStatus());
 
@@ -58,6 +64,8 @@ public class RestExceptionHandler {
                                 .timestamp(new Date(System.currentTimeMillis()))
                                 .throwable(ex.getCause())
                                 .build();
+                logger.error(errorResponse.toString());
+
                 return new ResponseEntity<>(errorResponse, ex.getHttpStatus());
 
         }
@@ -95,6 +103,7 @@ public class RestExceptionHandler {
                                 .validationError(errors)
                                 .throwable(ex.getCause())
                                 .build();
+                logger.error(errorResponse.toString());
 
                 return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
         }
